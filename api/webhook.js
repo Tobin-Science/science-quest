@@ -4,27 +4,7 @@
 // access token + their email) and generate their 150 student codes.
 // Registered in Stripe for the single event: checkout.session.completed
 // =====================================================================
-import { stripe, WEBHOOK_SECRET, adminDb, genToken, genCodes, sendEmail, questEmailHtml } from './_shared.js';
-
-// Give this owner 150 codes, collision-proof at any scale: insert
-// candidates skipping any that already exist (code is globally unique),
-// then top up the shortfall and repeat until the owner has 150. This
-// converges no matter how full the global pool gets.
-async function insertCodes(db, ownerId) {
-  for (let attempt = 0; attempt < 50; attempt++) {
-    const { count, error: cErr } = await db.from('quest_codes')
-      .select('code', { count: 'exact', head: true })
-      .eq('owner', ownerId);
-    if (cErr) throw cErr;
-    const have = count || 0;
-    if (have >= 150) return;
-    const rows = genCodes(150 - have).map(code => ({ code, owner: ownerId }));
-    const { error } = await db.from('quest_codes')
-      .upsert(rows, { onConflict: 'code', ignoreDuplicates: true });
-    if (error) throw error;
-  }
-  throw new Error('could not generate enough unique codes');
-}
+import { stripe, WEBHOOK_SECRET, adminDb, provisionOwner } from './_shared.js';
 
 export async function POST(request) {
   const sig = request.headers.get('stripe-signature');
@@ -60,25 +40,7 @@ export async function POST(request) {
       if (existing) return new Response('already processed', { status: 200 });
     }
 
-    const token = genToken();
-    const { data: owner, error: oErr } = await db.from('quest_owners')
-      .insert({
-        access_token: token,
-        email,
-        source: 'purchase',
-        stripe_customer: customer,
-        stripe_payment_intent: paymentIntent
-      })
-      .select('id').single();
-    if (oErr) throw oErr;
-
-    await insertCodes(db, owner.id);
-
-    // Best-effort welcome email (no-op until Resend is configured; never
-    // fails the webhook — the welcome page already delivers the link).
-    if (email) {
-      try { await sendEmail({ to: email, subject: 'Your Science Quest dashboard + 150 codes', html: questEmailHtml(token) }); } catch (e) {}
-    }
+    await provisionOwner(db, { email, source: 'purchase', stripe_customer: customer, stripe_payment_intent: paymentIntent });
     return new Response('ok', { status: 200 });
   } catch (e) {
     // 500 -> Stripe retries the webhook later.

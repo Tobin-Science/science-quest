@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Science Quest — Free for Cherokee County teachers</title>
+<style>
+  :root{--gold:#d4a747;--gold-bright:#f4d160;--gold-dark:#8b6914;--parchment:#f4e4bc;--parchment-dark:#c4a766;--stone-dark:#2a2520;--stone-light:#5a4f44;--good:#7ec46b;--danger:#e0a0a0}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:radial-gradient(ellipse at 50% -10%,#4a4036 0%,var(--stone-dark) 55%,#1c1815 100%);
+    color:var(--parchment);font-family:'Crimson Pro',Georgia,serif;text-align:center}
+  .box{width:100%;max-width:420px;background:linear-gradient(180deg,rgba(61,53,48,0.92),rgba(42,37,32,0.92));
+    border:1px solid var(--gold-dark);border-radius:10px;padding:30px 28px;box-shadow:0 8px 30px rgba(0,0,0,0.5)}
+  .ic{font-size:38px}
+  h1{font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:21px;letter-spacing:1px;color:var(--gold-bright);margin:8px 0}
+  p{color:var(--parchment-dark);font-size:15px;line-height:1.6}
+  label{display:block;font-family:'Cinzel',Georgia,serif;font-size:12px;letter-spacing:2px;color:var(--gold);margin:18px 0 8px;text-align:left}
+  input{width:100%;font-size:16px;padding:12px;border-radius:6px;border:1px solid var(--gold-dark);background:rgba(0,0,0,0.45);color:var(--gold-bright)}
+  input:focus{outline:none;border-color:var(--gold-bright)}
+  button{width:100%;font-family:'Cinzel',Georgia,serif;font-size:15px;letter-spacing:1px;margin-top:16px;padding:13px;border-radius:7px;cursor:pointer;border:1px solid var(--gold-dark);background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#2a2008;font-weight:700}
+  .msg{margin-top:16px;padding:12px 14px;border-radius:7px;font-size:15px}
+  .msg.ok{background:rgba(99,153,34,0.16);color:var(--good)}
+  .msg.err{background:rgba(96,32,32,0.3);color:var(--danger)}
+  .hide{display:none}
+  a{color:var(--gold-bright)}
+</style>
+</head>
+<body>
+<div class="box">
+  <div id="form">
+    <div class="ic">&#127979;</div>
+    <h1>Free for Cherokee County teachers</h1>
+    <p>Enter your <b>@cherokeek12.net</b> school email and we'll send you a one-click activation link — no payment needed.</p>
+    <label for="email">Your school email</label>
+    <input id="email" type="email" placeholder="you@cherokeek12.net" onkeydown="if(event.key==='Enter')send()">
+    <button onclick="send()" id="btn">Send my free activation link</button>
+    <div id="msg"></div>
+    <p style="margin-top:16px;font-size:13px">Not a Cherokee teacher? <a href="/">Get Science Quest here.</a></p>
+  </div>
+  <div id="done" class="hide">
+    <div class="ic">&#128231;</div>
+    <h1>Check your inbox</h1>
+    <p>We've sent an activation link to your school email. Click it to unlock Science Quest and your 150 codes. (Check spam/quarantine if it's not there in a minute.)</p>
+  </div>
+</div>
+<script>
+async function send(){
+  var email = (document.getElementById('email').value || '').trim();
+  var msg = document.getElementById('msg');
+  if(!email){ document.getElementById('email').focus(); return; }
+  var btn = document.getElementById('btn'); btn.disabled = true; btn.textContent = 'Sending…';
+  try{
+    var r = await fetch('/api/district-request', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email:email }) });
+    var j = await r.json().catch(function(){return {};});
+    if(!r.ok){
+      msg.className='msg err'; msg.textContent = j.error || 'Something went wrong — please try again.';
+      btn.disabled=false; btn.textContent='Send my free activation link'; return;
+    }
+    document.getElementById('form').classList.add('hide');
+    document.getElementById('done').classList.remove('hide');
+  }catch(e){
+    msg.className='msg err'; msg.textContent='Something went wrong — please try again.';
+    btn.disabled=false; btn.textContent='Send my free activation link';
+  }
+}
+</script>
+</body>
+</html>

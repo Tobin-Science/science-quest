@@ -102,7 +102,7 @@ export function questEmailHtml(token) {
   const play = (SITE_ORIGIN || '') + '/play.html';
   return '<div style="font-family:Georgia,serif;max-width:540px;margin:auto;color:#2a2520;line-height:1.6">' +
     '<h1 style="color:#8b6914">Your Science Quest is ready &#9876;</h1>' +
-    '<p>Thanks for your purchase! Below is your <b>private teacher dashboard</b> — bookmark it; it\'s how you manage your 150 student codes.</p>' +
+    '<p>Your Science Quest access is ready. Below is your <b>private teacher dashboard</b> — bookmark it; it\'s how you manage your 150 student codes.</p>' +
     '<p><a href="' + dash + '" style="display:inline-block;background:#d4a747;color:#2a2008;font-weight:bold;padding:12px 22px;border-radius:6px;text-decoration:none">Open my dashboard</a></p>' +
     '<p style="font-size:13px;color:#666;word-break:break-all">Or paste this link into your browser:<br>' + dash + '</p>' +
     '<hr style="border:none;border-top:1px solid #ddd;margin:18px 0">' +
@@ -114,4 +114,52 @@ export function questEmailHtml(token) {
     '</ol>' +
     '<p style="font-size:13px;color:#666;margin-top:16px">Keep this email — anyone with your dashboard link can manage your codes.</p>' +
   '</div>';
+}
+
+// Create an owner (purchase OR free district) + their 150 codes + welcome
+// email. Shared by the Stripe webhook and the district-free flow so both
+// paths behave identically.
+export async function provisionOwner(db, { email, source = 'purchase', stripe_customer = null, stripe_payment_intent = null }) {
+  const token = genToken();
+  const { data: owner, error } = await db.from('quest_owners')
+    .insert({ access_token: token, email: email || null, source, stripe_customer, stripe_payment_intent })
+    .select('id').single();
+  if (error) throw error;
+
+  // 150 codes, collision-proof top-up.
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const { count } = await db.from('quest_codes')
+      .select('code', { count: 'exact', head: true }).eq('owner', owner.id);
+    const have = count || 0;
+    if (have >= 150) break;
+    const rows = genCodes(150 - have).map(code => ({ code, owner: owner.id }));
+    const { error: e2 } = await db.from('quest_codes').upsert(rows, { onConflict: 'code', ignoreDuplicates: true });
+    if (e2) throw e2;
+  }
+
+  if (email) {
+    try { await sendEmail({ to: email, subject: 'Your Science Quest dashboard + 150 codes', html: questEmailHtml(token) }); } catch (e) {}
+  }
+  return token;
+}
+
+// Signed, expiring token for district email verification — no DB row
+// needed. HMAC keyed by the service-role secret (server-only).
+function _districtKey() { return process.env.SUPABASE_SERVICE_ROLE_KEY || 'fallback-key'; }
+export function signDistrictToken(email) {
+  const payload = Buffer.from(JSON.stringify({ e: String(email).toLowerCase(), x: Date.now() + 1000 * 60 * 60 * 24 })).toString('base64url');
+  const sig = crypto.createHmac('sha256', _districtKey()).update(payload).digest('base64url');
+  return payload + '.' + sig;
+}
+export function verifyDistrictToken(token) {
+  const parts = String(token || '').split('.');
+  if (parts.length !== 2) return null;
+  const [payload, sig] = parts;
+  const expect = crypto.createHmac('sha256', _districtKey()).update(payload).digest('base64url');
+  if (sig.length !== expect.length) return null;
+  try { if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expect))) return null; } catch (e) { return null; }
+  let data;
+  try { data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')); } catch (e) { return null; }
+  if (!data || !data.e || !data.x || Date.now() > data.x) return null;
+  return data.e;
 }
