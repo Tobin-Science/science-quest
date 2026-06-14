@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/",
-      "has": [{ "type": "host", "value": "^tobinscience\\.com$" }],
+      "has": [{ "type": "host", "value": "^(www\\.)?tobinscience\\.com$" }],
       "destination": "/home.html"
     }
   ]
