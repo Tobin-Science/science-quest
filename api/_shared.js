@@ -46,12 +46,14 @@ export function genToken() {
   return crypto.randomBytes(24).toString('base64url');
 }
 
-// Student codes like 'QUEST-7K2P'. Deliberately avoids look-alike
-// characters (no O/0, I/1, L) so kids type them correctly.
+// Student codes like 'QUEST-7K2PX'. Deliberately avoids look-alike
+// characters (no O/0, I/1, L) so kids type them correctly. 5 chars over a
+// 31-char alphabet = ~28.6 million combos, so the pool stays sparse even
+// with hundreds of thousands of codes (collisions stay negligible).
 const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export function makeCode() {
   let s = '';
-  for (let i = 0; i < 4; i++) s += ALPHA[crypto.randomInt(ALPHA.length)];
+  for (let i = 0; i < 5; i++) s += ALPHA[crypto.randomInt(ALPHA.length)];
   return 'QUEST-' + s;
 }
 // 150 codes unique within the batch. The DB also enforces global

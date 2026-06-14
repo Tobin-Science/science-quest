@@ -6,16 +6,24 @@
 // =====================================================================
 import { stripe, WEBHOOK_SECRET, adminDb, genToken, genCodes } from './_shared.js';
 
-// Insert 150 codes; on the rare cross-owner code collision (Postgres
-// unique violation 23505) regenerate the whole batch and retry.
+// Give this owner 150 codes, collision-proof at any scale: insert
+// candidates skipping any that already exist (code is globally unique),
+// then top up the shortfall and repeat until the owner has 150. This
+// converges no matter how full the global pool gets.
 async function insertCodes(db, ownerId) {
-  for (let attempt = 0; attempt < 6; attempt++) {
-    const rows = genCodes(150).map(code => ({ code, owner: ownerId }));
-    const { error } = await db.from('quest_codes').insert(rows);
-    if (!error) return;
-    if (error.code !== '23505') throw error;   // a real error, not a duplicate
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const { count, error: cErr } = await db.from('quest_codes')
+      .select('code', { count: 'exact', head: true })
+      .eq('owner', ownerId);
+    if (cErr) throw cErr;
+    const have = count || 0;
+    if (have >= 150) return;
+    const rows = genCodes(150 - have).map(code => ({ code, owner: ownerId }));
+    const { error } = await db.from('quest_codes')
+      .upsert(rows, { onConflict: 'code', ignoreDuplicates: true });
+    if (error) throw error;
   }
-  throw new Error('could not generate unique codes after several attempts');
+  throw new Error('could not generate enough unique codes');
 }
 
 export async function POST(request) {
