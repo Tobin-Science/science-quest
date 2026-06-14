@@ -1,0 +1,11 @@
+{
+  "name": "science-quest",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Science Quest — standalone one-time purchase + 150 student codes.",
+  "dependencies": {
+    "stripe": "^17.5.0",
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
