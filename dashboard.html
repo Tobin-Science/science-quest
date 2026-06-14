@@ -37,6 +37,7 @@
   button.danger{border-color:#7a4040;color:var(--danger);background:rgba(96,32,32,0.35)}
   .mono{font-family:monospace;font-size:13px;background:rgba(0,0,0,0.4);border:1px solid var(--gold-dark);border-radius:5px;padding:8px 12px;color:var(--gold-bright);word-break:break-all}
   .hint{font-size:14px;color:var(--parchment-dark);font-style:italic;margin-top:6px}
+  .ta{width:100%;height:130px;background:rgba(0,0,0,0.45);border:1px solid var(--gold-dark);border-radius:5px;color:var(--gold-bright);font-family:monospace;font-size:13px;padding:10px;resize:vertical}
   .msg{text-align:center;padding:50px 20px;color:var(--parchment-dark)}
   .msg h1{margin-bottom:12px}
   @media print{
@@ -105,9 +106,19 @@ function render(){
     '<div class="grid">'+grid+'</div>'+
     '<div class="links noprint">'+
       '<button class="primary" onclick="window.print()">&#128424; Print class set</button>'+
+      '<button onclick="toggleRoster()">&#9776; Paste class roster</button>'+
       '<button class="danger" onclick="resetYear()">&#8635; Reset for new year</button>'+
     '</div>'+
-    '<div class="hint noprint">Tip: click any code to label it with a student\'s name (optional).</div>'+
+    '<div id="rosterPanel" class="noprint" style="display:none;margin-top:14px">'+
+      '<div class="lbl">Paste your roster &middot; one student per line</div>'+
+      '<textarea class="ta" id="rosterText" placeholder="Tyler M.&#10;Jordan P.&#10;Alex R."></textarea>'+
+      '<div class="links" style="margin-top:8px">'+
+        '<button class="primary" onclick="assignRoster()">Assign to codes</button>'+
+        '<button onclick="toggleRoster()">Cancel</button>'+
+      '</div>'+
+      '<div class="hint">Names fill your codes in order, top to bottom. You can still click any code afterward to edit it.</div>'+
+    '</div>'+
+    '<div class="hint noprint" style="margin-top:8px">Tip: or click any single code to label it by hand.</div>'+
   '</div>'+
 
   '<div class="card noprint">'+
@@ -130,6 +141,26 @@ async function labelCode(code){
     var c = DATA.codes.find(function(x){return x.code===code;}); if(c) c.label = name.trim().slice(0,60);
     render();
   }catch(e){ alert('Could not save label: '+e.message); }
+}
+
+function toggleRoster(){
+  var p = el('rosterPanel'); if(!p) return;
+  p.style.display = (p.style.display==='none') ? 'block' : 'none';
+  if(p.style.display==='block'){ var t=el('rosterText'); if(t) t.focus(); }
+}
+
+async function assignRoster(){
+  var raw = (el('rosterText')||{}).value || '';
+  var names = raw.split(/\r?\n/).map(function(s){return s.trim();}).filter(Boolean);
+  if(!names.length){ alert('Paste at least one student name (one per line).'); return; }
+  if(!confirm('Assign '+names.length+' student'+(names.length===1?'':'s')+' to your first '+names.length+' code'+(names.length===1?'':'s')+'?\n\nThis replaces any names currently on those codes.')) return;
+  try{
+    var r = await api('assign-roster', { token:KEY, names:names });
+    await load();
+    var note = 'Assigned '+r.assigned+' student'+(r.assigned===1?'':'s')+' to codes.';
+    if(r.overflow>0) note += '\n\nNote: '+r.overflow+" name"+(r.overflow===1?'':'s')+" didn't fit — you have "+r.capacity+" codes total.";
+    alert(note);
+  }catch(e){ alert('Could not assign roster: '+e.message); }
 }
 
 async function resetYear(){
