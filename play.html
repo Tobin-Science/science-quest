@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Science Quest — Play</title>
+<style>
+  :root{
+    --gold:#d4a747;--gold-bright:#f4d160;--gold-dark:#8b6914;
+    --parchment:#f4e4bc;--parchment-dark:#c4a766;
+    --stone-dark:#2a2520;--stone-light:#5a4f44;
+    --good:#7ec46b;--good-bg:rgba(99,153,34,0.16);--danger:#e0a0a0;--danger-bg:rgba(96,32,32,0.3);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:radial-gradient(ellipse at 50% -10%,#4a4036 0%,var(--stone-dark) 55%,#1c1815 100%);
+    color:var(--parchment);font-family:'Crimson Pro',Georgia,serif}
+  .box{width:100%;max-width:400px;background:linear-gradient(180deg,rgba(61,53,48,0.92),rgba(42,37,32,0.92));
+    border:1px solid var(--gold-dark);border-radius:10px;padding:28px;box-shadow:0 8px 30px rgba(0,0,0,0.5)}
+  .crest{text-align:center;margin-bottom:20px}
+  .crest .ic{font-size:34px}
+  h1{font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:22px;letter-spacing:2px;color:var(--gold-bright);margin-top:6px}
+  .crest .sub{color:var(--parchment-dark);font-size:15px;margin-top:4px}
+  label{display:block;font-family:'Cinzel',Georgia,serif;font-size:12px;letter-spacing:2px;color:var(--gold);margin-bottom:8px}
+  input{width:100%;font-family:monospace;font-size:18px;letter-spacing:2px;text-align:center;text-transform:uppercase;
+    padding:12px;border-radius:6px;border:1px solid var(--gold-dark);background:rgba(0,0,0,0.45);color:var(--gold-bright)}
+  input:focus{outline:none;border-color:var(--gold-bright)}
+  button{width:100%;font-family:'Cinzel',Georgia,serif;font-size:15px;letter-spacing:1px;margin-top:16px;
+    padding:13px;border-radius:7px;cursor:pointer;border:1px solid var(--gold-dark);
+    background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#2a2008;font-weight:700}
+  button:hover{filter:brightness(1.08)}
+  button.ghost{background:rgba(0,0,0,0.3);color:var(--parchment-dark);font-weight:400}
+  .msg{margin-top:14px;padding:11px 14px;border-radius:7px;font-size:15px;text-align:center}
+  .msg.ok{background:var(--good-bg);color:var(--good)}
+  .msg.err{background:var(--danger-bg);color:var(--danger)}
+  .foot{margin-top:18px;border-top:1px solid var(--stone-light);padding-top:14px;font-size:13px;color:var(--parchment-dark);line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+  .note{text-align:center;font-size:13px;color:var(--stone-light);margin-top:12px}
+  .gamebox{margin-top:14px;border:1px dashed var(--gold-dark);border-radius:8px;padding:26px 16px;text-align:center;color:var(--parchment-dark);font-style:italic}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="crest"><div class="ic">&#9876;</div><h1>SCIENCE QUEST</h1><div class="sub" id="sub">Enter your code to play</div></div>
+
+  <div id="form">
+    <label for="code">Your play code</label>
+    <input id="code" placeholder="QUEST-XXXXX" autocomplete="off" onkeydown="if(event.key==='Enter')go()">
+    <button onclick="go()">&#9654;&nbsp; Start playing</button>
+    <div id="msg"></div>
+    <div class="note">Your teacher gives you this code.</div>
+  </div>
+
+  <div id="playing" class="hide">
+    <div class="msg ok" id="welcome"></div>
+    <div class="gamebox">The game will load here.<br><span style="font-size:12px">(We'll wire the full game in next.)</span></div>
+    <div class="foot"><span>&#128190;</span><span>Your character saves on this computer. On a different device, enter the same code — then use your Save Code from the game to bring your progress.</span></div>
+    <button class="ghost" onclick="switchStudent()">Not you? Enter a different code</button>
+  </div>
+</div>
+
+<script>
+var STORE = 'sq_play_code';
+function el(id){ return document.getElementById(id); }
+
+async function validate(code){
+  var r = await fetch('/api/validate-code', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ code:code }) });
+  return r.json();
+}
+
+function showPlaying(returning){
+  el('form').classList.add('hide');
+  el('playing').classList.remove('hide');
+  el('sub').textContent = 'You\'re in!';
+  el('welcome').innerHTML = returning
+    ? '&#10003; Welcome back! Same seat as before.'
+    : '&#10003; Code accepted! Your seat is claimed.';
+}
+
+async function go(){
+  var code = (el('code').value || '').trim().toUpperCase();
+  var msg = el('msg');
+  if(!code){ msg.className='msg err'; msg.textContent='Type your code first.'; return; }
+  msg.className='msg'; msg.textContent='Checking…';
+  try{
+    var res = await validate(code);
+    if(res.ok){
+      try{ localStorage.setItem(STORE, code); }catch(e){}
+      showPlaying(res.returning);
+    }else{
+      msg.className='msg err';
+      msg.textContent = res.reason==='not found' ? "We don't recognize that code. Check with your teacher." : (res.reason||'That code did not work.');
+    }
+  }catch(e){ msg.className='msg err'; msg.textContent='Something went wrong — try again.'; }
+}
+
+function switchStudent(){
+  try{ localStorage.removeItem(STORE); }catch(e){}
+  el('playing').classList.add('hide');
+  el('form').classList.remove('hide');
+  el('sub').textContent = 'Enter your code to play';
+  el('code').value=''; el('msg').textContent=''; el('code').focus();
+}
+
+// Auto-resume on the same device if a code is remembered and still valid.
+(async function(){
+  var saved = '';
+  try{ saved = localStorage.getItem(STORE) || ''; }catch(e){}
+  if(!saved) return;
+  try{
+    var res = await validate(saved);
+    if(res.ok) showPlaying(res.returning);
+    else { try{ localStorage.removeItem(STORE); }catch(e){} }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
