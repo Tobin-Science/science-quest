@@ -38,6 +38,8 @@
   .mono{font-family:monospace;font-size:13px;background:rgba(0,0,0,0.4);border:1px solid var(--gold-dark);border-radius:5px;padding:8px 12px;color:var(--gold-bright);word-break:break-all}
   .hint{font-size:14px;color:var(--parchment-dark);font-style:italic;margin-top:6px}
   .ta{width:100%;height:130px;background:rgba(0,0,0,0.45);border:1px solid var(--gold-dark);border-radius:5px;color:var(--gold-bright);font-family:monospace;font-size:13px;padding:10px;resize:vertical}
+  .tips{background:rgba(0,0,0,0.3);border:1px solid var(--gold-dark);border-radius:8px;padding:14px 18px;font-size:15px;color:var(--parchment)}
+  .tips li{margin-bottom:6px}
   .msg{text-align:center;padding:50px 20px;color:var(--parchment-dark)}
   .msg h1{margin-bottom:12px}
   @media print{
@@ -123,9 +125,22 @@ function render(){
 
   '<div class="card noprint">'+
     '<div class="lbl">Teacher tools</div>'+
-    '<div class="links" style="margin-bottom:18px">'+
+    '<div class="links" style="margin-bottom:10px">'+
       '<button onclick="openAsset(\'leaderboard\')">&#127942; Open Hall of Champions</button>'+
-      '<button onclick="openAsset(\'guide\')">&#128214; Strategy guide (PDF)</button>'+
+      '<button onclick="toggleTips()">&#128161; Leaderboard tips</button>'+
+      '<button onclick="openAsset(\'guide\')">&#128214; Strategy Guide &mdash; print for students</button>'+
+    '</div>'+
+    '<div id="tipsPanel" class="tips" style="display:none;margin-bottom:18px">'+
+      '<div style="font-family:\'Cinzel\',Georgia,serif;color:var(--gold);font-size:12px;letter-spacing:2px;margin-bottom:10px">USING THE LEADERBOARD TO BOOST ENGAGEMENT</div>'+
+      '<ul style="margin:0;padding-left:18px">'+
+        '<li>Project the Hall of Champions during class &mdash; a warm-up or end-of-week ritual.</li>'+
+        '<li>Name a &ldquo;Champion of the Week&rdquo; &mdash; a quick shout-out to the top climber.</li>'+
+        '<li>Reset per <em>unit</em>, not just per year, so everyone gets a fresh shot.</li>'+
+        '<li>Celebrate more than level &mdash; best gear, rarest pet, most gold.</li>'+
+        '<li>Recognize &ldquo;most improved,&rdquo; not only #1.</li>'+
+        '<li>Run period-vs-period rivalry &mdash; name a separate board per class period.</li>'+
+        '<li>Remind students the way to climb is by mastering the science.</li>'+
+      '</ul>'+
     '</div>'+
     '<div class="lbl">Student play link &middot; share with your class</div>'+
     '<div class="links"><span class="mono" style="flex:1">'+esc(playLink)+'</span>'+
@@ -150,6 +165,11 @@ async function labelCode(code){
 
 function openAsset(asset){
   window.open('/api/teacher-file?token=' + encodeURIComponent(KEY) + '&asset=' + asset, '_blank');
+}
+
+function toggleTips(){
+  var p = el('tipsPanel'); if(!p) return;
+  p.style.display = (p.style.display==='none') ? 'block' : 'none';
 }
 
 function toggleRoster(){
