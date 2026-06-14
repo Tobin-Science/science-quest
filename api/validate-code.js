@@ -4,7 +4,7 @@
 // code, claim the seat (stamp activated_at the first time) and say OK.
 // Re-entering the same code is fine and never uses a second seat.
 // =====================================================================
-import { adminDb, signAsset, corsHeaders, json } from './_shared.js';
+import { adminDb, corsHeaders, json } from './_shared.js';
 
 export async function OPTIONS(request) {
   return new Response(null, { status: 204, headers: corsHeaders(request.headers.get('origin')) });
@@ -31,10 +31,7 @@ export async function POST(request) {
         .update({ activated_at: new Date().toISOString() }).eq('code', code);
       if (uErr) throw uErr;
     }
-    // Hand out a short-lived signed link to the protected game (null if
-    // the game file hasn't been uploaded yet — the seat still claims fine).
-    const gameUrl = await signAsset(db, 'game.html', 14400); // 4 hours
-    return json({ ok: true, returning, gameUrl }, 200, origin);
+    return json({ ok: true, returning }, 200, origin);
   } catch (e) {
     return json({ error: e.message }, 500, origin);
   }

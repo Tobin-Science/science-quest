@@ -68,23 +68,18 @@ async function validate(code){
   return r.json();
 }
 
-var GAME_URL = '';
-function showPlaying(returning, gameUrl){
+var PLAY_CODE = '';
+function showPlaying(returning, code){
   el('form').classList.add('hide');
   el('playing').classList.remove('hide');
   el('sub').textContent = 'You\'re in!';
   el('welcome').innerHTML = returning
     ? '&#10003; Welcome back! Same seat as before.'
     : '&#10003; Code accepted! Your seat is claimed.';
-  GAME_URL = gameUrl || '';
-  var gb = el('gamebox');
-  if(GAME_URL){
-    gb.innerHTML = '<button onclick="enterGame()" style="margin-top:0">&#9654;&nbsp; Enter the game</button>';
-  } else {
-    gb.innerHTML = 'The game will load here.<br><span style="font-size:12px">(Almost ready — the game is being set up.)</span>';
-  }
+  PLAY_CODE = code || '';
+  el('gamebox').innerHTML = '<button onclick="enterGame()" style="margin-top:0">&#9654;&nbsp; Enter the game</button>';
 }
-function enterGame(){ if(GAME_URL) window.location.href = GAME_URL; }
+function enterGame(){ if(PLAY_CODE) window.location.href = '/api/game?code=' + encodeURIComponent(PLAY_CODE); }
 
 async function go(){
   var code = (el('code').value || '').trim().toUpperCase();
@@ -95,7 +90,7 @@ async function go(){
     var res = await validate(code);
     if(res.ok){
       try{ localStorage.setItem(STORE, code); }catch(e){}
-      showPlaying(res.returning, res.gameUrl);
+      showPlaying(res.returning, code);
     }else{
       msg.className='msg err';
       msg.textContent = res.reason==='not found' ? "We don't recognize that code. Check with your teacher." : (res.reason||'That code did not work.');
@@ -118,7 +113,7 @@ function switchStudent(){
   if(!saved) return;
   try{
     var res = await validate(saved);
-    if(res.ok) showPlaying(res.returning, res.gameUrl);
+    if(res.ok) showPlaying(res.returning, saved);
     else { try{ localStorage.removeItem(STORE); }catch(e){} }
   }catch(e){}
 })();
