@@ -3,6 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  /* On the umbrella domain (tobinscience.com / www), send the root to the
+     home page. The quest subdomain is untouched, so the store is unaffected. */
+  (function(){
+    var h = location.hostname;
+    if ((h === 'tobinscience.com' || h === 'www.tobinscience.com') && location.pathname === '/') {
+      location.replace('/home.html');
+    }
+  })();
+</script>
 <title>Science Quest — Classroom RPG ($19.99, one-time)</title>
 <style>
   :root{--gold:#d4a747;--gold-bright:#f4d160;--gold-dark:#8b6914;--parchment:#f4e4bc;--parchment-dark:#c4a766;--stone-dark:#2a2520;--stone:#3d3530;--stone-light:#5a4f44;--good:#7ec46b}
