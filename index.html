@@ -3,23 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Science Quest</title>
+<title>Science Quest — Classroom RPG ($19.99, one-time)</title>
 <style>
-  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
-    background:radial-gradient(ellipse at 50% -10%,#4a4036 0%,#2a2520 55%,#1c1815 100%);
-    color:#f4e4bc;font-family:Georgia,serif;text-align:center;padding:24px}
-  .box{max-width:520px}
-  h1{font-size:34px;letter-spacing:3px;color:#f4d160;margin:0 0 8px}
-  p{color:#c4a766;font-size:17px;line-height:1.6}
-  .soon{margin-top:18px;font-size:14px;color:#8b6914;letter-spacing:2px;text-transform:uppercase}
+  :root{--gold:#d4a747;--gold-bright:#f4d160;--gold-dark:#8b6914;--parchment:#f4e4bc;--parchment-dark:#c4a766;--stone-dark:#2a2520;--stone:#3d3530;--stone-light:#5a4f44;--good:#7ec46b}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:radial-gradient(ellipse at 50% -8%,#4a4036 0%,var(--stone-dark) 55%,#1c1815 100%);color:var(--parchment);font-family:'Crimson Pro',Georgia,serif;font-size:17px;line-height:1.6;padding:40px 18px 70px}
+  .wrap{max-width:760px;margin:0 auto}
+  .hero{text-align:center;margin-bottom:40px}
+  .hero .ic{font-size:54px}
+  h1{font-family:'Cinzel',Georgia,serif;font-weight:900;font-size:40px;letter-spacing:4px;color:var(--gold-bright);text-shadow:0 2px 0 var(--gold-dark);margin:6px 0}
+  .tag{font-size:19px;color:var(--parchment-dark);max-width:520px;margin:6px auto 0}
+  .pricetag{display:inline-block;margin-top:20px;font-family:'Cinzel',Georgia,serif;font-size:15px;letter-spacing:1px;color:var(--gold);border:1px solid var(--gold-dark);border-radius:30px;padding:8px 20px}
+  .pricetag b{color:var(--gold-bright);font-size:18px}
+  .cta{display:block;width:100%;max-width:340px;margin:22px auto 0;font-family:'Cinzel',Georgia,serif;font-size:18px;letter-spacing:1px;padding:16px;border-radius:9px;cursor:pointer;border:1px solid var(--gold-dark);background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#2a2008;font-weight:700}
+  .cta:hover{filter:brightness(1.08)}
+  .cta:disabled{opacity:.7;cursor:default}
+  .reassure{font-size:14px;color:var(--parchment-dark);margin-top:10px}
+  .card{background:linear-gradient(180deg,rgba(61,53,48,0.9),rgba(42,37,32,0.9));border:1px solid var(--gold-dark);border-radius:10px;padding:24px 28px;margin-bottom:20px}
+  h2{font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:20px;letter-spacing:2px;color:var(--gold-bright);margin-bottom:14px;text-align:center}
+  .inc{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;font-size:17px}
+  .inc .ck{color:var(--good);font-weight:700;flex:0 0 auto}
+  .steps{display:grid;gap:14px}
+  .step{display:flex;gap:14px;align-items:flex-start}
+  .num{flex:0 0 34px;height:34px;border-radius:50%;background:var(--stone);border:1px solid var(--gold);color:var(--gold-bright);font-family:'Cinzel',Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .step b{color:var(--gold-bright);font-weight:600}
+  .note{background:rgba(0,0,0,0.3);border:1px solid var(--stone-light);border-radius:8px;padding:14px 16px;font-size:15px;color:var(--parchment-dark);margin-top:8px}
+  .note b{color:var(--gold)}
+  .district{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:15px;color:var(--parchment-dark)}
+  .district b{color:var(--good)}
+  .canceled{display:none;background:rgba(96,32,32,0.3);border:1px solid #7a4040;color:#e0b3b3;border-radius:8px;padding:10px 14px;text-align:center;margin-bottom:20px;font-size:15px}
+  footer{text-align:center;color:var(--stone-light);font-size:13px;margin-top:30px}
 </style>
 </head>
 <body>
-  <div class="box">
-    <div style="font-size:44px">&#9876;</div>
+<div class="wrap">
+
+  <div class="canceled" id="canceled">Checkout canceled — no charge was made. You can try again any time.</div>
+
+  <div class="hero">
+    <div class="ic">&#9876;</div>
     <h1>SCIENCE QUEST</h1>
-    <p>An educational RPG for the science classroom.<br>The store is being set up.</p>
-    <div class="soon">Coming soon</div>
+    <p class="tag">An educational RPG that turns your science class into an adventure your students actually want to play.</p>
+    <div class="pricetag"><b>$19.99</b> &middot; one-time &middot; yours forever</div>
+    <button class="cta" id="buy" onclick="buy()">Buy Science Quest &mdash; $19.99</button>
+    <div class="reassure">A one-time purchase, never a subscription. Reuse it with new students every year.</div>
   </div>
+
+  <div class="card">
+    <h2>What you get</h2>
+    <div class="inc"><span class="ck">&#10003;</span><span>The full <b>Science Quest</b> RPG &mdash; the complete adventure game.</span></div>
+    <div class="inc"><span class="ck">&#10003;</span><span><b>150 student play codes</b> &mdash; hand one to each student; reset and reuse them every year.</span></div>
+    <div class="inc"><span class="ck">&#10003;</span><span><b>Hall of Champions</b> &mdash; a class leaderboard to track and celebrate progress.</span></div>
+    <div class="inc"><span class="ck">&#10003;</span><span><b>Strategy Guide (PDF)</b> &mdash; print or share with your students.</span></div>
+  </div>
+
+  <div class="card">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step"><div class="num">1</div><div>You buy once for <b>$19.99</b> and get your own private teacher dashboard.</div></div>
+      <div class="step"><div class="num">2</div><div>Your dashboard holds <b>150 student codes</b> &mdash; paste your roster to auto-fill them, then print.</div></div>
+      <div class="step"><div class="num">3</div><div>Each student enters their code and <b>plays the game</b> &mdash; no accounts, no logins.</div></div>
+      <div class="step"><div class="num">4</div><div>Watch everyone climb the <b>leaderboard</b>. At year's end, hit <b>Reset</b> and reuse it all &mdash; no second purchase.</div></div>
+    </div>
+    <div class="district"><span>&#127979;</span><span><b>Cherokee County teacher?</b> Science Quest is included free with your school email. (Free access coming soon &mdash; check back.)</span></div>
+  </div>
+
+  <button class="cta" id="buy2" onclick="buy()">Buy Science Quest &mdash; $19.99</button>
+  <div class="reassure" style="text-align:center">You'll get your codes instantly after checkout.</div>
+
+  <footer>Science Quest &middot; a one-time classroom purchase. Secure checkout by Stripe.</footer>
+</div>
+
+<script>
+if(new URLSearchParams(location.search).get('canceled')) document.getElementById('canceled').style.display='block';
+
+async function buy(){
+  var btns = [document.getElementById('buy'), document.getElementById('buy2')];
+  btns.forEach(function(b){ if(b){ b.disabled=true; b.textContent='Loading…'; } });
+  try{
+    var r = await fetch('/api/create-checkout', { method:'POST', headers:{'Content-Type':'application/json'}, body:'{}' });
+    var j = await r.json();
+    if(j.url){ location.href = j.url; return; }
+    throw new Error(j.error || 'Could not start checkout');
+  }catch(e){
+    alert('Sorry — could not start checkout: ' + e.message);
+    btns.forEach(function(b){ if(b){ b.disabled=false; b.textContent='Buy Science Quest — $19.99'; } });
+  }
+}
+</script>
 </body>
 </html>
