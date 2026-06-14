@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Science Quest — Teacher Dashboard</title>
+<style>
+  :root{
+    --gold:#d4a747;--gold-bright:#f4d160;--gold-dark:#8b6914;
+    --parchment:#f4e4bc;--parchment-dark:#c4a766;
+    --stone-dark:#2a2520;--stone:#3d3530;--stone-light:#5a4f44;
+    --good:#7ec46b;--good-bg:rgba(99,153,34,0.18);--danger:#e0a0a0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;background:radial-gradient(ellipse at 50% -10%,#4a4036 0%,var(--stone-dark) 55%,#1c1815 100%);
+    color:var(--parchment);font-family:'Crimson Pro',Georgia,serif;font-size:17px;padding:28px 18px 64px}
+  .wrap{max-width:1000px;margin:0 auto}
+  .crest{text-align:center;margin-bottom:22px}
+  h1{font-family:'Cinzel',Georgia,serif;font-weight:900;font-size:30px;letter-spacing:3px;color:var(--gold-bright);text-shadow:0 2px 0 var(--gold-dark)}
+  .sub{font-size:13px;letter-spacing:3px;color:var(--parchment-dark);margin-top:6px;text-transform:uppercase}
+  .card{background:linear-gradient(180deg,rgba(61,53,48,0.92),rgba(42,37,32,0.92));border:1px solid var(--gold-dark);border-radius:8px;padding:20px 24px;margin-bottom:18px;box-shadow:0 6px 24px rgba(0,0,0,0.4)}
+  .lbl{font-family:'Cinzel',Georgia,serif;font-size:12px;letter-spacing:2px;color:var(--gold);margin-bottom:8px}
+  .meterrow{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .big{font-size:26px;font-weight:600;color:var(--gold-bright)}
+  .bar{height:9px;background:rgba(0,0,0,0.4);border-radius:99px;overflow:hidden;margin:10px 0 4px}
+  .bar>div{height:100%;background:var(--good);width:0%}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin:14px 0}
+  .code{background:rgba(0,0,0,0.35);border:1px solid var(--stone-light);border-radius:6px;padding:9px 6px;text-align:center;cursor:pointer;font-family:monospace;font-size:14px;color:var(--gold-bright)}
+  .code:hover{border-color:var(--gold)}
+  .code.on{background:var(--good-bg);border-color:var(--good)}
+  .code .lab{display:block;font-family:'Crimson Pro',Georgia,serif;font-size:11px;color:var(--parchment-dark);margin-top:3px;min-height:13px}
+  .code .mark{display:block;font-size:10px;color:var(--good);margin-top:2px}
+  .links{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px}
+  button{font-family:'Cinzel',Georgia,serif;font-size:13px;letter-spacing:1px;padding:10px 18px;border-radius:5px;cursor:pointer;border:1px solid var(--gold-dark);background:rgba(0,0,0,0.3);color:var(--parchment)}
+  button:hover{filter:brightness(1.1)}
+  button.primary{background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#2a2008;font-weight:700}
+  button.danger{border-color:#7a4040;color:var(--danger);background:rgba(96,32,32,0.35)}
+  .mono{font-family:monospace;font-size:13px;background:rgba(0,0,0,0.4);border:1px solid var(--gold-dark);border-radius:5px;padding:8px 12px;color:var(--gold-bright);word-break:break-all}
+  .hint{font-size:14px;color:var(--parchment-dark);font-style:italic;margin-top:6px}
+  .msg{text-align:center;padding:50px 20px;color:var(--parchment-dark)}
+  .msg h1{margin-bottom:12px}
+  @media print{
+    body{background:#fff;color:#000;padding:0}
+    .noprint{display:none!important}
+    .card{background:#fff;border:none;box-shadow:none;color:#000}
+    .code{border:1px solid #999;color:#000;background:#fff}
+    .code .lab,.code .mark{color:#333}
+    h1{color:#000;text-shadow:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="msg"><h1>Loading…</h1></div>
+</div>
+
+<script>
+var KEY = new URLSearchParams(location.search).get('key') || '';
+var DATA = null;
+
+function el(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+
+async function api(path, body){
+  var r = await fetch('/api/'+path, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  var j = await r.json().catch(function(){return {};});
+  if(!r.ok) throw new Error(j.error || ('HTTP '+r.status));
+  return j;
+}
+
+function showError(title, detail){
+  el('wrap').innerHTML =
+    '<div class="msg"><h1>'+esc(title)+'</h1><p>'+esc(detail)+'</p></div>';
+}
+
+async function load(){
+  if(!KEY){ showError('No dashboard link', 'Open this page using the private link from your welcome email.'); return; }
+  try{
+    DATA = await api('dashboard', { token: KEY });
+    render();
+  }catch(e){
+    if(String(e.message).indexOf('not found')>=0) showError("We couldn't find that link", 'Double-check the private link from your welcome email, or use “email me my link”.');
+    else showError('Something went wrong', e.message);
+  }
+}
+
+function render(){
+  var pct = Math.round(DATA.used / DATA.total * 100) || 0;
+  var playLink = location.origin + '/play.html';
+  var grid = DATA.codes.map(function(c){
+    return '<div class="code'+(c.activated_at?' on':'')+'" onclick="labelCode(\''+c.code+'\')" title="Click to label with a student name">'+
+      esc(c.code)+
+      '<span class="lab">'+(c.label?esc(c.label):'&nbsp;')+'</span>'+
+      (c.activated_at?'<span class="mark">&#10003; in use</span>':'')+
+      '</div>';
+  }).join('');
+
+  el('wrap').innerHTML =
+  '<div class="crest noprint"><h1>&#9876; SCIENCE QUEST</h1><div class="sub">Teacher Dashboard</div></div>'+
+
+  '<div class="card">'+
+    '<div class="meterrow"><span class="lbl" style="margin:0">Student codes &middot; give each student one to play</span>'+
+      '<span><span class="big">'+DATA.used+'</span> <span style="color:var(--parchment-dark)">of '+DATA.total+' in use</span></span></div>'+
+    '<div class="bar"><div style="width:'+pct+'%"></div></div>'+
+    '<div class="grid">'+grid+'</div>'+
+    '<div class="links noprint">'+
+      '<button class="primary" onclick="window.print()">&#128424; Print class set</button>'+
+      '<button class="danger" onclick="resetYear()">&#8635; Reset for new year</button>'+
+    '</div>'+
+    '<div class="hint noprint">Tip: click any code to label it with a student\'s name (optional).</div>'+
+  '</div>'+
+
+  '<div class="card noprint">'+
+    '<div class="lbl">Student play link &middot; share with your class</div>'+
+    '<div class="links"><span class="mono" style="flex:1">'+esc(playLink)+'</span>'+
+      '<button onclick="copy(\''+playLink+'\',this)">Copy</button></div>'+
+    '<div class="lbl" style="margin-top:18px">Your private dashboard link &middot; bookmark this!</div>'+
+    '<div class="links"><span class="mono" style="flex:1">'+esc(location.href)+'</span>'+
+      '<button onclick="copy(location.href,this)">Copy</button></div>'+
+    '<div class="hint">This link is how you get back here. Keep it safe — anyone with it can manage your codes.</div>'+
+  '</div>';
+}
+
+async function labelCode(code){
+  var cur = (DATA.codes.find(function(c){return c.code===code;})||{}).label || '';
+  var name = prompt('Label '+code+' with a student name (optional):', cur);
+  if(name===null) return;
+  try{
+    await api('label', { token:KEY, code:code, label:name });
+    var c = DATA.codes.find(function(x){return x.code===code;}); if(c) c.label = name.trim().slice(0,60);
+    render();
+  }catch(e){ alert('Could not save label: '+e.message); }
+}
+
+async function resetYear(){
+  if(!confirm('Reset for a new year? This frees every seat and clears all student names. (Your codes stay the same.)')) return;
+  try{
+    await api('reset', { token:KEY });
+    await load();
+  }catch(e){ alert('Could not reset: '+e.message); }
+}
+
+function copy(text, btn){
+  var done = function(){ if(btn){ var t=btn.textContent; btn.textContent='Copied!'; setTimeout(function(){btn.textContent=t;},1200);} };
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(done);
+  else done();
+}
+
+load();
+</script>
+</body>
+</html>
