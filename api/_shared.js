@@ -64,3 +64,13 @@ export function genCodes(n) {
   while (set.size < n) set.add(makeCode());
   return [...set];
 }
+
+// The PRIVATE Storage bucket holding the protected assets (game,
+// leaderboard, guide). Files are never public — access is only ever a
+// short-lived signed URL handed out after a valid code/token.
+export const QUEST_BUCKET = 'quest';
+export async function signAsset(db, path, seconds) {
+  const { data, error } = await db.storage.from(QUEST_BUCKET).createSignedUrl(path, seconds);
+  if (error || !data) return null;   // file missing / not uploaded yet
+  return data.signedUrl;
+}

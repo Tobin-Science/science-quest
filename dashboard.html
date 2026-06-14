@@ -122,6 +122,11 @@ function render(){
   '</div>'+
 
   '<div class="card noprint">'+
+    '<div class="lbl">Teacher tools</div>'+
+    '<div class="links" style="margin-bottom:18px">'+
+      '<button onclick="openAsset(\'leaderboard\')">&#127942; Open Hall of Champions</button>'+
+      '<button onclick="openAsset(\'guide\')">&#128214; Strategy guide (PDF)</button>'+
+    '</div>'+
     '<div class="lbl">Student play link &middot; share with your class</div>'+
     '<div class="links"><span class="mono" style="flex:1">'+esc(playLink)+'</span>'+
       '<button onclick="copy(\''+playLink+'\',this)">Copy</button></div>'+
@@ -141,6 +146,16 @@ async function labelCode(code){
     var c = DATA.codes.find(function(x){return x.code===code;}); if(c) c.label = name.trim().slice(0,60);
     render();
   }catch(e){ alert('Could not save label: '+e.message); }
+}
+
+async function openAsset(asset){
+  try{
+    var r = await api('teacher-asset', { token:KEY, asset:asset });
+    window.open(r.url, '_blank');
+  }catch(e){
+    alert(String(e.message).indexOf('not available')>=0
+      ? 'That file hasn\'t been uploaded yet.' : 'Could not open: '+e.message);
+  }
 }
 
 function toggleRoster(){

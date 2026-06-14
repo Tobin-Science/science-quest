@@ -53,7 +53,7 @@
 
   <div id="playing" class="hide">
     <div class="msg ok" id="welcome"></div>
-    <div class="gamebox">The game will load here.<br><span style="font-size:12px">(We'll wire the full game in next.)</span></div>
+    <div class="gamebox" id="gamebox">The game will load here.</div>
     <div class="foot"><span>&#128190;</span><span>Your character saves on this computer. On a different device, enter the same code — then use your Save Code from the game to bring your progress.</span></div>
     <button class="ghost" onclick="switchStudent()">Not you? Enter a different code</button>
   </div>
@@ -68,14 +68,23 @@ async function validate(code){
   return r.json();
 }
 
-function showPlaying(returning){
+var GAME_URL = '';
+function showPlaying(returning, gameUrl){
   el('form').classList.add('hide');
   el('playing').classList.remove('hide');
   el('sub').textContent = 'You\'re in!';
   el('welcome').innerHTML = returning
     ? '&#10003; Welcome back! Same seat as before.'
     : '&#10003; Code accepted! Your seat is claimed.';
+  GAME_URL = gameUrl || '';
+  var gb = el('gamebox');
+  if(GAME_URL){
+    gb.innerHTML = '<button onclick="enterGame()" style="margin-top:0">&#9654;&nbsp; Enter the game</button>';
+  } else {
+    gb.innerHTML = 'The game will load here.<br><span style="font-size:12px">(Almost ready — the game is being set up.)</span>';
+  }
 }
+function enterGame(){ if(GAME_URL) window.location.href = GAME_URL; }
 
 async function go(){
   var code = (el('code').value || '').trim().toUpperCase();
@@ -86,7 +95,7 @@ async function go(){
     var res = await validate(code);
     if(res.ok){
       try{ localStorage.setItem(STORE, code); }catch(e){}
-      showPlaying(res.returning);
+      showPlaying(res.returning, res.gameUrl);
     }else{
       msg.className='msg err';
       msg.textContent = res.reason==='not found' ? "We don't recognize that code. Check with your teacher." : (res.reason||'That code did not work.');
@@ -109,7 +118,7 @@ function switchStudent(){
   if(!saved) return;
   try{
     var res = await validate(saved);
-    if(res.ok) showPlaying(res.returning);
+    if(res.ok) showPlaying(res.returning, res.gameUrl);
     else { try{ localStorage.removeItem(STORE); }catch(e){} }
   }catch(e){}
 })();
