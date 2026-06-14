@@ -51,7 +51,7 @@ async function send(){
   if(!email){ document.getElementById('email').focus(); return; }
   var btn = document.getElementById('btn'); btn.disabled = true; btn.textContent = 'Sending…';
   try{
-    var r = await fetch('/api/district-request', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email:email }) });
+    var r = await fetch('/api/district', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email:email }) });
     var j = await r.json().catch(function(){return {};});
     if(!r.ok){
       msg.className='msg err'; msg.textContent = j.error || 'Something went wrong — please try again.';
