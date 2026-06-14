@@ -12,6 +12,8 @@ locally). All are env-var'd so the test -> live switch needs no code change.
 | `SUPABASE_URL` | `https://fmbdoxfkjldvpkyryqlx.supabase.co` | same project as the hub |
 | `SUPABASE_SERVICE_ROLE_KEY` | `sb_secret_…` | Supabase → Project settings → API (SECRET — Derek adds) |
 | `SITE_ORIGIN` | the Quest site URL (e.g. `https://science-quest.vercel.app`) | set after the Vercel project exists |
+| `RESEND_API_KEY` | `re_…` | Resend → API Keys (for the welcome / recovery emails; email is skipped if unset) |
+| `RESEND_FROM` | e.g. `Science Quest <hello@yourdomain.com>` | optional; defaults to `onboarding@resend.dev` (test sender only delivers to your own Resend account email — a VERIFIED DOMAIN is required to email real buyers) |
 
 ## At launch (LIVE mode) — Phase 5
 Swap to: `STRIPE_SECRET_KEY` = `sk_live_…`, `STRIPE_PRICE_QUEST` = the LIVE

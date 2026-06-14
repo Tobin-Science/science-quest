@@ -73,7 +73,8 @@ async function api(path, body){
 
 function showError(title, detail){
   el('wrap').innerHTML =
-    '<div class="msg"><h1>'+esc(title)+'</h1><p>'+esc(detail)+'</p></div>';
+    '<div class="msg"><h1>'+esc(title)+'</h1><p>'+esc(detail)+'</p>'+
+    '<p style="margin-top:14px"><a href="/recover.html" style="color:var(--gold-bright)">Email me my link</a></p></div>';
 }
 
 async function load(){

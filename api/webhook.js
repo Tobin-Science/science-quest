@@ -4,7 +4,7 @@
 // access token + their email) and generate their 150 student codes.
 // Registered in Stripe for the single event: checkout.session.completed
 // =====================================================================
-import { stripe, WEBHOOK_SECRET, adminDb, genToken, genCodes } from './_shared.js';
+import { stripe, WEBHOOK_SECRET, adminDb, genToken, genCodes, sendEmail, questEmailHtml } from './_shared.js';
 
 // Give this owner 150 codes, collision-proof at any scale: insert
 // candidates skipping any that already exist (code is globally unique),
@@ -60,9 +60,10 @@ export async function POST(request) {
       if (existing) return new Response('already processed', { status: 200 });
     }
 
+    const token = genToken();
     const { data: owner, error: oErr } = await db.from('quest_owners')
       .insert({
-        access_token: genToken(),
+        access_token: token,
         email,
         source: 'purchase',
         stripe_customer: customer,
@@ -72,6 +73,12 @@ export async function POST(request) {
     if (oErr) throw oErr;
 
     await insertCodes(db, owner.id);
+
+    // Best-effort welcome email (no-op until Resend is configured; never
+    // fails the webhook — the welcome page already delivers the link).
+    if (email) {
+      try { await sendEmail({ to: email, subject: 'Your Science Quest dashboard + 150 codes', html: questEmailHtml(token) }); } catch (e) {}
+    }
     return new Response('ok', { status: 200 });
   } catch (e) {
     // 500 -> Stripe retries the webhook later.
