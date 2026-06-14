@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tobin Science — classroom science that students actually want to do</title>
+<style>
+  :root{--ink:#1f2933;--muted:#5b6770;--line:#e3e6ea;--bg:#f6f8fa;--card:#fff;--ac:#2f5fd0;--gold:#b8862b;--green:#2f7a4d}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;padding:48px 18px 70px}
+  .wrap{max-width:860px;margin:0 auto}
+  header{text-align:center;margin-bottom:42px}
+  .logo{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:600}
+  h1{font-size:38px;margin:8px 0 10px;letter-spacing:-0.5px}
+  .tag{font-size:19px;color:var(--muted);max-width:560px;margin:0 auto}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column}
+  .card .ic{font-size:32px}
+  .card h2{font-size:21px;margin:10px 0 6px}
+  .card p{color:var(--muted);font-size:15.5px;flex:1}
+  .btn{display:inline-block;margin-top:16px;padding:11px 18px;border-radius:10px;font-weight:600;font-size:15px;text-decoration:none;text-align:center;color:#fff}
+  .btn.hub{background:var(--ac)}
+  .btn.quest{background:var(--gold)}
+  .soon{margin-top:16px;padding:11px 18px;border-radius:10px;font-weight:600;font-size:15px;text-align:center;color:var(--muted);background:var(--bg);border:1px dashed var(--line)}
+  .price{font-size:13px;color:var(--muted);margin-top:8px}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin-top:46px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">Tobin Science</div>
+    <h1>Science your students actually want to do.</h1>
+    <p class="tag">Standards-aligned lessons, games, and a full RPG adventure for the middle-school science classroom.</p>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <div class="ic">🔬</div>
+      <h2>Science Hub</h2>
+      <p>Lessons, quizzes, minigames, printables, and a paperless gradebook for Physical, Earth, and Life Science — built around the standards.</p>
+      <a class="btn hub" href="https://tobin-science.github.io/science-hub/">Open the Science Hub →</a>
+    </div>
+
+    <div class="card">
+      <div class="ic">⚔️</div>
+      <h2>Science Quest</h2>
+      <p>The full role-playing game where students level up by mastering 8th-grade physical science. Comes with 150 student codes and a class leaderboard.</p>
+      <a class="btn quest" href="https://quest.tobinscience.com">Get Science Quest →</a>
+      <div class="price">One-time $19.99 · free for Cherokee County teachers</div>
+    </div>
+
+    <div class="card">
+      <div class="ic">🌍</div>
+      <h2>Earth Quest</h2>
+      <p>A 6th-grade Earth Science RPG in the same adventure style as Science Quest. In development.</p>
+      <div class="soon">Coming soon</div>
+    </div>
+  </div>
+
+  <footer>© Tobin Science · built for the classroom</footer>
+</div>
+</body>
+</html>
