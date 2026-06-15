@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tobin Science Hub — Account</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{--ink:#1B2440;--ink2:#5A6480;--line:#DDE3F0;--ac:#5B67E0;--good:#2f7a4d;--bad:#b3261e}
+  *{box-sizing:border-box;margin:0}
+  body{font-family:Georgia,'Times New Roman',serif;background:linear-gradient(160deg,#1B2440 0%,#2A3558 55%,#3B4A7A 100%);
+    color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .box{width:100%;max-width:440px;background:#fff;border-radius:18px;padding:32px 28px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+  .brand{font-weight:800;letter-spacing:.4px;color:var(--ink);font-size:1.05rem;text-align:center;margin-bottom:18px}
+  h1{font-size:1.5rem;text-align:center;margin:4px 0 10px;color:var(--ink)}
+  .msg{text-align:center;color:var(--ink2);font-size:1rem;line-height:1.55;margin-bottom:6px}
+  .msg.ok{color:var(--good)} .msg.err{color:var(--bad)}
+  label{display:block;font-size:.85rem;letter-spacing:1px;text-transform:uppercase;color:var(--ink2);margin:18px 0 6px}
+  input{width:100%;font-size:1.05rem;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit}
+  input:focus{outline:none;border-color:var(--ac)}
+  .btn{display:block;width:100%;text-align:center;margin-top:16px;padding:13px;border-radius:10px;border:none;
+    background:var(--ac);color:#fff;font-weight:800;font-size:1rem;font-family:inherit;cursor:pointer;text-decoration:none}
+  .btn:hover{filter:brightness(1.06)}
+  .hide{display:none}
+  .spin{width:34px;height:34px;border:4px solid var(--line);border-top-color:var(--ac);border-radius:50%;margin:8px auto 14px;animation:s .8s linear infinite}
+  @keyframes s{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="brand">🔬 Tobin Science Hub</div>
+  <div id="spin" class="spin"></div>
+  <h1 id="title">One moment…</h1>
+  <p id="msg" class="msg">Verifying your link…</p>
+
+  <div id="pwform" class="hide">
+    <label for="pw">New password</label>
+    <input id="pw" type="password" placeholder="••••••••" autocomplete="new-password" onkeydown="if(event.key==='Enter')savePw()">
+    <button id="pwbtn" class="btn" onclick="savePw()">Save new password</button>
+  </div>
+
+  <a id="hublink" class="btn hide" href="#">Go to the Science Hub →</a>
+</div>
+
+<script>
+const SB_URL='https://fmbdoxfkjldvpkyryqlx.supabase.co';
+const SB_KEY='sb_publishable_oH7IbuY19NAjSW9MKmykkw_be4aDuAw';
+const HUB_DEFAULT='https://tobin-science.github.io/science-hub/';
+const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth:{ detectSessionInUrl:false, persistSession:true, autoRefreshToken:false } });
+
+const qs = new URLSearchParams(location.search);
+const token_hash = qs.get('token_hash');
+const type = qs.get('type');
+let next = qs.get('next') || HUB_DEFAULT;
+if(!/^https?:\/\//.test(next)) next = HUB_DEFAULT;   // only allow real http(s) destinations
+
+function el(id){ return document.getElementById(id); }
+function setTitle(t){ el('title').textContent = t; }
+function setMsg(t,k){ el('msg').textContent = t; el('msg').className = 'msg' + (k?' '+k:''); }
+function show(id){ el(id).classList.remove('hide'); }
+function hide(id){ el(id).classList.add('hide'); }
+function stopSpin(){ hide('spin'); }
+function linkErr(m){ return /expired|invalid|otp|token/i.test(m||'') ? 'This link has expired or was already used. Please request a new one from the hub.' : (m || 'This link could not be verified.'); }
+
+(async function(){
+  if(!token_hash || !type){ stopSpin(); setTitle('Link problem'); setMsg('This link is missing information. Please request a new one from the hub.','err'); el('hublink').href=next; el('hublink').textContent='Back to the Science Hub →'; show('hublink'); return; }
+  try{
+    const { error } = await sb.auth.verifyOtp({ token_hash, type });
+    stopSpin();
+    if(error){ setTitle('This link didn’t work'); setMsg(linkErr(error.message),'err'); el('hublink').href=next; el('hublink').textContent='Back to the Science Hub →'; show('hublink'); return; }
+    if(type==='recovery'){
+      setTitle('Set a new password');
+      setMsg('Choose a new password for your teacher account.');
+      show('pwform'); el('pw').focus();
+    } else {
+      setTitle('Email confirmed!');
+      setMsg('Your email is verified. You can now sign in to your teacher tools.','ok');
+      el('hublink').href=next; el('hublink').textContent='Go to the Science Hub →'; show('hublink');
+    }
+  }catch(e){ stopSpin(); setTitle('Something went wrong'); setMsg('Please try the link again, or request a new one from the hub.','err'); el('hublink').href=next; show('hublink'); }
+})();
+
+async function savePw(){
+  const pw = el('pw').value || '';
+  if(pw.length < 6){ setMsg('Password must be at least 6 characters.','err'); return; }
+  const btn = el('pwbtn'); btn.disabled = true;
+  try{
+    const { error } = await sb.auth.updateUser({ password: pw });
+    if(error){ setMsg(error.message,'err'); btn.disabled=false; return; }
+    hide('pwform'); setTitle('All set!'); setMsg('Your password is updated. Head back to the hub and sign in.','ok');
+    el('hublink').href=next; el('hublink').textContent='Go to the Science Hub →'; show('hublink');
+  }catch(e){ setMsg('Something went wrong — please try again.','err'); btn.disabled=false; }
+}
+</script>
+</body>
+</html>
