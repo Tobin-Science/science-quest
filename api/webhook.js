@@ -4,7 +4,7 @@
 // access token + their email) and generate their 150 student codes.
 // Registered in Stripe for the single event: checkout.session.completed
 // =====================================================================
-import { stripe, WEBHOOK_SECRET, adminDb, provisionOwner } from './_shared.js';
+import { stripe, WEBHOOK_SECRET, adminDb, provisionOwner, upgradeOwnerToFull } from './_shared.js';
 
 export async function POST(request) {
   const sig = request.headers.get('stripe-signature');
@@ -30,6 +30,7 @@ export async function POST(request) {
   const email = (s.customer_details && s.customer_details.email) || s.customer_email || '';
   const customer = typeof s.customer === 'string'
     ? s.customer : (s.customer && s.customer.id) || null;
+  const upgradeOwner = (s.metadata && s.metadata.upgrade_owner) || null;
 
   try {
     // Idempotency: if this payment was already turned into an owner, stop.
@@ -40,7 +41,13 @@ export async function POST(request) {
       if (existing) return new Response('already processed', { status: 200 });
     }
 
-    await provisionOwner(db, { email, source: 'purchase', stripe_customer: customer, stripe_payment_intent: paymentIntent });
+    if (upgradeOwner) {
+      // A free-trial teacher upgraded: convert their EXISTING account to a
+      // full lifetime 150-code one (their handed-out codes keep working).
+      await upgradeOwnerToFull(db, upgradeOwner, { stripe_customer: customer, stripe_payment_intent: paymentIntent });
+    } else {
+      await provisionOwner(db, { email, source: 'purchase', stripe_customer: customer, stripe_payment_intent: paymentIntent });
+    }
     return new Response('ok', { status: 200 });
   } catch (e) {
     // 500 -> Stripe retries the webhook later.

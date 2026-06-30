@@ -116,31 +116,97 @@ export function questEmailHtml(token) {
   '</div>';
 }
 
-// Create an owner (purchase OR free district) + their 150 codes + welcome
-// email. Shared by the Stripe webhook and the district-free flow so both
-// paths behave identically.
-export async function provisionOwner(db, { email, source = 'purchase', stripe_customer = null, stripe_payment_intent = null }) {
+// Seat counts: a full purchase grants 150 reusable codes; a free-trial
+// owner gets 5 codes for one week (TRIAL_DAYS).
+export const FULL_SEATS = 150;
+export const TRIAL_SEATS = 5;
+export const TRIAL_DAYS = 7;
+
+// "Confirm your email to start your free week" — sent when a teacher
+// requests a trial. Clicking the link provisions their 5-seat trial.
+export function trialConfirmEmailHtml(link) {
+  return '<div style="font-family:Georgia,serif;max-width:540px;margin:auto;color:#2a2520;line-height:1.6">' +
+    '<h1 style="color:#8b6914">Start your free week of Science Quest &#9876;</h1>' +
+    '<p>Confirm your email to unlock <b>5 student seats free for 7 days</b> &mdash; the full game, no card required.</p>' +
+    '<p><a href="' + link + '" style="display:inline-block;background:#d4a747;color:#2a2008;font-weight:bold;padding:12px 22px;border-radius:6px;text-decoration:none">Start my free week</a></p>' +
+    '<p style="font-size:13px;color:#666;word-break:break-all">Or paste this link into your browser:<br>' + link + '</p>' +
+    '<p style="font-size:13px;color:#666">This link expires in 24 hours. If you didn\'t request this, you can ignore it.</p>' +
+  '</div>';
+}
+
+// "Your free week is live" — sent after the teacher confirms; carries their
+// private dashboard link.
+export function trialWelcomeEmailHtml(token, trialEndsISO) {
+  const dash = dashboardLink(token);
+  const play = (SITE_ORIGIN || '') + '/play.html';
+  let ends = '';
+  try { ends = new Date(trialEndsISO).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }); } catch (e) {}
+  return '<div style="font-family:Georgia,serif;max-width:540px;margin:auto;color:#2a2520;line-height:1.6">' +
+    '<h1 style="color:#8b6914">Your free week is live &#9876;</h1>' +
+    '<p>You\'ve got <b>5 student seats</b> to try Science Quest free' + (ends ? ' through <b>' + ends + '</b>' : '') + '. Below is your <b>private teacher dashboard</b> &mdash; bookmark it.</p>' +
+    '<p><a href="' + dash + '" style="display:inline-block;background:#d4a747;color:#2a2008;font-weight:bold;padding:12px 22px;border-radius:6px;text-decoration:none">Open my dashboard</a></p>' +
+    '<p style="font-size:13px;color:#666;word-break:break-all">Or paste this link into your browser:<br>' + dash + '</p>' +
+    '<hr style="border:none;border-top:1px solid #ddd;margin:18px 0">' +
+    '<p style="margin:0 0 6px"><b>Getting started</b></p>' +
+    '<ol style="margin:0;padding-left:20px">' +
+      '<li>Open your dashboard and give each of your 5 codes to a student, along with the play link: <a href="' + play + '">' + play + '</a></li>' +
+      '<li>When you\'re ready, unlock <b>all 150 codes for life</b> for a one-time <b>$19.99</b> &mdash; right from your dashboard. Your trial codes keep working.</li>' +
+    '</ol>' +
+  '</div>';
+}
+
+// Collision-proof top-up: ensure the owner has at least `target` codes. Safe
+// to call repeatedly (only adds what's missing), so it doubles as the
+// trial->full upgrade path.
+export async function topUpCodes(db, ownerId, target) {
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const { count } = await db.from('quest_codes')
+      .select('code', { count: 'exact', head: true }).eq('owner', ownerId);
+    const have = count || 0;
+    if (have >= target) break;
+    const rows = genCodes(target - have).map(code => ({ code, owner: ownerId }));
+    const { error } = await db.from('quest_codes').upsert(rows, { onConflict: 'code', ignoreDuplicates: true });
+    if (error) throw error;
+  }
+}
+
+// Create an owner (purchase, free district, OR free trial) + their codes +
+// welcome email. Shared by the Stripe webhook, the district-free flow, and
+// the free-trial flow so every path behaves identically.
+//   seats     — how many codes to generate (150 normally, 5 for a trial)
+//   trialDays — if set, marks this a trial that expires in N days
+export async function provisionOwner(db, { email, source = 'purchase', stripe_customer = null, stripe_payment_intent = null, seats = FULL_SEATS, trialDays = null }) {
   const token = genToken();
+  const trial_ends = trialDays ? new Date(Date.now() + trialDays * 86400000).toISOString() : null;
   const { data: owner, error } = await db.from('quest_owners')
-    .insert({ access_token: token, email: email || null, source, stripe_customer, stripe_payment_intent })
+    .insert({ access_token: token, email: email || null, source, stripe_customer, stripe_payment_intent, trial_ends })
     .select('id').single();
   if (error) throw error;
 
-  // 150 codes, collision-proof top-up.
-  for (let attempt = 0; attempt < 50; attempt++) {
-    const { count } = await db.from('quest_codes')
-      .select('code', { count: 'exact', head: true }).eq('owner', owner.id);
-    const have = count || 0;
-    if (have >= 150) break;
-    const rows = genCodes(150 - have).map(code => ({ code, owner: owner.id }));
-    const { error: e2 } = await db.from('quest_codes').upsert(rows, { onConflict: 'code', ignoreDuplicates: true });
-    if (e2) throw e2;
-  }
+  await topUpCodes(db, owner.id, seats);
 
   if (email) {
-    try { await sendEmail({ to: email, subject: 'Your Science Quest dashboard + 150 codes', html: questEmailHtml(token) }); } catch (e) {}
+    try {
+      if (trialDays) await sendEmail({ to: email, subject: 'Your free week of Science Quest is ready', html: trialWelcomeEmailHtml(token, trial_ends) });
+      else await sendEmail({ to: email, subject: 'Your Science Quest dashboard + 150 codes', html: questEmailHtml(token) });
+    } catch (e) {}
   }
   return token;
+}
+
+// Upgrade a free-trial owner to a full, lifetime 150-code account. Called by
+// the webhook when a trial teacher buys. Idempotent: keeps their existing
+// (already-handed-out) codes, just tops up to 150 and clears the trial.
+export async function upgradeOwnerToFull(db, ownerId, { stripe_customer = null, stripe_payment_intent = null } = {}) {
+  const { data: owner } = await db.from('quest_owners')
+    .select('access_token').eq('id', ownerId).maybeSingle();
+  if (!owner) return null;
+  const upd = { trial_ends: null, source: 'purchase' };
+  if (stripe_customer) upd.stripe_customer = stripe_customer;
+  if (stripe_payment_intent) upd.stripe_payment_intent = stripe_payment_intent;
+  await db.from('quest_owners').update(upd).eq('id', ownerId);
+  await topUpCodes(db, ownerId, FULL_SEATS);
+  return owner.access_token;
 }
 
 // Signed, expiring token for district email verification — no DB row
@@ -161,5 +227,25 @@ export function verifyDistrictToken(token) {
   let data;
   try { data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')); } catch (e) { return null; }
   if (!data || !data.e || !data.x || Date.now() > data.x) return null;
+  return data.e;
+}
+
+// Free-trial email-verification token. Same HMAC scheme as the district
+// token, but marked k:'trial' so the two can't be swapped.
+export function signTrialToken(email) {
+  const payload = Buffer.from(JSON.stringify({ e: String(email).toLowerCase(), k: 'trial', x: Date.now() + 1000 * 60 * 60 * 24 })).toString('base64url');
+  const sig = crypto.createHmac('sha256', _districtKey()).update(payload).digest('base64url');
+  return payload + '.' + sig;
+}
+export function verifyTrialToken(token) {
+  const parts = String(token || '').split('.');
+  if (parts.length !== 2) return null;
+  const [payload, sig] = parts;
+  const expect = crypto.createHmac('sha256', _districtKey()).update(payload).digest('base64url');
+  if (sig.length !== expect.length) return null;
+  try { if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expect))) return null; } catch (e) { return null; }
+  let data;
+  try { data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')); } catch (e) { return null; }
+  if (!data || !data.e || data.k !== 'trial' || !data.x || Date.now() > data.x) return null;
   return data.e;
 }

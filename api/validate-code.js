@@ -19,11 +19,21 @@ export async function POST(request) {
 
     const db = adminDb();
     const { data: row, error } = await db.from('quest_codes')
-      .select('code, activated_at').eq('code', code).maybeSingle();
+      .select('code, activated_at, owner').eq('code', code).maybeSingle();
     if (error) throw error;
 
     // 200 with ok:false so the page can show a friendly message (not an error).
     if (!row) return json({ ok: false, reason: 'not found' }, 200, origin);
+
+    // If this code belongs to a free-trial owner whose week has ended, the
+    // seat is locked — don't claim it, don't let them in.
+    if (row.owner) {
+      const { data: owner } = await db.from('quest_owners')
+        .select('trial_ends').eq('id', row.owner).maybeSingle();
+      if (owner && owner.trial_ends && Date.now() > new Date(owner.trial_ends).getTime()) {
+        return json({ ok: false, reason: 'trial_expired' }, 200, origin);
+      }
+    }
 
     const returning = !!row.activated_at;
     if (!returning) {

@@ -17,7 +17,7 @@ export async function POST(request) {
 
     const db = adminDb();
     const { data: owner, error } = await db.from('quest_owners')
-      .select('id, email, source, created_at')
+      .select('id, email, source, created_at, trial_ends')
       .eq('access_token', token).maybeSingle();
     if (error) throw error;
     if (!owner) return json({ error: 'not found' }, 404, origin);
@@ -29,7 +29,12 @@ export async function POST(request) {
     if (cErr) throw cErr;
 
     const used = codes.filter(c => c.activated_at).length;
-    return json({ email: owner.email, source: owner.source, total: codes.length, used, codes }, 200, origin);
+    const is_trial = owner.source === 'trial' && !!owner.trial_ends;
+    const trial_expired = is_trial && Date.now() > new Date(owner.trial_ends).getTime();
+    return json({
+      email: owner.email, source: owner.source, total: codes.length, used, codes,
+      trial_ends: owner.trial_ends || null, is_trial, trial_expired, full_seats: 150
+    }, 200, origin);
   } catch (e) {
     return json({ error: e.message }, 500, origin);
   }

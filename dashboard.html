@@ -42,6 +42,17 @@
   .tips li{margin-bottom:6px}
   .msg{text-align:center;padding:50px 20px;color:var(--parchment-dark)}
   .msg h1{margin-bottom:12px}
+  .trialbanner{border-color:var(--gold);background:linear-gradient(180deg,rgba(99,153,34,0.16),rgba(42,37,32,0.92))}
+  .trialbanner.expired{border-color:#7a4040;background:linear-gradient(180deg,rgba(96,32,32,0.30),rgba(42,37,32,0.92))}
+  .tb-row{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .tb-tag{font-family:'Cinzel',Georgia,serif;font-size:12px;letter-spacing:2px;color:var(--good)}
+  .tb-big{font-size:24px;font-weight:600;color:var(--gold-bright);margin:2px 0}
+  .tb-sub{font-size:15px;color:var(--parchment-dark);max-width:520px}
+  .tb-btn{white-space:normal;font-size:14px}
+  .upok{border-color:var(--good);background:linear-gradient(180deg,rgba(99,153,34,0.22),rgba(42,37,32,0.92));text-align:center}
+  .upok .tb-big{color:var(--good)}
+  .code.locked{cursor:default;opacity:.55;color:var(--parchment-dark);border-style:dashed}
+  .code.locked:hover{border-color:var(--stone-light)}
   @media print{
     body{background:#fff;color:#000;padding:0}
     .noprint{display:none!important}
@@ -88,6 +99,27 @@ async function load(){
   }
 }
 
+function daysLeft(iso){ try{ return Math.max(0, Math.ceil((new Date(iso) - new Date())/86400000)); }catch(e){ return 0; } }
+
+function trialBanner(){
+  if(!DATA.is_trial) return '';
+  if(DATA.trial_expired){
+    return '<div class="card trialbanner expired noprint"><div class="tb-row">'+
+      '<div><div class="tb-tag" style="color:var(--danger)">FREE WEEK ENDED</div>'+
+      '<div class="tb-big">Your free week is up</div>'+
+      '<div class="tb-sub">Your students’ codes are paused. Unlock the full game one time for <b>$19.99</b> to get <b>150 reusable seats for life</b> — reuse them with new classes every year. Your trial codes start working again instantly.</div></div>'+
+      '<button class="primary tb-btn" onclick="upgrade(this)">&#128275; Unlock 150 seats for life &mdash; $19.99</button>'+
+      '</div></div>';
+  }
+  var d = daysLeft(DATA.trial_ends);
+  return '<div class="card trialbanner noprint"><div class="tb-row">'+
+    '<div><div class="tb-tag">FREE WEEK</div>'+
+    '<div class="tb-big">'+d+' day'+(d===1?'':'s')+' left</div>'+
+    '<div class="tb-sub">You have <b>'+DATA.total+' of '+(DATA.full_seats||150)+'</b> seats unlocked. Unlock all '+(DATA.full_seats||150)+' for life — a one-time <b>$19.99</b>, reusable every year. Your trial codes keep working.</div></div>'+
+    '<button class="primary tb-btn" onclick="upgrade(this)">&#128275; Unlock all '+(DATA.full_seats||150)+' for life &mdash; $19.99</button>'+
+    '</div></div>';
+}
+
 function render(){
   var pct = Math.round(DATA.used / DATA.total * 100) || 0;
   var playLink = location.origin + '/play.html';
@@ -99,11 +131,27 @@ function render(){
       '</div>';
   }).join('');
 
+  // Trial owners see their remaining (locked) seats as a buy prompt.
+  var lockedCount = DATA.is_trial ? Math.max(0, (DATA.full_seats||150) - DATA.total) : 0;
+  for(var i=0;i<lockedCount;i++){
+    grid += '<div class="code locked" title="Unlock with the full version">&#128274;<span class="lab">locked</span></div>';
+  }
+
+  var upgraded = new URLSearchParams(location.search).get('upgraded') && !DATA.is_trial;
+  var upBanner = upgraded
+    ? '<div class="card upok noprint"><div class="tb-big">&#127881; You’re unlocked for life!</div>'+
+      '<div class="tb-sub" style="margin:0 auto">All '+DATA.total+' codes are now yours forever — reset and reuse them with new students every year.</div></div>'
+    : '';
+
+  var seatLbl = DATA.is_trial ? 'Free-trial codes &middot; give each student one to play' : 'Student codes &middot; give each student one to play';
+
   el('wrap').innerHTML =
   '<div class="crest noprint"><h1>&#9876; SCIENCE QUEST</h1><div class="sub">Teacher Dashboard</div></div>'+
 
+  upBanner + trialBanner() +
+
   '<div class="card">'+
-    '<div class="meterrow"><span class="lbl" style="margin:0">Student codes &middot; give each student one to play</span>'+
+    '<div class="meterrow"><span class="lbl" style="margin:0">'+seatLbl+'</span>'+
       '<span><span class="big">'+DATA.used+'</span> <span style="color:var(--parchment-dark)">of '+DATA.total+' in use</span></span></div>'+
     '<div class="bar"><div style="width:'+pct+'%"></div></div>'+
     '<div class="grid">'+grid+'</div>'+
@@ -199,6 +247,19 @@ async function resetYear(){
     await api('reset', { token:KEY });
     await load();
   }catch(e){ alert('Could not reset: '+e.message); }
+}
+
+async function upgrade(btn){
+  if(btn){ btn.disabled = true; btn.dataset.t = btn.textContent; btn.textContent = 'Loading…'; }
+  try{
+    var r = await fetch('/api/create-checkout', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ token:KEY }) });
+    var j = await r.json().catch(function(){ return {}; });
+    if(j.url){ location.href = j.url; return; }
+    throw new Error(j.error || 'Could not start checkout');
+  }catch(e){
+    alert('Sorry — could not start checkout: ' + e.message);
+    if(btn){ btn.disabled = false; btn.textContent = btn.dataset.t || 'Unlock for life — $19.99'; }
+  }
 }
 
 function copy(text, btn){

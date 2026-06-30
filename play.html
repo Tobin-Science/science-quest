@@ -94,7 +94,10 @@ async function go(){
       showPlaying(res.returning, code);
     }else{
       msg.className='msg err';
-      msg.textContent = res.reason==='not found' ? "We don't recognize that code. Check with your teacher." : (res.reason||'That code did not work.');
+      msg.textContent =
+        res.reason==='not found' ? "We don't recognize that code. Check with your teacher." :
+        res.reason==='trial_expired' ? "Your class's free trial week has ended. Ask your teacher — they can unlock the full game." :
+        (res.reason||'That code did not work.');
     }
   }catch(e){ msg.className='msg err'; msg.textContent='Something went wrong — try again.'; }
 }

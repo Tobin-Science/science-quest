@@ -47,6 +47,11 @@
   .trailer{position:relative;width:100%;aspect-ratio:16/9;border-radius:9px;overflow:hidden;border:1px solid var(--gold-dark);margin-bottom:8px;background:#000}
   .trailer iframe{position:absolute;inset:0;width:100%;height:100%}
   .vidcap{text-align:center;font-size:14px;color:var(--parchment-dark);margin:0 0 16px}
+  .trialform{display:flex;gap:10px;flex-wrap:wrap;max-width:480px;margin:8px auto 0}
+  .trialform input{flex:1;min-width:180px;font-family:'Crimson Pro',Georgia,serif;font-size:16px;padding:13px 14px;border-radius:8px;border:1px solid var(--gold-dark);background:rgba(0,0,0,0.4);color:var(--parchment)}
+  .trialform input:focus{outline:none;border-color:var(--gold-bright)}
+  .trialform .cta{width:auto;max-width:none;margin:0;white-space:nowrap}
+  .trialmsg{max-width:480px;margin:14px auto 0;text-align:center;background:rgba(99,153,34,0.18);border:1px solid var(--good);color:var(--good);border-radius:8px;padding:12px 14px;font-size:15px}
   .tobin-cta-wrap{text-align:center;margin:34px 0 4px}
   .tobin-cta{display:inline-flex;align-items:center;gap:18px;padding:14px 26px;background:#fff;border-radius:18px;text-decoration:none;box-shadow:0 12px 34px rgba(0,0,0,.55);transition:transform .15s ease, box-shadow .15s ease;max-width:100%;font-family:Georgia,serif}
   .tobin-cta:hover{transform:translateY(-4px);box-shadow:0 18px 44px rgba(0,0,0,.62)}
@@ -72,6 +77,17 @@
     <button class="cta" id="buy" onclick="buy()">Buy Science Quest &mdash; $19.99</button>
     <div class="reassure">A one-time purchase, never a subscription. Reuse it with new students every year.</div>
     <div class="reassure" style="margin-top:14px">Already purchased? <a href="/recover.html" style="color:var(--gold-bright)">Find your dashboard &rarr;</a></div>
+  </div>
+
+  <div class="card" id="trialCard">
+    <h2>&#10022; Try it free for a week</h2>
+    <p style="text-align:center;margin-bottom:6px">Not ready to buy? Confirm your email and get <b style="color:var(--gold-bright)">5 student seats free for 7 days</b> &mdash; the full game, no card required.</p>
+    <div id="trialForm" class="trialform">
+      <input id="trialEmail" type="email" inputmode="email" placeholder="you@school.org" autocomplete="email" onkeydown="if(event.key==='Enter')startTrial()">
+      <button class="cta" id="trialBtn" onclick="startTrial()">Start my free week</button>
+    </div>
+    <div id="trialMsg" class="trialmsg" style="display:none"></div>
+    <div class="reassure" style="text-align:center;margin-top:10px">When your week is up, unlock all 150 codes for life for a one-time $19.99.</div>
   </div>
 
   <div class="card">
@@ -120,6 +136,22 @@
 
 <script>
 if(new URLSearchParams(location.search).get('canceled')) document.getElementById('canceled').style.display='block';
+
+async function startTrial(){
+  var email = (document.getElementById('trialEmail').value || '').trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ alert('Please enter a valid email address.'); return; }
+  var b = document.getElementById('trialBtn'); b.disabled = true; b.textContent = 'Sending…';
+  try{
+    var r = await fetch('/api/district', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email:email, kind:'trial' }) });
+    var j = await r.json().catch(function(){ return {}; });
+    if(!r.ok) throw new Error(j.error || 'Could not start your free week');
+    document.getElementById('trialForm').style.display = 'none';
+    var m = document.getElementById('trialMsg'); m.style.display = 'block';
+    m.innerHTML = '&#9993; Check your email! We sent a confirmation link to <b>' + email.replace(/[<>&"]/g,'') + '</b>. Click it to start your free week.';
+  }catch(e){
+    alert('Sorry — ' + e.message); b.disabled = false; b.textContent = 'Start my free week';
+  }
+}
 
 async function buy(){
   var btns = [document.getElementById('buy'), document.getElementById('buy2')];

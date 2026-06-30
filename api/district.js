@@ -5,9 +5,10 @@
 //   GET  ?token=...           -> verify the link, grant free access,
 //                                redirect to the teacher dashboard
 // =====================================================================
-import { adminDb, provisionOwner, sendEmail, signDistrictToken, verifyDistrictToken, SITE_ORIGIN, corsHeaders, json } from './_shared.js';
+import { adminDb, provisionOwner, sendEmail, signDistrictToken, verifyDistrictToken, signTrialToken, verifyTrialToken, trialConfirmEmailHtml, TRIAL_SEATS, TRIAL_DAYS, SITE_ORIGIN, corsHeaders, json } from './_shared.js';
 
 const DISTRICT_DOMAIN = '@cherokeek12.net';
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 function note(message) {
   return new Response(
@@ -21,12 +22,25 @@ export async function OPTIONS(request) {
   return new Response(null, { status: 204, headers: corsHeaders(request.headers.get('origin')) });
 }
 
-// Teacher asks for a free activation link.
+// Teacher asks for a free activation link (district) OR a free-trial
+// confirmation link (kind:'trial').
 export async function POST(request) {
   const origin = request.headers.get('origin');
   try {
-    let { email } = await request.json();
+    let { email, kind } = await request.json();
     email = String(email || '').trim().toLowerCase();
+
+    // ---- Free-trial confirmation: any valid email, 5 seats for a week. ----
+    if (kind === 'trial') {
+      if (!EMAIL_RE.test(email)) {
+        return json({ error: 'Please enter a valid email address.' }, 400, origin);
+      }
+      const link = (SITE_ORIGIN || '') + '/api/district?ttoken=' + encodeURIComponent(signTrialToken(email));
+      await sendEmail({ to: email, subject: 'Confirm your email to start your free week of Science Quest', html: trialConfirmEmailHtml(link) });
+      return json({ ok: true }, 200, origin);
+    }
+
+    // ---- District free access: @cherokeek12.net only. ----
     if (!email.endsWith(DISTRICT_DOMAIN)) {
       return json({ error: 'Please use your @cherokeek12.net school email.' }, 400, origin);
     }
@@ -44,10 +58,35 @@ export async function POST(request) {
   }
 }
 
-// Teacher clicks the activation link from the email.
+// Teacher clicks the link from the email — district activation (?token=)
+// or free-trial confirmation (?ttoken=).
 export async function GET(request) {
   try {
-    const token = new URL(request.url).searchParams.get('token') || '';
+    const params = new URL(request.url).searchParams;
+
+    // ---- Free-trial confirmation ----
+    const ttoken = params.get('ttoken');
+    if (ttoken) {
+      const email = verifyTrialToken(ttoken);
+      if (!email) {
+        return note('This free-week link is invalid or has expired. Please request a new one from the store page.');
+      }
+      const db = adminDb();
+      // One trial (or account) per email: if they already have ANY account,
+      // send them to it rather than minting a fresh week.
+      const { data: existing } = await db.from('quest_owners')
+        .select('access_token').ilike('email', email).limit(1).maybeSingle();
+      const accessToken = existing
+        ? existing.access_token
+        : await provisionOwner(db, { email, source: 'trial', seats: TRIAL_SEATS, trialDays: TRIAL_DAYS });
+      return new Response(null, {
+        status: 302,
+        headers: { Location: '/dashboard.html?key=' + encodeURIComponent(accessToken) }
+      });
+    }
+
+    // ---- District activation ----
+    const token = params.get('token') || '';
     const email = verifyDistrictToken(token);
     if (!email || !email.endsWith(DISTRICT_DOMAIN)) {
       return note('This activation link is invalid or has expired. Please request a new one.');
