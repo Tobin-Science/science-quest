@@ -150,7 +150,7 @@ function render(){
 
   upBanner + trialBanner() +
 
-  '<div class="card">'+
+  '<div class="card" id="codesCard">'+
     '<div class="meterrow"><span class="lbl" style="margin:0">'+seatLbl+'</span>'+
       '<span><span class="big">'+DATA.used+'</span> <span style="color:var(--parchment-dark)">of '+DATA.total+' in use</span></span></div>'+
     '<div class="bar"><div style="width:'+pct+'%"></div></div>'+
@@ -172,7 +172,7 @@ function render(){
     '<div class="hint noprint" style="margin-top:8px">Tip: or click any single code to label it by hand.</div>'+
   '</div>'+
 
-  '<div class="card noprint">'+
+  '<div class="card noprint" id="toolsCard">'+
     '<div class="lbl">Teacher tools</div>'+
     '<div class="links" style="margin-bottom:10px">'+
       '<button onclick="openAsset(\'leaderboard\')">&#127942; Open Hall of Champions</button>'+
@@ -199,6 +199,11 @@ function render(){
       '<button onclick="copy(location.href,this)">Copy</button></div>'+
     '<div class="hint">This link is how you get back here. Keep it safe — anyone with it can manage your codes.</div>'+
   '</div>';
+
+  // Teacher tools (play link + bookmark) sit ABOVE the codes so a teacher
+  // first sees what to do, not a wall of codes.
+  var _tc = el('toolsCard'), _cc = el('codesCard');
+  if(_tc && _cc) _cc.parentNode.insertBefore(_tc, _cc);
 }
 
 async function labelCode(code){
