@@ -1,0 +1,2220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>1 v 1 Life Science · Tobin Science</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    background:#eef1f4;
+    font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    color:#1a2330;overflow:hidden;-webkit-text-size-adjust:100%;user-select:none;
+  }
+  :root{
+    --navy:#2f4a6b; --navy-d:#16263d; --green:#4a8a3f;
+    --red:#d83a2f; --red-d:#a82418; --red-l:#f06a5d;
+    --blue:#2f72c4; --blue-d:#1b4d8f; --blue-l:#5fa0e6;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    --line:#e2e7ec;
+  }
+  #app{height:100%;width:100%;position:relative;}
+  .screen{position:absolute;inset:0;display:none;flex-direction:column;}
+  .screen.on{display:flex;}
+
+  /* ---- shared chrome ---- */
+  .topbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(6px);flex:none;z-index:5;}
+  .brand{display:flex;align-items:center;gap:10px;cursor:pointer;}
+  .brand img{width:34px;height:34px;border-radius:50%;display:block;}
+  .brand .t{font-weight:800;font-size:16px;letter-spacing:-.01em;line-height:1;}
+  .brand .t b{color:var(--red);} .brand .t i{font-style:normal;color:var(--blue);}
+  .brand .s{font-size:10px;color:#8a929a;font-family:var(--mono);margin-top:3px;}
+  .spacer{flex:1;}
+  .btn{padding:9px 15px;border:1px solid #d7dde3;background:#fff;border-radius:9px;font-weight:600;font-size:13px;color:#1a2330;cursor:pointer;font-family:inherit;transition:border-color .15s,box-shadow .15s,background .15s;}
+  .btn:hover{border-color:#c2ccd6;box-shadow:0 3px 10px rgba(20,30,45,.07);}
+  .btn-accent{background:var(--navy);color:#fff;border:none;}
+  .btn-accent:hover{background:#27405d;}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px;border:1px solid var(--line);background:#fff;}
+  .dot{width:9px;height:9px;border-radius:50%;}
+  .dot.r{background:var(--red);} .dot.b{background:var(--blue);}
+
+  /* ---- title ---- */
+  #title{align-items:center;justify-content:center;background:
+     radial-gradient(120% 80% at 12% -10%, rgba(216,58,47,.12), transparent 55%),
+     radial-gradient(120% 80% at 88% -10%, rgba(47,114,196,.12), transparent 55%),
+     #eef1f4;}
+  .hero{text-align:center;padding:24px;max-width:760px;}
+  .hero .logo{width:96px;height:96px;border-radius:50%;margin-bottom:18px;box-shadow:0 10px 30px rgba(20,30,45,.18);}
+  .hero h1{font-size:clamp(40px,9vw,84px);line-height:.92;letter-spacing:-.03em;font-weight:900;}
+  .hero h1 .v{color:#9aa3ab;font-weight:800;margin:0 .08em;}
+  .hero h1 .r{color:var(--red);} .hero h1 .b{color:var(--blue);}
+  .hero p{margin-top:14px;color:#5a6470;font-size:16px;line-height:1.5;}
+  .hero .vs{margin:22px auto 6px;display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;}
+  .keycap{font-family:var(--mono);font-weight:800;font-size:12px;border-radius:7px;padding:7px 9px;border:2px solid;min-width:30px;text-align:center;}
+  .keycap.r{border-color:var(--red);color:var(--red-d);background:#fdeceb;}
+  .keycap.b{border-color:var(--blue);color:var(--blue-d);background:#eaf2fc;}
+  .keyset{display:flex;gap:5px;align-items:center;}
+  .start-btn{margin-top:26px;font-size:18px;padding:15px 40px;border-radius:13px;font-weight:800;letter-spacing:.01em;}
+
+  /* ---- hub ---- */
+  #hub{background:#eef1f4;}
+  .hub-body{flex:1;overflow-y:auto;padding:20px;}
+  .hub-inner{max-width:1080px;margin:0 auto;}
+  .section-h{font-family:var(--mono);font-size:12px;font-weight:700;color:#8a929a;text-transform:uppercase;letter-spacing:.08em;margin:6px 2px 12px;}
+  .std-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;}
+  .std-chip{cursor:pointer;border:2px solid var(--line);background:#fff;border-radius:11px;padding:9px 13px;font-weight:700;font-size:13px;color:#4a5562;transition:all .14s;display:flex;flex-direction:column;gap:2px;min-width:78px;}
+  .std-chip small{font-family:var(--mono);font-size:10px;font-weight:600;color:#9aa3ab;}
+  .std-chip.sel{border-color:var(--navy);color:var(--navy);background:#f4f7fb;box-shadow:0 3px 12px rgba(47,74,107,.12);}
+  .std-chip.sel small{color:var(--navy);}
+  .games{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:14px;}
+  .game-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:0;cursor:pointer;overflow:hidden;transition:transform .12s,box-shadow .15s,border-color .15s;display:flex;flex-direction:column;}
+  .game-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(20,30,45,.13);border-color:#d2dae2;}
+  .game-card.soon{opacity:.66;cursor:default;}
+  .game-card.soon:hover{transform:none;box-shadow:none;border-color:var(--line);}
+  .gc-art{height:96px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .gc-body{padding:13px 15px 15px;}
+  .gc-tag{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.05em;padding:3px 7px;border-radius:5px;color:#fff;margin-bottom:8px;}
+  .gc-title{font-size:16px;font-weight:800;letter-spacing:-.01em;line-height:1.1;}
+  .gc-desc{font-size:12.5px;color:#6a7480;line-height:1.4;margin-top:6px;}
+  .gc-soon{position:absolute;top:9px;right:9px;background:rgba(22,38,61,.86);color:#fff;font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 7px;border-radius:5px;letter-spacing:.04em;}
+
+  /* scoreboard */
+  .score-bar{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px 14px;margin-bottom:20px;}
+  .score-side{display:flex;align-items:center;gap:9px;font-weight:800;}
+  .score-num{font-family:var(--mono);font-size:24px;line-height:1;}
+  .score-side.r .score-num{color:var(--red);} .score-side.b .score-num{color:var(--blue);}
+  .score-mid{flex:1;text-align:center;font-family:var(--mono);font-size:11px;color:#9aa3ab;}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;}
+  .seg button{border:none;background:#fff;padding:7px 12px;font-family:var(--mono);font-size:12px;font-weight:700;color:#6a7480;cursor:pointer;border-right:1px solid var(--line);}
+  .seg button:last-child{border-right:none;}
+  .seg button.on{background:var(--navy);color:#fff;}
+
+  /* ---- game screen ---- */
+  #game{background:#0f1a2b;}
+  .game-top{display:flex;align-items:center;gap:12px;padding:8px 14px;background:#16263d;color:#fff;flex:none;z-index:5;}
+  .game-top .gt-name{font-weight:800;font-size:15px;}
+  .game-top .gt-std{font-family:var(--mono);font-size:11px;color:#7f93ad;}
+  .gt-score{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-weight:800;font-size:18px;}
+  .gt-score.r{color:var(--red-l);} .gt-score.b{color:var(--blue-l);}
+  .gt-btn{padding:7px 13px;border:1px solid #2f4666;background:transparent;color:#cdd8e6;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;font-family:inherit;}
+  .gt-btn:hover{background:#22344f;}
+  .canvas-wrap{flex:1;position:relative;min-height:0;}
+  canvas{display:block;width:100%;height:100%;touch-action:none;}
+
+  /* result modal */
+  #result{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(10,18,30,.6);backdrop-filter:blur(3px);z-index:20;}
+  #result.on{display:flex;}
+  .result-card{background:#fff;border-radius:18px;padding:32px 34px;text-align:center;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,.4);animation:pop .25s ease;}
+  @keyframes pop{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+  .result-card .win{font-size:13px;font-family:var(--mono);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9aa3ab;}
+  .result-card h2{font-size:38px;font-weight:900;margin:8px 0 4px;letter-spacing:-.02em;}
+  .result-card .rscore{font-family:var(--mono);font-size:15px;color:#6a7480;margin-bottom:22px;}
+  .result-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+  /* footer TS button */
+  .ts-foot{flex:none;text-align:center;padding:12px;border-top:1px solid var(--line);background:#fff;}
+  .ts-link{display:inline-flex;align-items:center;gap:9px;text-decoration:none;background:var(--green);color:#fff;font-weight:800;font-size:13.5px;padding:11px 20px;border-radius:11px;box-shadow:0 4px 14px rgba(74,138,63,.28);transition:transform .12s,box-shadow .15s;}
+  .ts-link:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(74,138,63,.36);}
+  .ts-link img{width:22px;height:22px;border-radius:50%;}
+  .gc-link{margin-top:10px;width:100%;border:1px solid var(--line);background:#f4f7fb;border-radius:9px;padding:8px;font-weight:700;font-size:12px;color:var(--navy);cursor:pointer;font-family:inherit;transition:background .14s,border-color .14s;}
+  .gc-link:hover{background:#eaf0f6;border-color:#c2ccd6;}
+  /* freemium: badges, locked cards, play/buy buttons */
+  .gc-badge{position:absolute;top:9px;left:9px;font-family:var(--mono);font-size:9.5px;font-weight:800;padding:4px 8px;border-radius:6px;letter-spacing:.03em;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,.18);}
+  .gc-badge.free{background:var(--green);color:#fff;}
+  .gc-badge.week{background:#e8a52a;color:#3a2600;}
+  .gc-badge.lock{background:rgba(22,38,61,.92);color:#ffd36a;}
+  .game-card.locked{border-style:dashed;border-color:#cdd5de;}
+  .game-card.locked .gc-art{filter:grayscale(.5) brightness(.82);}
+  .game-card.locked:hover{transform:none;box-shadow:0 8px 20px rgba(20,30,45,.10);}
+  .gc-play{margin-top:10px;width:100%;border:none;background:var(--green);color:#fff;border-radius:9px;padding:9px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;transition:filter .14s;}
+  .gc-play:hover{filter:brightness(1.07);}
+  .gc-buy{margin-top:10px;width:100%;border:1px solid #d8b24a;background:#fff7e6;color:#8a5a10;border-radius:9px;padding:9px;font-weight:800;font-size:12.5px;cursor:pointer;font-family:inherit;transition:background .14s;}
+  .gc-buy:hover{background:#ffefcf;}
+  .gc-own{margin-top:7px;width:100%;border:1px solid var(--line);background:#fff;color:#6a7480;border-radius:9px;padding:7px;font-weight:700;font-size:11.5px;cursor:pointer;font-family:inherit;transition:background .14s,color .14s,border-color .14s;}
+  .gc-own:hover{background:#fff7e6;color:#8a5a10;border-color:#d8b24a;}
+  .buy-box{background:#f4f7fb;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:14px;display:flex;gap:18px;align-items:center;}
+  .buy-price{font-size:42px;font-weight:900;color:var(--navy);letter-spacing:-.02em;line-height:1;}
+  .buy-list{list-style:none;font-size:13px;color:#4a5562;line-height:1.7;}
+  .buy-list li::before{content:'\2713  ';color:var(--green);font-weight:900;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#6a7480;margin:-6px 2px 14px;}
+  .legend b{font-weight:700;color:#3a4552;}
+  .legend .k{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:middle;}
+  #linkModal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(10,18,30,.6);backdrop-filter:blur(3px);z-index:50;padding:20px;}
+  #linkModal.on{display:flex;}
+  .lm-card{background:#fff;border-radius:18px;padding:24px 26px;max-width:560px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.4);animation:pop .2s ease;}
+  .lm-h{font-size:22px;font-weight:900;letter-spacing:-.01em;}
+  .lm-sub{font-size:13px;color:#6a7480;margin:4px 0 8px;}
+  .lm-lbl{display:block;font-family:var(--mono);font-size:11px;font-weight:700;color:#8a929a;text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px;}
+  .lm-row{display:flex;gap:8px;align-items:flex-start;}
+  .lm-in{flex:1;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:var(--mono);font-size:12px;color:#1a2330;background:#f4f7fb;resize:none;width:100%;}
+  .lm-note{font-size:12px;color:#8a929a;margin-top:14px;line-height:1.5;}
+  .lm-actions{display:flex;justify-content:flex-end;margin-top:16px;}
+
+  .hint{font-family:var(--mono);font-size:11px;color:#9aa3ab;text-align:center;margin-top:10px;}
+  @media(max-width:560px){
+    .brand .s{display:none;}
+    .gt-std{display:none;}
+  }
+</style>
+</head>
+<body>
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100" height="100" fill="#0f1a2b"/>
+  <rect x="8" y="8" width="38" height="84" rx="6" fill="#2a1310"/>
+  <rect x="54" y="8" width="38" height="84" rx="6" fill="#0f1d33"/>
+  <circle cx="27" cy="50" r="13" fill="#d83a2f"/>
+  <circle cx="73" cy="50" r="13" fill="#2f72c4"/>
+  <text x="50" y="56" font-family="Arial" font-size="15" font-weight="900" fill="#dce6f2" text-anchor="middle">v</text>
+</svg>
+</template>
+<div id="app">
+
+  <!-- TITLE -->
+  <section id="title" class="screen on">
+    <div class="hero">
+      <img class="logo" src="assets/tobin-logo.png" alt="Tobin Science">
+      <h1><span class="r">1</span><span class="v">v</span><span class="b">1</span> LIFE SCIENCE</h1>
+      <p>A head-to-head science arcade. Red battles Blue across mini-games — answer fast, play hard, win the standard.</p>
+      <div class="vs">
+        <div class="keyset">
+          <span class="keycap r">W</span><span class="keycap r">A</span><span class="keycap r">S</span><span class="keycap r">D</span>
+          <span style="font-weight:800;color:var(--red);margin-left:4px;">RED</span>
+        </div>
+        <span style="font-weight:900;color:#9aa3ab;font-size:20px;">VS</span>
+        <div class="keyset">
+          <span style="font-weight:800;color:var(--blue);margin-right:4px;">BLUE</span>
+          <span class="keycap b">↑</span><span class="keycap b">←</span><span class="keycap b">↓</span><span class="keycap b">→</span>
+        </div>
+      </div>
+      <button class="btn btn-accent start-btn" id="toHub">Enter the Arena →</button>
+      <div class="hint">Two players · one keyboard · or tap “Touch mode” inside any game</div>
+    </div>
+  </section>
+
+  <!-- HUB -->
+  <section id="hub" class="screen">
+    <div class="topbar">
+      <div class="brand" id="hubBrand">
+        <img src="assets/tobin-logo.png" alt="">
+        <div>
+          <div class="t"><b>1</b>v<i>1</i> Life Science</div>
+          <div class="s">red vs blue · pick a standard &amp; a game</div>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <span class="pill"><span class="dot r"></span> Red &nbsp; <span class="dot b"></span> Blue</span>
+    </div>
+
+    <div class="hub-body">
+      <div class="hub-inner">
+
+        <div class="score-bar">
+          <div class="score-side r"><span class="dot r" style="width:13px;height:13px;"></span> RED <span class="score-num" id="sbRed">0</span></div>
+          <div class="score-mid">SESSION TOURNAMENT<br><span id="sbInfo">first team to win is on top</span></div>
+          <div class="score-side b"><span class="score-num" id="sbBlue">0</span> BLUE <span class="dot b" style="width:13px;height:13px;"></span></div>
+          <button class="btn" id="resetScore" style="margin-left:8px;">Reset</button>
+        </div>
+
+        <div class="section-h">1 · Pick a standard</div>
+        <div class="std-row" id="stdRow"></div>
+
+        <div class="section-h">2 · Pick a game &nbsp;<span style="color:var(--navy);text-transform:none;letter-spacing:0;">— match: <span id="modeLabel">first to 3</span></span></div>
+        <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:18px;">
+          <span class="section-h" style="margin:0;">Win at</span>
+          <div class="seg" id="targetSeg">
+            <button data-t="2">First to 2</button>
+            <button data-t="3" class="on">First to 3</button>
+            <button data-t="5">First to 5</button>
+          </div>
+          <div class="seg" id="touchSeg" style="margin-left:auto;">
+            <button data-touch="0" class="on">⌨ Keyboard</button>
+            <button data-touch="1">👆 Touch</button>
+          </div>
+        </div>
+
+        <div class="legend">
+          <span><span class="k" style="background:var(--green)"></span><b>Free</b> — play here anytime</span>
+          <span><span class="k" style="background:#e8a52a"></span><b>Free this week</b> — rotates every Monday</span>
+          <span><span class="k" style="background:#16263d"></span><b>🔒 $2</b> — unlock &amp; download to keep forever</span>
+        </div>
+        <div class="games" id="gameGrid"></div>
+      </div>
+    </div>
+
+    <div class="ts-foot">
+      <a class="ts-link" href="https://tobinscience.com" target="_blank" rel="noopener">
+        <img src="assets/tobin-logo.png" alt=""> Find More Great Resources at TobinScience.com →
+      </a>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="game" class="screen">
+    <div class="game-top">
+      <button class="gt-btn" id="quitGame">← Quit</button>
+      <span class="gt-name" id="gtName">Game</span>
+      <span class="gt-std" id="gtStd"></span>
+      <div class="spacer"></div>
+      <span class="gt-score r"><span class="dot r"></span><span id="gtRed">0</span></span>
+      <span class="gt-std">to <span id="gtTarget">3</span></span>
+      <span class="gt-score b"><span id="gtBlue">0</span><span class="dot b"></span></span>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="cv"></canvas>
+      <div id="result">
+        <div class="result-card">
+          <div class="win">Winner</div>
+          <h2 id="winName">Red</h2>
+          <div class="rscore" id="winScore"></div>
+          <div class="result-actions">
+            <button class="btn" id="rematch">Rematch</button>
+            <button class="btn btn-accent" id="backHub">Back to Hub</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =====================================================================
+   1 v 1 LIFE SCIENCE  ·  TobinScience.com
+   Single-file, vanilla JS + Canvas 2D. Built light for Chromebooks.
+   To add a game: push an entry into GAMES with a make() factory that
+   returns { update(dt), draw(g), onResize() }. Call ENG.win(player)
+   when a game ends.
+   ===================================================================== */
+(function(){
+"use strict";
+
+/* ---------- palette ---------- */
+const C = {
+  red:'#d83a2f', redD:'#a82418', redL:'#f06a5d', redBg:'#2a1310',
+  blue:'#2f72c4', blueD:'#1b4d8f', blueL:'#5fa0e6', blueBg:'#0f1d33',
+  navy:'#16263d', line:'#2a3a52', ink:'#dce6f2', mut:'#8aa0bd',
+  field:'#0f1a2b', good:'#46c46a', bad:'#e2554a'
+};
+const PLAYERS = ['red','blue'];
+function col(p){return p==='red'?C.red:C.blue;}
+function colD(p){return p==='red'?C.redD:C.blueD;}
+function colL(p){return p==='red'?C.redL:C.blueL;}
+
+/* =====================================================================
+   QUESTION BANKS  ·  GA 7th grade Life Science S7L1–S7L5
+   type 'mc'  -> opts[4], a = index of correct
+   type 'tf'  -> a = true/false  (rendered as True / False)
+   ===================================================================== */
+const STANDARDS = [
+  {id:'S7L1', name:'Classification', sub:'diversity · six kingdoms'},
+  {id:'S7L2', name:'Cells & Body',   sub:'organelles · systems'},
+  {id:'S7L3', name:'Genetics',       sub:'reproduction · heredity'},
+  {id:'S7L4', name:'Ecology',        sub:'ecosystems · energy'},
+  {id:'S7L5', name:'Evolution',      sub:'natural selection'},
+  {id:'MIX',  name:'Mixed Review',   sub:'all standards'}
+];
+
+const BANK = {
+S7L1:[
+ {type:'mc', q:'How many kingdoms are in the modern classification system used today?', opts:['Two','Four','Six','Ten'], a:2, ex:'Living things are sorted into six kingdoms: archaea, bacteria, protists, fungi, plants, and animals.'},
+ {type:'mc', q:'Scientists classify organisms mainly by their…', opts:['Size and weight','Shared characteristics','Color only','Where they were found'], a:1, ex:'Classification groups organisms by shared characteristics, like body structures and cell type.'},
+ {type:'mc', q:'Which kingdom contains organisms whose cells have NO nucleus (prokaryotes)?', opts:['Plants','Animals','Bacteria','Fungi'], a:2, ex:'Bacteria and archaea are prokaryotes — their cells have no nucleus. All other kingdoms are eukaryotes.'},
+ {type:'mc', q:'A mushroom is a decomposer that absorbs nutrients. It belongs to which kingdom?', opts:['Plants','Fungi','Protists','Animals'], a:1, ex:'Mushrooms, molds, and yeasts are fungi — they absorb nutrients rather than making their own food.'},
+ {type:'mc', q:'The two-word scientific name of an organism (like Homo sapiens) uses its…', opts:['Kingdom and phylum','Genus and species','Class and order','Family and domain'], a:1, ex:'Binomial nomenclature names an organism by its genus and species.'},
+ {type:'mc', q:'An animal WITHOUT a backbone is called a(n)…', opts:['Vertebrate','Invertebrate','Mammal','Amphibian'], a:1, ex:'Invertebrates (like insects and worms) have no backbone; vertebrates (like fish and mammals) do.'},
+ {type:'mc', q:'A dichotomous key identifies an organism by asking a series of…', opts:['Two-choice questions','Random guesses','Color questions','Yes-only questions'], a:0, ex:'A dichotomous key uses paired either/or questions to narrow down and identify an organism.'},
+ {type:'mc', q:'Which classification level is the BROADEST (most organisms)?', opts:['Species','Genus','Kingdom','Order'], a:2, ex:'Kingdom is very broad; species is the most specific level with the fewest, most similar organisms.'},
+ {type:'tf', q:'All organisms in the kingdom Plantae make their own food using sunlight.', a:true, ex:'Plants are producers — they make their own food through photosynthesis.'},
+ {type:'tf', q:'Fungi make their own food through photosynthesis, just like plants.', a:false, ex:'Fungi do NOT photosynthesize — they absorb nutrients from other matter as decomposers.'},
+ {type:'tf', q:'The species level contains organisms that are the most alike.', a:true, ex:'Species is the most specific group — its members are so similar they can reproduce together.'},
+ {type:'tf', q:'Bacteria and archaea are single-celled organisms without a true nucleus.', a:true, ex:'Both bacteria and archaea are prokaryotes — single cells with no membrane-bound nucleus.'},
+],
+S7L2:[
+ {type:'mc', q:'Which organelle controls the cell and holds its genetic information (DNA)?', opts:['Mitochondria','Nucleus','Cell wall','Lysosome'], a:1, ex:'The nucleus is the control center of the cell and stores the DNA.'},
+ {type:'mc', q:'The mitochondria are known as the ___ of the cell because they release energy.', opts:['Powerhouse','Brain','Skeleton','Skin'], a:0, ex:'Mitochondria release energy from food, so they are called the powerhouse of the cell.'},
+ {type:'mc', q:'Which structures are found in PLANT cells but NOT animal cells?', opts:['Nucleus & mitochondria','Cell wall & chloroplasts','Cytoplasm & membrane','Lysosome & nucleus'], a:1, ex:'Only plant cells have a cell wall and chloroplasts; animal cells have neither.'},
+ {type:'mc', q:'Chloroplasts carry out…', opts:['Digestion','Photosynthesis','Waste removal','Reproduction'], a:1, ex:'Chloroplasts use sunlight to make food in a process called photosynthesis.'},
+ {type:'mc', q:'What controls which materials enter and leave the cell?', opts:['Nucleus','Cell membrane','Chloroplast','Vacuole'], a:1, ex:'The cell membrane is selectively permeable — it controls what goes in and out of the cell.'},
+ {type:'mc', q:'Put these in order from SMALLEST to largest:', opts:['Organ → tissue → cell','Cell → tissue → organ','Tissue → cell → organ','Organ → cell → tissue'], a:1, ex:'Cells form tissues, tissues form organs, organs form organ systems, systems form the organism.'},
+ {type:'mc', q:'Which body system transports blood, oxygen, and nutrients through the body?', opts:['Respiratory','Nervous','Cardiovascular','Digestive'], a:2, ex:'The cardiovascular (circulatory) system moves blood, oxygen, and nutrients throughout the body.'},
+ {type:'mc', q:'The respiratory system’s main job is to…', opts:['Digest food','Exchange oxygen and carbon dioxide','Pump blood','Send nerve signals'], a:1, ex:'The respiratory system brings in oxygen and removes carbon dioxide from the body.'},
+ {type:'tf', q:'A lysosome breaks down and digests waste inside the cell.', a:true, ex:'Lysosomes contain enzymes that break down waste and worn-out cell parts.'},
+ {type:'tf', q:'Both plant and animal cells have a rigid cell wall.', a:false, ex:'Only plant cells have a cell wall; animal cells have just a flexible cell membrane.'},
+ {type:'tf', q:'The cell is the basic building block of all living things.', a:true, ex:'All living organisms are made of one or more cells — the basic unit of life.'},
+ {type:'tf', q:'Body systems like the digestive and circulatory systems work together to keep you alive.', a:true, ex:'Organ systems interact — for example, the digestive system supplies nutrients the blood then carries.'},
+],
+S7L3:[
+ {type:'mc', q:'Genes that carry instructions for traits are located on…', opts:['Chromosomes','Cell walls','Ribosomes','Vacuoles'], a:0, ex:'Genes are segments of DNA found on chromosomes inside the nucleus.'},
+ {type:'mc', q:'A DOMINANT allele is written with a ___ letter and hides the recessive trait.', opts:['Lowercase','Capital','Number','Symbol'], a:1, ex:'Dominant alleles use a capital letter (B) and mask recessive alleles (b) when present.'},
+ {type:'mc', q:'Sexual reproduction produces offspring that are…', opts:['Identical to one parent','Genetically different from parents','Clones','Always male'], a:1, ex:'Sexual reproduction mixes genes from two parents, creating offspring with genetic variation.'},
+ {type:'mc', q:'Asexual reproduction produces offspring that are…', opts:['Genetically identical to the parent','Different from the parent','Always larger','Made by two parents'], a:0, ex:'Asexual reproduction uses one parent, so offspring are genetic copies (clones) of that parent.'},
+ {type:'mc', q:'An organism with the genotype Bb (one dominant, one recessive) will show the…', opts:['Recessive trait','Dominant trait','No trait','Both equally'], a:1, ex:'With at least one dominant allele (B), the dominant trait is expressed.'},
+ {type:'mc', q:'Crossing Bb × Bb gives a phenotype ratio of about…', opts:['1 dominant : 1 recessive','All dominant','3 dominant : 1 recessive','All recessive'], a:2, ex:'A Bb × Bb cross gives 3 offspring showing the dominant trait for every 1 recessive (3:1).'},
+ {type:'mc', q:'Choosing parent organisms with desired traits to breed is called…', opts:['Natural selection','Selective breeding','Cloning','Mutation'], a:1, ex:'Selective breeding is when humans choose which organisms reproduce to pass on desired traits.'},
+ {type:'mc', q:'A trait is…', opts:['A type of cell','A characteristic passed from parents','A body system','A kind of chromosome'], a:1, ex:'A trait is an inherited characteristic, like eye color or height.'},
+ {type:'tf', q:'Asexual reproduction results in offspring with identical genetic information.', a:true, ex:'Because there is only one parent, asexual offspring are genetically identical to it.'},
+ {type:'tf', q:'Sexual reproduction increases genetic variation in offspring.', a:true, ex:'Combining genes from two parents creates new gene combinations and more variation.'},
+ {type:'tf', q:'Offspring inherit their genes from their parents.', a:true, ex:'Traits are passed from parents to offspring through genes on chromosomes.'},
+ {type:'tf', q:'Chromosomes are found in the mitochondria of the cell.', a:false, ex:'Chromosomes are found in the nucleus of the cell, not the mitochondria.'},
+],
+S7L4:[
+ {type:'mc', q:'Organisms that make their own food, like plants, are called…', opts:['Consumers','Producers','Decomposers','Predators'], a:1, ex:'Producers (like plants) make their own food using sunlight and form the base of a food chain.'},
+ {type:'mc', q:'In most ecosystems, the original source of energy is the…', opts:['Soil','Sun','Water','Wind'], a:1, ex:'Nearly all energy in an ecosystem starts with sunlight captured by producers.'},
+ {type:'mc', q:'Which organisms break down dead matter and return nutrients to the soil?', opts:['Producers','Herbivores','Decomposers','Carnivores'], a:2, ex:'Decomposers (like fungi and bacteria) recycle nutrients by breaking down dead organisms.'},
+ {type:'mc', q:'The arrows in a food chain show the direction that ___ flows.', opts:['Energy','Water','Air','Soil'], a:0, ex:'Food-chain arrows point from the organism being eaten to the eater, showing energy flow.'},
+ {type:'mc', q:'About how much energy passes from one level of a food chain to the next?', opts:['10%','50%','90%','100%'], a:0, ex:'Only about 10% of energy transfers up each level; most is lost as heat, so pyramids get smaller at the top.'},
+ {type:'mc', q:'Which is an ABIOTIC (nonliving) part of an ecosystem?', opts:['A rabbit','A tree','Sunlight','Bacteria'], a:2, ex:'Abiotic factors are nonliving — like sunlight, water, temperature, and soil.'},
+ {type:'mc', q:'An animal that eats ONLY plants is a(n)…', opts:['Carnivore','Herbivore','Omnivore','Decomposer'], a:1, ex:'A herbivore eats only plants; carnivores eat meat and omnivores eat both.'},
+ {type:'mc', q:'Which biome is hot and dry with very little rainfall?', opts:['Tropical rain forest','Desert','Tundra','Temperate forest'], a:1, ex:'Deserts get the least rainfall of any biome and have organisms adapted to store water.'},
+ {type:'tf', q:'In an ecosystem, matter is recycled while energy flows through and is lost.', a:true, ex:'Matter cycles again and again, but energy flows one way and is gradually lost as heat.'},
+ {type:'tf', q:'Limiting factors like disease, climate, and food supply can control a population’s size.', a:true, ex:'Limiting factors such as resources, disease, and climate keep populations from growing without limit.'},
+ {type:'tf', q:'A community includes only the living things in an area.', a:true, ex:'A community is all the living populations in an area; adding the abiotic factors makes an ecosystem.'},
+ {type:'tf', q:'Decomposers return nutrients to the soil for producers to reuse.', a:true, ex:'Decomposers break down dead matter, recycling nutrients back into the soil.'},
+],
+S7L5:[
+ {type:'mc', q:'Natural selection is often described as…', opts:['Survival of the strongest','Survival of the best-adapted','Survival of the largest','Survival of the fastest'], a:1, ex:'Natural selection favors the organisms best adapted to their environment, not just the strongest.'},
+ {type:'mc', q:'Differences among individuals of the same species are called…', opts:['Adaptations','Variation','Extinction','Fossils'], a:1, ex:'Variation is the natural difference in traits within a population — the raw material for selection.'},
+ {type:'mc', q:'A trait that helps an organism survive in its environment is a(n)…', opts:['Adaptation','Habitat','Predator','Fossil'], a:0, ex:'An adaptation is an inherited trait that increases an organism’s chance of surviving and reproducing.'},
+ {type:'mc', q:'Fossils are important because they provide evidence that…', opts:['Organisms never change','Life has changed over time','The Earth is small','All species are the same'], a:1, ex:'The fossil record shows how organisms have changed, appeared, and gone extinct over long periods.'},
+ {type:'mc', q:'In undisturbed rock layers, the DEEPEST fossils are usually the…', opts:['Youngest','Oldest','Largest','Smallest'], a:1, ex:'Deeper rock layers formed first, so the fossils buried deepest are the oldest.'},
+ {type:'mc', q:'When a species dies out completely, it becomes…', opts:['Adapted','Extinct','Dominant','A fossil-maker'], a:1, ex:'Extinction is when every member of a species has died and none remain.'},
+ {type:'mc', q:'A green insect on green leaves is hard for predators to see. This adaptation is…', opts:['Migration','Camouflage','Hibernation','Extinction'], a:1, ex:'Camouflage lets an organism blend into its surroundings to avoid predators.'},
+ {type:'mc', q:'Which scientist is famous for the theory of evolution by natural selection?', opts:['Isaac Newton','Charles Darwin','Gregor Mendel','Albert Einstein'], a:1, ex:'Charles Darwin proposed evolution by natural selection after studying variation in nature.'},
+ {type:'tf', q:'Individuals with helpful traits are more likely to survive and reproduce.', a:true, ex:'Helpful traits make survival and reproduction more likely, so those traits become more common.'},
+ {type:'tf', q:'Fossils provide evidence for how organisms have evolved over time.', a:true, ex:'The fossil record documents changes in organisms across millions of years.'},
+ {type:'tf', q:'Natural selection acts on the variation that already exists in a population.', a:true, ex:'Selection can only work on the differences (variation) already present among individuals.'},
+ {type:'tf', q:'Over many generations, natural selection can change the common traits of a population.', a:true, ex:'As better-adapted individuals reproduce more, helpful traits become more common over generations.'},
+],
+};
+
+function makeMix(){
+  let all=[];
+  for(const k of ['S7L1','S7L2','S7L3','S7L4','S7L5']) all=all.concat(BANK[k]);
+  return all;
+}
+BANK.MIX = makeMix();
+
+/* normalize a question into {q, opts[], correct, ex} */
+function normQ(raw){
+  if(raw.type==='tf'){
+    return {q:raw.q, opts:['True','False'], correct: raw.a?0:1, n:2, ex:raw.ex||''};
+  }
+  return {q:raw.q, opts:raw.opts.slice(), correct:raw.a, n:raw.opts.length, ex:raw.ex||''};
+}
+
+/* per-standard shuffled queue so questions don't repeat back-to-back */
+const QBag = {
+  bags:{},
+  next(std){
+    let b=this.bags[std];
+    if(!b||!b.length){
+      b=this.bags[std]=BANK[std].map((_,i)=>i);
+      for(let i=b.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[b[i],b[j]]=[b[j],b[i]];}
+    }
+    const raw=BANK[std][b.shift()];
+    const out=normQ(raw);
+    // shuffle option order for mc (keep tf as True/False)
+    if(raw.type!=='tf'){
+      const idx=out.opts.map((_,i)=>i);
+      for(let i=idx.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[idx[i],idx[j]]=[idx[j],idx[i]];}
+      out.opts=idx.map(i=>out.opts[i]);
+      out.correct=idx.indexOf(out.correct);
+    }
+    return out;
+  }
+};
+
+/* =====================================================================
+   INPUT  ·  keyboard (WASD / arrows / space / enter) + on-canvas touch
+   API: IN.held(player, action) | IN.pressed(player, action)
+        actions: 'up' 'down' 'left' 'right' 'fire'
+   Answering: IN.answer(player, n)  -> 0..n-1 once, or -1
+   ===================================================================== */
+const KEYMAP = {
+  red:  {up:'w', down:'s', left:'a', right:'d', fire:'space'},
+  blue: {up:'arrowup', down:'arrowdown', left:'arrowleft', right:'arrowright', fire:'enter'}
+};
+const ANS_DIR4 = ['up','left','down','right']; // diamond order
+const ANS_DIR2 = ['up','down'];
+
+const IN = {
+  down:new Set(), pkeys:new Set(),
+  touchHold:{red:{},blue:{}}, touchPress:{red:{},blue:{}},
+  touchAnswer:{red:-1, blue:-1},
+  regions:[], // {x,y,w,h, player, action}  action: dir/fire  OR answer regions handled separately
+  ansRegions:[], // {x,y,w,h, player, idx}
+  init(){
+    addEventListener('keydown', e=>{
+      const k=norm(e); if(!k) return;
+      if(['space','arrowup','arrowdown','arrowleft','arrowright'].includes(k)) e.preventDefault();
+      if(!e.repeat){ this.pkeys.add(k); }
+      this.down.add(k);
+    });
+    addEventListener('keyup', e=>{ const k=norm(e); if(k) this.down.delete(k); });
+    addEventListener('blur', ()=>{ this.down.clear(); });
+    function norm(e){
+      let k=e.key.toLowerCase();
+      if(k===' '||k==='spacebar') return 'space';
+      if(k==='enter') return 'enter';
+      if(k.startsWith('arrow')) return k;
+      if('wasd'.includes(k)) return k;
+      return null;
+    }
+  },
+  // canvas pointer handling
+  bindCanvas(cv){
+    const self=this;
+    function pt(e){const r=cv.getBoundingClientRect();return {x:e.clientX-r.left, y:e.clientY-r.top};}
+    const active={}; // pointerId -> region ref
+    function hitDir(p){ for(const r of self.regions){ if(p.x>=r.x&&p.x<=r.x+r.w&&p.y>=r.y&&p.y<=r.y+r.h) return r; } return null; }
+    function hitAns(p){ for(const r of self.ansRegions){ if(p.x>=r.x&&p.x<=r.x+r.w&&p.y>=r.y&&p.y<=r.y+r.h) return r; } return null; }
+    cv.addEventListener('pointerdown', e=>{
+      cv.setPointerCapture(e.pointerId);
+      const p=pt(e);
+      const a=hitAns(p); if(a){ self.touchAnswer[a.player]=a.idx; }
+      const d=hitDir(p); if(d){ active[e.pointerId]=d; self.touchHold[d.player][d.action]=true; self.touchPress[d.player][d.action]=true; }
+    });
+    cv.addEventListener('pointerup', e=>{ const d=active[e.pointerId]; if(d){ self.touchHold[d.player][d.action]=false; delete active[e.pointerId]; } });
+    cv.addEventListener('pointercancel', e=>{ const d=active[e.pointerId]; if(d){ self.touchHold[d.player][d.action]=false; delete active[e.pointerId]; } });
+    cv.addEventListener('pointermove', e=>{
+      const d=active[e.pointerId]; if(!d) return; const p=pt(e);
+      const inside = p.x>=d.x&&p.x<=d.x+d.w&&p.y>=d.y&&p.y<=d.y+d.h;
+      self.touchHold[d.player][d.action]=inside;
+    });
+  },
+  held(player, action){
+    return this.down.has(KEYMAP[player][action]) || !!this.touchHold[player][action];
+  },
+  pressed(player, action){
+    return this.pkeys.has(KEYMAP[player][action]) || !!this.touchPress[player][action];
+  },
+  // returns answer index 0..n-1 chosen THIS frame, else -1
+  answer(player, n){
+    const dirs = n<=2?ANS_DIR2:ANS_DIR4;
+    for(let i=0;i<dirs.length && i<n;i++){
+      if(this.pkeys.has(KEYMAP[player][dirs[i]]) || this.touchPress[player][dirs[i]]) return i;
+    }
+    if(this.touchAnswer[player]>=0 && this.touchAnswer[player]<n){ return this.touchAnswer[player]; }
+    return -1;
+  },
+  // glyph shown on an answer option for player & option index
+  glyph(player, i, n){
+    const dirs = n<=2?ANS_DIR2:ANS_DIR4;
+    const g = player==='red'
+      ? {up:'W',left:'A',down:'S',right:'D'}
+      : {up:'↑',left:'←',down:'↓',right:'→'};
+    return g[dirs[i]]||'';
+  },
+  endFrame(){
+    this.pkeys.clear();
+    this.touchPress={red:{},blue:{}};
+    this.touchAnswer={red:-1, blue:-1};
+    this.regions=[]; this.ansRegions=[];
+  },
+  addRegion(r){ this.regions.push(r); },
+  addAnsRegion(r){ this.ansRegions.push(r); }
+};
+
+/* =====================================================================
+   STATE (session)
+   ===================================================================== */
+const ST = {
+  standard:'S7L1',
+  target:3,
+  touch:false,
+  series:{red:0, blue:0}, // tournament: games won
+};
+
+/* =====================================================================
+   ENGINE  ·  canvas, loop, screen routing
+   ===================================================================== */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d', {alpha:false});
+const ENG = {
+  W:0,H:0,dpr:1,
+  screen:'title',
+  game:null, gameDef:null,
+  running:false, lastT:0,
+  resize(){
+    const wrap=cv.parentElement;
+    const w=wrap.clientWidth, h=wrap.clientHeight;
+    this.dpr=Math.min(window.devicePixelRatio||1, 1.75);
+    cv.width=Math.max(1,Math.round(w*this.dpr));
+    cv.height=Math.max(1,Math.round(h*this.dpr));
+    ctx.setTransform(this.dpr,0,0,this.dpr,0,0);
+    this.W=w; this.H=h;
+    if(this.game && this.game.onResize) this.game.onResize();
+  },
+  start(def){
+    this.gameDef=def;
+    ST.scoreR=0; ST.scoreB=0;
+    document.getElementById('gtName').textContent=def.name;
+    document.getElementById('gtStd').textContent=STANDARDS.find(s=>s.id===ST.standard).id+' · '+STANDARDS.find(s=>s.id===ST.standard).name;
+    document.getElementById('gtTarget').textContent=ST.target;
+    setScore(0,0);
+    show('game');
+    hideResult();
+    this.resize();
+    this.game=def.make(this);
+    this.lastT=performance.now();
+    this._lastFrame=0;
+    if(!this.running){ this.running=true; this.schedule(); }
+  },
+  quit(){ this.game=null; this.running=false; cancelAnimationFrame(this._rafId); clearTimeout(this._toId); show('hub'); renderHub(); },
+  schedule(){
+    // Prefer requestAnimationFrame (smooth, vsync). Watchdog setTimeout drives
+    // the loop in environments where rAF is throttled to zero (some embeds/previews).
+    this._rafId = requestAnimationFrame(()=>this.frame());
+    this._toId  = setTimeout(()=>{ if(this.running) this.frame(); }, 33);
+  },
+  frame(){
+    if(!this.running) return;
+    const t=performance.now();
+    if(this._lastFrame && t-this._lastFrame < 8){ return; } // a sibling timer already ran this frame
+    cancelAnimationFrame(this._rafId); clearTimeout(this._toId);
+    let dt=(t-this.lastT)/1000; this.lastT=t;
+    if(dt>0.05) dt=0.05; // clamp big gaps (tab switch / slow chromebook)
+    const g={ctx, W:this.W, H:this.H};
+    if(this.game){
+      ctx.fillStyle=C.field; ctx.fillRect(0,0,this.W,this.H);
+      this.game.update(dt);
+      this.game.draw(g);
+    }
+    IN.endFrame();
+    this._lastFrame=t;
+    this.schedule();
+  },
+  score(player, n){
+    if(player==='red') ST.scoreR=(ST.scoreR||0)+n; else ST.scoreB=(ST.scoreB||0)+n;
+    setScore(ST.scoreR||0, ST.scoreB||0);
+    if((ST.scoreR||0)>=ST.target) this.win('red');
+    else if((ST.scoreB||0)>=ST.target) this.win('blue');
+  },
+  win(player){
+    this.running=false;
+    ST.series[player]++;
+    const card=document.getElementById('result');
+    document.getElementById('winName').textContent = player==='red'?'RED WINS':'BLUE WINS';
+    document.getElementById('winName').style.color = col(player);
+    document.getElementById('winScore').textContent = `${ST.scoreR||0} — ${ST.scoreB||0}  ·  series ${ST.series.red} : ${ST.series.blue}`;
+    card.classList.add('on');
+  }
+};
+function setScore(r,b){
+  document.getElementById('gtRed').textContent=r;
+  document.getElementById('gtBlue').textContent=b;
+}
+function hideResult(){ document.getElementById('result').classList.remove('on'); }
+
+/* ---------- canvas draw helpers ---------- */
+function rr(g,x,y,w,h,r){const c=g.ctx;c.beginPath();r=Math.min(r,w/2,h/2);c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function fillRR(g,x,y,w,h,r,fill){rr(g,x,y,w,h,r);g.ctx.fillStyle=fill;g.ctx.fill();}
+function text(g,s,x,y,size,color,weight,align,font){const c=g.ctx;c.fillStyle=color;c.textAlign=align||'left';c.textBaseline='middle';c.font=`${weight||600} ${size}px ${font||'-apple-system,Segoe UI,Roboto,sans-serif'}`;c.fillText(s,x,y);}
+function wrapText(g,s,x,y,maxW,lh,size,color,weight,align){
+  const c=g.ctx; c.font=`${weight||700} ${size}px -apple-system,Segoe UI,Roboto,sans-serif`; c.textAlign=align||'center'; c.textBaseline='middle'; c.fillStyle=color;
+  const words=s.split(' '); let line=''; const lines=[];
+  for(const w of words){ const test=line?line+' '+w:w; if(c.measureText(test).width>maxW && line){ lines.push(line); line=w; } else line=test; }
+  if(line) lines.push(line);
+  const startY=y-(lines.length-1)*lh/2;
+  lines.forEach((ln,i)=>c.fillText(ln, x, startY+i*lh));
+  return lines.length;
+}
+
+/* =====================================================================
+   QUIZ PANEL  ·  reusable diamond-answer widget for a half-screen
+   On a WRONG answer it freezes for EXPLAIN_SEC seconds and shows the
+   correct answer + a short explanation, then auto-advances.
+   ===================================================================== */
+const EXPLAIN_SEC = 5;
+function drawExplainCard(g, R, q, player, remain, total){
+  const cx=R.x+R.w/2, cy=R.y+R.h*0.46;
+  const pw=Math.min(R.w-28,470), ph=Math.min(R.h-70,300);
+  const px=cx-pw/2, py=cy-ph/2;
+  fillRR(g,px,py,pw,ph,16,'rgba(16,26,44,.97)');
+  g.ctx.lineWidth=2; rr(g,px,py,pw,ph,16); g.ctx.strokeStyle=C.bad; g.ctx.stroke();
+  text(g,'\u2717  NOT QUITE',cx,py+30,15,C.bad,800,'center','var(--mono)');
+  text(g,'CORRECT ANSWER',cx,py+60,11,C.mut,700,'center','var(--mono)');
+  g.ctx.save(); wrapText(g,q.opts[q.correct],cx,py+88,pw-44,22,17,C.good,800,'center'); g.ctx.restore();
+  g.ctx.save(); wrapText(g,q.ex||'',cx,py+ph*0.60,pw-50,20,14.5,C.ink,500,'center'); g.ctx.restore();
+  const secs=Math.max(0,Math.ceil(remain));
+  text(g,'Keep going in '+secs+'s',cx,py+ph-26,12.5,colL(player),700,'center','var(--mono)');
+  fillRR(g,px+24,py+ph-15,pw-48,5,3,'#2a3a52');
+  fillRR(g,px+24,py+ph-15,(pw-48)*Math.max(0,remain/total),5,3,colL(player));
+}
+
+function QuizPanel(player, rectFn, explainRectFn){
+  return {
+    q:null, explainT:0,
+    fresh(){ this.q=QBag.next(ST.standard); this.explainT=0; },
+    busy(){ return this.explainT>0; },
+    update(dt){
+      if(this.explainT>0){
+        this.explainT-=dt;
+        if(this.explainT<=0){ this.fresh(); }
+        return 'busy';
+      }
+      const idx=IN.answer(player, this.q.n);
+      if(idx>=0){
+        if(idx===this.q.correct) return true;
+        this.explainT=EXPLAIN_SEC; return false; // wrong → start explanation freeze
+      }
+      return null;
+    },
+    draw(g){
+      const R=rectFn();
+      if(this.explainT>0){ drawExplainCard(g,(explainRectFn||rectFn)(),this.q,player,this.explainT,EXPLAIN_SEC); return; }
+      const cx=R.x+R.w/2;
+      g.ctx.save(); wrapText(g, this.q.q, cx, R.y+30, R.w-40, 22, 16, C.ink, 700, 'center'); g.ctx.restore();
+      const cyBase=R.y+R.h*0.60;
+      const ow=Math.min(R.w*0.46, 200), oh=44, pad=14;
+      const spreadY=Math.min(72, R.h*0.18+oh/2);
+      const slots = this.q.n<=2
+        ? [{x:cx-ow/2, y:cyBase-spreadY-oh/2},{x:cx-ow/2, y:cyBase+spreadY-oh/2}]
+        : [
+            {x:cx-ow/2,        y:cyBase-spreadY-oh/2},
+            {x:R.x+pad,        y:cyBase-oh/2},
+            {x:cx-ow/2,        y:cyBase+spreadY-oh/2},
+            {x:R.x+R.w-pad-ow, y:cyBase-oh/2},
+          ];
+      for(let i=0;i<this.q.n;i++){
+        const s=slots[i];
+        fillRR(g, s.x, s.y, ow, oh, 10, '#1c2c44');
+        g.ctx.lineWidth=2; rr(g, s.x, s.y, ow, oh, 10); g.ctx.strokeStyle=C.line; g.ctx.stroke();
+        const gl=IN.glyph(player,i,this.q.n);
+        fillRR(g, s.x+6, s.y+6, 30, oh-12, 7, col(player));
+        text(g, gl, s.x+21, s.y+oh/2, 16, '#fff', 800, 'center', 'var(--mono)');
+        g.ctx.save();
+        wrapText(g, this.q.opts[i], s.x+44+(ow-50)/2, s.y+oh/2, ow-54, 15, 13.5, C.ink, 600, 'center');
+        g.ctx.restore();
+        IN.addAnsRegion({x:s.x,y:s.y,w:ow,h:oh,player,idx:i});
+      }
+    }
+  };
+}
+
+/* =====================================================================
+   GAME 1 · FLASH-CARD SPEED DUEL
+   ===================================================================== */
+function FlashCards(eng){
+  const panels={red:null, blue:null};
+  function rectFn(player){ return ()=> player==='red'
+    ? {x:0,y:0,w:eng.W/2,h:eng.H}
+    : {x:eng.W/2,y:0,w:eng.W/2,h:eng.H}; }
+  for(const p of PLAYERS){ panels[p]=QuizPanel(p, rectFn(p)); panels[p].fresh(); }
+  const streak={red:0, blue:0};
+  return {
+    onResize(){},
+    update(dt){
+      for(const p of PLAYERS){
+        const res=panels[p].update(dt);
+        if(res===true){ streak[p]++; panels[p].fresh(); eng.score(p,1); }
+        else if(res===false){ streak[p]=0; } // wrong → panel shows the 5s explanation
+      }
+    },
+    draw(g){
+      // halves
+      g.ctx.fillStyle=C.redBg; g.ctx.fillRect(0,0,eng.W/2,eng.H);
+      g.ctx.fillStyle=C.blueBg; g.ctx.fillRect(eng.W/2,0,eng.W/2,eng.H);
+      divider(g,eng);
+      sideLabel(g,'red','RED',eng); sideLabel(g,'blue','BLUE',eng);
+      for(const p of PLAYERS) panels[p].draw(g);
+      banner(g,eng,'Answer with your keys — fastest correct answers win!');
+    }
+  };
+}
+
+/* =====================================================================
+   GAME 2 · TANK ARTILLERY DUEL  (projectile aiming over a hill)
+   Each player: answer a question to LOAD a shell, then aim & fire.
+   ===================================================================== */
+function Tanks(eng){
+  let W,H,ground;
+  const tank={
+    red:  {x:0,y:0,angle:45,power:62,phase:'answer',shell:null,hp:0,fireCd:0,recoil:0},
+    blue: {x:0,y:0,angle:45,power:62,phase:'answer',shell:null,hp:0,fireCd:0,recoil:0}
+  };
+  const panels={
+    red:QuizPanel('red', ()=>({x:0,y:0,w:W/2,h:H*0.5}), ()=>({x:0,y:0,w:W/2,h:H})),
+    blue:QuizPanel('blue', ()=>({x:W/2,y:0,w:W/2,h:H*0.5}), ()=>({x:W/2,y:0,w:W/2,h:H}))
+  };
+  let hillX, hillW, hillH;
+  const G=900; // gravity px/s^2
+  function layout(){
+    W=eng.W; H=eng.H; ground=H-46;
+    tank.red.x=W*0.10; tank.blue.x=W*0.90;
+    tank.red.y=ground; tank.blue.y=ground;
+    hillW=Math.min(W*0.18,180); hillX=W/2; hillH=Math.min(H*0.34,180);
+  }
+  layout();
+  for(const p of PLAYERS) panels[p].fresh();
+
+  function fire(p){
+    const t=tank[p];
+    const dir = p==='red'?1:-1;
+    const ang=t.angle*Math.PI/180;
+    // scale launch speed to field width so 100% power clears the full gap (+arc over the hill)
+    const vmax=Math.sqrt(1.08*W*G);
+    const sp = vmax*(t.power/100);
+    t.shell={x:t.x, y:t.y-16, vx:Math.cos(ang)*sp*dir, vy:-Math.sin(ang)*sp, trail:[]};
+    t.recoil=8;
+  }
+  function repositionTanks(){
+    // randomize BOTH tanks on a hit so the same shot can't be reused
+    tank.red.x  = W*(0.06+Math.random()*0.32);
+    tank.blue.x = W*(0.62+Math.random()*0.32);
+  }
+  function hitTank(shell, p){
+    const t=tank[p];
+    return Math.abs(shell.x-t.x)<26 && shell.y> t.y-30;
+  }
+  return {
+    onResize(){ layout(); },
+    update(dt){
+      for(const p of PLAYERS){
+        const t=tank[p];
+        if(t.recoil>0) t.recoil-=dt*40;
+        if(t.phase==='answer'){
+          const res=panels[p].update(dt);
+          if(res===true){ t.phase='aim'; }
+          // wrong → panel freezes this side with the explanation card
+        } else if(t.phase==='aim' && !t.shell){
+          // aim controls
+          const aSpd=42*dt, pSpd=46*dt;
+          if(IN.held(p,'up'))   t.angle=Math.min(85,t.angle+aSpd);
+          if(IN.held(p,'down')) t.angle=Math.max(8, t.angle-aSpd);
+          if(IN.held(p,'right'))t.power=Math.min(100,t.power+pSpd*(p==='red'?1:1));
+          if(IN.held(p,'left')) t.power=Math.max(20, t.power-pSpd);
+          if(IN.pressed(p,'fire')) fire(p);
+        }
+        // update shell
+        if(t.shell){
+          const s=t.shell;
+          s.vy+=G*dt; s.x+=s.vx*dt; s.y+=s.vy*dt;
+          s.trail.push(s.x,s.y); if(s.trail.length>40) s.trail.splice(0,2);
+          // hill collision
+          const overHill=Math.abs(s.x-hillX)<hillW/2;
+          const hillTop=ground-hillH*Math.cos((s.x-hillX)/(hillW/2)*1.2);
+          if(overHill && s.y>hillTop){ t.shell=null; t.phase='answer'; panels[p].fresh(); continue; }
+          // opponent hit
+          const opp = p==='red'?'blue':'red';
+          if(hitTank(s,opp)){ t.shell=null; t.phase='answer'; panels[p].fresh(); spark(s.x,tank[opp].y-14,col(p),24); eng.score(p,1); repositionTanks(); continue; }
+          // out of bounds / ground
+          if(s.y>ground || s.x<-20 || s.x>W+20){
+            if(s.y>ground) spark(s.x,ground-6,'#5a4636');
+            t.shell=null; t.phase='answer'; panels[p].fresh();
+          }
+        }
+      }
+      updateSparks(dt);
+    },
+    draw(g){
+      const c=g.ctx;
+      // sky halves
+      c.fillStyle='#13233a'; c.fillRect(0,0,W,H);
+      c.fillStyle=C.redBg; c.fillRect(0,0,W/2,H*0.5);
+      c.fillStyle=C.blueBg; c.fillRect(W/2,0,W/2,H*0.5);
+      divider(g,eng);
+      // ground
+      c.fillStyle='#26201a'; c.fillRect(0,ground,W,H-ground);
+      c.fillStyle='#33291f'; c.fillRect(0,ground,W,4);
+      // hill
+      c.beginPath(); c.moveTo(hillX-hillW/2,ground);
+      for(let i=-hillW/2;i<=hillW/2;i+=6){ const xx=hillX+i; const yy=ground-hillH*Math.cos(i/(hillW/2)*1.2); c.lineTo(xx,yy); }
+      c.lineTo(hillX+hillW/2,ground); c.closePath(); c.fillStyle='#3a2f24'; c.fill();
+      // tanks
+      for(const p of PLAYERS) drawTank(g,tank[p],p);
+      // sparks + shells
+      for(const p of PLAYERS){ const t=tank[p]; if(t.shell) drawShell(g,t.shell,p); }
+      drawSparks(g);
+      // panels / aim HUD per side (top half)
+      for(const p of PLAYERS){
+        const t=tank[p];
+        if(t.phase==='answer'){ panels[p].draw(g); }
+        else { drawAimHud(g,p,t); }
+      }
+      sideLabel(g,'red','RED',eng); sideLabel(g,'blue','BLUE',eng);
+      banner(g,eng,'Answer right to LOAD · then aim (W/S or ↑/↓ angle, A/D or ←/→ power) · fire SPACE / ENTER');
+    }
+  };
+  function drawAimHud(g,p,t){
+    const R = p==='red'?{x:0,w:W/2}:{x:W/2,w:W/2};
+    const cx=R.x+R.w/2;
+    fillRR(g,cx-150,18,300,70,12,'rgba(20,32,52,.85)');
+    text(g,'🎯 LOADED — AIM & FIRE',cx,38,14,colL(p),800,'center');
+    text(g,`Angle ${Math.round(t.angle)}°`,cx-66,66,13,C.ink,700,'center','var(--mono)');
+    text(g,`Power ${Math.round(t.power)}`,cx+66,66,13,C.ink,700,'center','var(--mono)');
+    // power bar
+    fillRR(g,cx-70,76,140,6,3,'#2a3a52');
+    fillRR(g,cx-70,76,140*t.power/100,6,3,colL(p));
+    // touch controls on the bottom half for this side
+    if(ST.touch) drawTankTouch(g,p,t);
+  }
+  function drawTankTouch(g,p,t){
+    const R = p==='red'?{x:0,w:W/2}:{x:W/2,w:W/2};
+    const by=H-150, bx=R.x+R.w/2;
+    padButton(g,p,'up',  bx-26, by-44, 52,40,'＋°');
+    padButton(g,p,'down',bx-26, by+4,  52,40,'－°');
+    padButton(g,p,'left',bx-110,by-20, 52,40,'◀');
+    padButton(g,p,'right',bx+58, by-20,52,40,'▶');
+    padButton(g,p,'fire',bx-44, by+52, 88,44,'FIRE',true);
+  }
+  function drawTank(g,t,p){
+    const c=g.ctx; const flip=p==='blue'?-1:1;
+    const x=t.x - (t.recoil>0?t.recoil*flip*0.4:0);
+    c.fillStyle=colD(p); fillRR(g,x-22,t.y-16,44,16,5,colD(p));
+    c.fillStyle=col(p); fillRR(g,x-15,t.y-26,30,14,5,col(p));
+    // barrel
+    const ang=t.angle*Math.PI/180;
+    c.save(); c.translate(x,t.y-20); c.rotate(-ang*flip); c.fillStyle=colL(p);
+    c.fillRect(0,-3,(flip>0?30:-30),6); c.restore();
+  }
+  function drawShell(g,s,p){
+    const c=g.ctx;
+    c.strokeStyle='rgba(255,255,255,.18)'; c.lineWidth=2; c.beginPath();
+    for(let i=0;i<s.trail.length;i+=2){ if(i===0)c.moveTo(s.trail[i],s.trail[i+1]); else c.lineTo(s.trail[i],s.trail[i+1]); }
+    c.stroke();
+    c.fillStyle=colL(p); c.beginPath(); c.arc(s.x,s.y,5,0,7); c.fill();
+  }
+}
+
+/* shared simple spark system (used by several games) */
+const SPK=[];
+function spark(x,y,color,n){ n=n||16; for(let i=0;i<n;i++){const a=Math.random()*6.28,sp=40+Math.random()*180;SPK.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-40,life:.5+Math.random()*.4,c:color});} }
+function updateSparks(dt){ for(let i=SPK.length-1;i>=0;i--){const s=SPK[i];s.life-=dt;if(s.life<=0){SPK.splice(i,1);continue;}s.vy+=400*dt;s.x+=s.vx*dt;s.y+=s.vy*dt;} }
+function drawSparks(g){ const c=g.ctx; for(const s of SPK){ c.globalAlpha=Math.max(0,s.life*1.6); c.fillStyle=s.c; c.fillRect(s.x-2,s.y-2,4,4);} c.globalAlpha=1; }
+
+/* =====================================================================
+   GAME 3 · HOOP RACER  (continuous race: fly the gates to the finish)
+   Correct gate → 2s speed BOOST. Wrong gate → stall + 5s explanation.
+   8 gates spread far apart, then a finish line. First to finish wins.
+   ===================================================================== */
+/* =====================================================================
+   GAME 3 · HOOP RACER  (answers drift DOWN slowly; slide your ship along
+   the bottom and fly through the CORRECT one)
+   Correct catch → gentle 2.5s boost. Wrong → stall + explanation.
+   8 questions to the finish. First to clear all 8 wins.
+   ===================================================================== */
+function HoopRace(eng){
+  const GATE_COUNT=8, FALL_SEC=6, BOOST_MULT=1.45, BOOST_SEC=2.5, STOP_SEC=EXPLAIN_SEC;
+  let W,H, winner=null;
+  function half(p){ return p==='red'?{x:0,w:eng.W/2}:{x:eng.W/2,w:eng.W/2}; }
+  const spawnTop=()=>120, catchY=()=>eng.H-118, shipY=()=>eng.H-92;
+  const fallSpeed=()=>(catchY()-spawnTop())/FALL_SEC;
+  function colFill(p){ return p==='red'?'rgba(216,58,47,.26)':'rgba(47,114,196,.26)'; }
+  const S={red:null, blue:null};
+  function mk(p){ return {x:half(p).x+half(p).w/2, gateIdx:0, q:null, cols:[], optY:spawnTop(), boostT:0, stopT:0, explainQ:null, finished:false}; }
+  function colsFor(p,n){ const R=half(p), cols=[]; for(let i=0;i<n;i++) cols.push({cx:R.x+R.w*(i+0.5)/n, w:R.w/n-14}); return cols; }
+  function loadGate(p){ const s=S[p]; s.q=QBag.next(ST.standard); s.cols=colsFor(p,s.q.n); s.optY=spawnTop(); }
+  function reset(){ W=eng.W;H=eng.H; for(const p of PLAYERS){ S[p]=mk(p); loadGate(p); } document.getElementById('gtTarget').textContent=GATE_COUNT; }
+  reset();
+  function nearestCol(s){ let n=0,bd=1e9; s.cols.forEach((c,i)=>{const d=Math.abs(c.cx-s.x); if(d<bd){bd=d;n=i;}}); return n; }
+  return {
+    onResize(){ W=eng.W;H=eng.H; for(const p of PLAYERS){ const s=S[p], R=half(p); s.cols=colsFor(p,s.q.n); s.x=Math.max(R.x+34,Math.min(s.x,R.x+R.w-34)); } },
+    update(dt){
+      for(const p of PLAYERS){
+        const s=S[p]; if(s.finished) continue;
+        if(s.stopT>0){ s.stopT-=dt; continue; }   // stalled: frozen, explanation showing
+        if(s.boostT>0) s.boostT-=dt;
+        const R=half(p), spd=Math.max(420,R.w);
+        if(IN.held(p,'left'))  s.x-=spd*dt;
+        if(IN.held(p,'right')) s.x+=spd*dt;
+        s.x=Math.max(R.x+34,Math.min(s.x,R.x+R.w-34));
+        s.optY += fallSpeed()*(s.boostT>0?BOOST_MULT:1)*dt;
+        if(s.optY>=catchY()){
+          const pick=nearestCol(s);
+          if(pick===s.q.correct){ s.boostT=BOOST_SEC; spark(s.x, catchY(), col(p), 22); }
+          else { s.stopT=STOP_SEC; s.explainQ=s.q; }
+          s.gateIdx++;
+          if(s.gateIdx>=GATE_COUNT){ if(!winner){ winner=p; s.finished=true; ST.scoreR=S.red.gateIdx; ST.scoreB=S.blue.gateIdx; eng.win(p); } }
+          else loadGate(p);
+        }
+      }
+      ST.scoreR=S.red.gateIdx; ST.scoreB=S.blue.gateIdx;
+      document.getElementById('gtRed').textContent=Math.min(S.red.gateIdx,GATE_COUNT);
+      document.getElementById('gtBlue').textContent=Math.min(S.blue.gateIdx,GATE_COUNT);
+      updateSparks(dt);
+    },
+    draw(g){
+      const c=g.ctx;
+      c.fillStyle=C.redBg; c.fillRect(0,0,eng.W/2,eng.H);
+      c.fillStyle=C.blueBg; c.fillRect(eng.W/2,0,eng.W/2,eng.H);
+      divider(g,eng);
+      for(const p of PLAYERS) if(S[p].stopT<=0) drawCatchLine(g,p);
+      drawSparks(g);
+      for(const p of PLAYERS){
+        const s=S[p];
+        if(s.stopT>0){ drawExplainCard(g,{x:half(p).x,y:0,w:half(p).w,h:eng.H}, s.explainQ, p, s.stopT, STOP_SEC); }
+        else { drawLaneHint(g,p); drawFalling(g,p); drawShip(g,p); drawPrompt(g,p); if(ST.touch) drawRaceTouch(g,p); }
+        drawProgress(g,p);
+      }
+      sideLabel(g,'red','RED',eng); sideLabel(g,'blue','BLUE',eng);
+      banner(g,eng,'Slide left / right and fly through the CORRECT falling answer. First to clear 8 wins!');
+    }
+  };
+  function drawCatchLine(g,p){
+    const R=half(p), c=g.ctx, y=catchY()+34;
+    c.save(); c.setLineDash([8,7]); c.lineWidth=2; c.strokeStyle='rgba(255,255,255,.18)';
+    c.beginPath(); c.moveTo(R.x+18,y); c.lineTo(R.x+R.w-18,y); c.stroke(); c.restore();
+  }
+  function drawLaneHint(g,p){
+    const s=S[p], R=half(p), c=g.ctx, i=nearestCol(s), col0=s.cols[i];
+    c.fillStyle=colFill(p);
+    fillRR(g, col0.cx-col0.w/2, spawnTop()-40, col0.w, catchY()+44-(spawnTop()-40), 10, colFill(p));
+  }
+  function drawFalling(g,p){
+    const s=S[p], c=g.ctx, near=nearestCol(s), bh=66;
+    for(let i=0;i<s.cols.length;i++){
+      const col0=s.cols[i], bw=col0.w, x=col0.cx-bw/2, y=s.optY-bh/2, on=(i===near);
+      fillRR(g,x,y,bw,bh,12, on?colFill(p):'rgba(20,32,52,.9)');
+      c.lineWidth=on?3.5:2.5; rr(g,x,y,bw,bh,12); c.strokeStyle=on?colL(p):C.line; c.stroke();
+      g.ctx.save(); wrapText(g,s.q.opts[i], col0.cx, s.optY, bw-16, 15, 12.5, C.ink, 700,'center'); g.ctx.restore();
+    }
+  }
+  function drawShip(g,p){
+    const s=S[p], c=g.ctx, x=s.x, y=shipY();
+    c.save(); c.translate(x,y);
+    // downward thrust
+    if(s.boostT>0){ c.fillStyle='rgba(255,210,120,.55)'; c.beginPath(); c.moveTo(-7,14); c.lineTo(0,30+Math.random()*12); c.lineTo(7,14); c.closePath(); c.fill(); }
+    else { c.fillStyle='rgba(255,200,120,.7)'; c.beginPath(); c.moveTo(-5,14); c.lineTo(0,22+Math.random()*8); c.lineTo(5,14); c.closePath(); c.fill(); }
+    c.fillStyle=col(p); c.beginPath(); c.moveTo(0,-16); c.lineTo(-13,13); c.lineTo(13,13); c.closePath(); c.fill();
+    c.fillStyle=colL(p); c.beginPath(); c.arc(0,2,4,0,7); c.fill();
+    c.restore();
+  }
+  function drawPrompt(g,p){
+    const s=S[p], R=half(p), cx=R.x+R.w/2;
+    fillRR(g,cx-Math.min(R.w*0.46,300),16,Math.min(R.w*0.92,600),54,12,'rgba(16,26,44,.94)');
+    g.ctx.save(); wrapText(g,s.q.q,cx,43,Math.min(R.w*0.88,560),18,15,colL(p),800,'center'); g.ctx.restore();
+  }
+  function drawProgress(g,p){
+    const s=S[p], R=half(p), c=g.ctx, bx=R.x+24, bw=R.w-48, by=eng.H-40;
+    text(g, s.gateIdx>=GATE_COUNT?'FINISHED!':'Question '+(s.gateIdx+1)+' / '+GATE_COUNT, R.x+24, by-13, 12.5, colL(p),800,'left','var(--mono)');
+    if(s.boostT>0) text(g,'⚡ BOOST', R.x+R.w-24, by-13, 12.5, C.good,800,'right','var(--mono)');
+    else if(s.stopT>0) text(g,'✗ STALLED', R.x+R.w-24, by-13, 12.5, C.bad,800,'right','var(--mono)');
+    fillRR(g,bx,by,bw,7,4,'#1b2740');
+    fillRR(g,bx,by,bw*Math.min(1,s.gateIdx/GATE_COUNT),7,4,col(p));
+  }
+  function drawRaceTouch(g,p){
+    const R=half(p), by=eng.H-150;
+    padButton(g,p,'left', R.x+24, by, 76,48,'◀');
+    padButton(g,p,'right',R.x+R.w-100, by, 76,48,'▶');
+  }
+}
+
+/* =====================================================================
+   SHARED FIELD FURNITURE  (kept from the core engine)
+   ===================================================================== */
+function divider(g,eng){ const c=g.ctx; c.fillStyle='rgba(255,255,255,.10)'; c.fillRect(eng.W/2-1,0,2,eng.H); }
+function sideLabel(g,p,txt,eng){ const x=p==='red'?14:eng.W-14; text(g,txt,x,eng.H-22,13,colL(p),800,p==='red'?'left':'right','var(--mono)'); }
+function banner(g,eng,msg){
+  const c=g.ctx; const y=eng.H-16; c.save();
+  c.font='600 11px ui-monospace,monospace'; c.textAlign='center'; c.textBaseline='middle';
+  const w=c.measureText(msg).width+24; fillRR(g,eng.W/2-w/2,y-12,w,22,11,'rgba(8,14,24,.7)');
+  c.fillStyle=C.mut; c.fillText(msg,eng.W/2,y); c.restore();
+}
+function padButton(g,player,action,x,y,w,h,label,big){
+  const held=IN.held(player,action);
+  fillRR(g,x,y,w,h,9, held?col(player):'rgba(30,44,66,.92)');
+  g.ctx.lineWidth=2; rr(g,x,y,w,h,9); g.ctx.strokeStyle=col(player); g.ctx.stroke();
+  text(g,label,x+w/2,y+h/2, big?15:18, held?'#fff':C.ink, 800,'center','var(--mono)');
+  IN.addRegion({x,y,w,h,player,action});
+}
+function dpad(g,p,eng,useFire){ if(!ST.touch) return;
+  const b = p==='red' ? {x:76,y:eng.H-120} : {x:eng.W-136,y:eng.H-120};
+  const s=40,gap=44;
+  padButton(g,p,'up',b.x,b.y-gap,s,s,'\u25B2');
+  padButton(g,p,'down',b.x,b.y+gap,s,s,'\u25BC');
+  padButton(g,p,'left',b.x-gap,b.y,s,s,'\u25C0');
+  padButton(g,p,'right',b.x+gap,b.y,s,s,'\u25B6');
+  if(useFire) padButton(g,p,'fire',b.x,b.y,s,s,'\u25CF',true);
+}
+function halfRect(eng,p){ return p==='red'?{x:0,w:eng.W/2}:{x:eng.W/2,w:eng.W/2}; }
+
+/* =====================================================================
+   ENGINE A · SORT INTO BINS   (classification games)
+   cfg = { bins:[{label,color}], items:[{name,bin,ex}], prompt }
+   Each side draws a card and presses the labeled key for the right bin.
+   Wrong -> freeze + correct answer + explanation. First to target wins.
+   ===================================================================== */
+function SortBins(eng, cfg){
+  const nB=cfg.bins.length;
+  function mkSide(){ return {q:[], item:null, freeze:0}; }
+  const S={red:mkSide(), blue:mkSide()};
+  function draw1(p){ const s=S[p];
+    if(!s.q.length){ s.q=cfg.items.map((_,i)=>i); for(let i=s.q.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[s.q[i],s.q[j]]=[s.q[j],s.q[i]];} }
+    s.item=cfg.items[s.q.shift()]; s.freeze=0;
+  }
+  draw1('red'); draw1('blue');
+  function updSide(p,dt){ const s=S[p];
+    if(s.freeze>0){ s.freeze-=dt; if(s.freeze<=0) draw1(p); return; }
+    const idx=IN.answer(p,nB);
+    if(idx>=0){
+      if(idx===s.item.bin){ const R=halfRect(eng,p); spark(R.x+R.w/2, eng.H*0.44, col(p), 16); eng.score(p,1); if(ENG.running) draw1(p); }
+      else s.freeze=EXPLAIN_SEC;
+    }
+  }
+  function drawSide(g,p){ const s=S[p], R=halfRect(eng,p), cx=R.x+R.w/2;
+    if(s.freeze>0){
+      const q={opts:[cfg.bins[s.item.bin].label], correct:0, ex:s.item.ex};
+      drawExplainCard(g,{x:R.x,y:46,w:R.w,h:eng.H-46}, q, p, s.freeze, EXPLAIN_SEC); return;
+    }
+    text(g,cfg.prompt,cx,64,12.5,C.mut,700,'center','var(--mono)');
+    // item card
+    const cw=Math.min(R.w-46,320), ch=76, cxx=cx-cw/2, cyy=96;
+    fillRR(g,cxx,cyy,cw,ch,14,'rgba(20,32,52,.92)');
+    g.ctx.lineWidth=2; rr(g,cxx,cyy,cw,ch,14); g.ctx.strokeStyle=colL(p); g.ctx.stroke();
+    g.ctx.save(); wrapText(g,s.item.name,cx,cyy+ch/2,cw-28,22,18,C.ink,800,'center'); g.ctx.restore();
+    // bins
+    const top=cyy+ch+22, gap=10, bh=Math.min(56,(eng.H-top-26-gap*(nB-1))/nB), bw=Math.min(R.w-46,340), bx=cx-bw/2;
+    for(let i=0;i<nB;i++){ const by=top+i*(bh+gap);
+      fillRR(g,bx,by,bw,bh,11,'rgba(30,44,66,.85)');
+      g.ctx.lineWidth=2.5; rr(g,bx,by,bw,bh,11); g.ctx.strokeStyle=cfg.bins[i].color; g.ctx.stroke();
+      const gl=IN.glyph(p,i,nB);
+      fillRR(g,bx+8,by+bh/2-15,30,30,8,cfg.bins[i].color);
+      text(g,gl,bx+8+15,by+bh/2,14,'#fff',800,'center','var(--mono)');
+      text(g,cfg.bins[i].label,bx+50,by+bh/2,15.5,C.ink,700,'left');
+      IN.addAnsRegion({x:bx,y:by,w:bw,h:bh,player:p,idx:i});
+    }
+  }
+  return {
+    onResize(){},
+    update(dt){ updateSparks(dt); if(ENG.running){ updSide('red',dt); updSide('blue',dt); } },
+    draw(g){ divider(g,eng); drawSide(g,'red'); drawSide(g,'blue'); drawSparks(g);
+      sideLabel(g,'red','RED',eng); sideLabel(g,'blue','BLUE',eng); }
+  };
+}
+
+/* =====================================================================
+   ENGINE B · ORDER LADDER   (sequencing games)
+   cfg = { seq:[[label,color],...], prompt, foot }
+   Slot 0 is given; pick the next tile from the tray with LEFT/RIGHT,
+   confirm with FIRE. Each correct placement scores. Board clears -> reshuffle.
+   ===================================================================== */
+function OrderLadder(eng, cfg){
+  const N=cfg.seq.length;
+  function mkSide(){ return {placed:1, tray:[], cursor:0, wrong:0}; }
+  const S={red:mkSide(), blue:mkSide()};
+  function newRound(p){ const s=S[p]; s.placed=1;
+    s.tray=[]; for(let i=1;i<N;i++) s.tray.push(i);
+    for(let i=s.tray.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[s.tray[i],s.tray[j]]=[s.tray[j],s.tray[i]];}
+    s.cursor=0; s.wrong=0;
+  }
+  newRound('red'); newRound('blue');
+  function updSide(p,dt){ const s=S[p];
+    if(s.wrong>0){ s.wrong-=dt; return; }
+    if(!s.tray.length){ eng.score(p,1); if(ENG.running) newRound(p); return; }
+    if(IN.pressed(p,'left'))  s.cursor=(s.cursor-1+s.tray.length)%s.tray.length;
+    if(IN.pressed(p,'right')) s.cursor=(s.cursor+1)%s.tray.length;
+    if(IN.pressed(p,'fire')){
+      const pick=s.tray[s.cursor];
+      if(pick===s.placed){ const R=halfRect(eng,p); spark(R.x+R.w/2,eng.H*0.4,col(p),14); s.tray.splice(s.cursor,1); if(s.cursor>=s.tray.length) s.cursor=Math.max(0,s.tray.length-1); s.placed++; eng.score(p,1); if(ENG.running&&!s.tray.length) newRound(p); }
+      else s.wrong=0.9;
+    }
+  }
+  function drawSide(g,p){ const s=S[p], R=halfRect(eng,p), cx=R.x+R.w/2;
+    text(g,cfg.prompt,cx,58,12,C.mut,700,'center','var(--mono)');
+    // ladder (built so far), bottom = slot0
+    const lw=Math.min(R.w-56,300), lx=cx-lw/2, rowH=Math.min(30,(eng.H*0.42)/N), baseY=eng.H*0.5+ (N*rowH)/2;
+    for(let i=0;i<N;i++){ const y=baseY-i*(rowH+3)-rowH; const done=i<s.placed;
+      const cell=cfg.seq[i];
+      fillRR(g,lx,y,lw,rowH,7, done?cell[1]:'rgba(255,255,255,.05)');
+      if(!done){ g.ctx.lineWidth=1.5; rr(g,lx,y,lw,rowH,7); g.ctx.strokeStyle='rgba(255,255,255,.18)'; g.ctx.stroke(); }
+      text(g, done?cell[0]:'?', lx+lw/2, y+rowH/2, 13.5, done?'#0d1420':'#5f7089', 800,'center');
+    }
+    text(g,'\u2193 lowest', lx-4, baseY-rowH/2, 9.5, C.mut,700,'right','var(--mono)');
+    // tray
+    const s2=S[p];
+    if(s2.wrong>0){ text(g,'\u2717 not next',cx,eng.H-88,14,C.bad,800,'center','var(--mono)'); }
+    const tw=Math.min((R.w-40)/Math.max(1,s2.tray.length), 96), th=34, ty=eng.H-70, totalW=tw*s2.tray.length, tx0=cx-totalW/2;
+    for(let i=0;i<s2.tray.length;i++){ const cell=cfg.seq[s2.tray[i]], tx=tx0+i*tw;
+      const sel=i===s2.cursor;
+      fillRR(g,tx+2,ty,tw-4,th,7, sel?cell[1]:'rgba(30,44,66,.9)');
+      if(sel){ g.ctx.lineWidth=2.5; rr(g,tx+2,ty,tw-4,th,7); g.ctx.strokeStyle='#fff'; g.ctx.stroke(); }
+      text(g,cell[0],tx+tw/2,ty+th/2,11.5, sel?'#0d1420':C.ink,700,'center');
+    }
+    if(ST.touch){ padButton(g,p,'left',R.x+16,eng.H-118,52,40,'\u25C0'); padButton(g,p,'right',R.x+72,eng.H-118,52,40,'\u25B6'); padButton(g,p,'fire',R.x+R.w-84,eng.H-118,68,40,'PLACE',true); }
+  }
+  return {
+    onResize(){},
+    update(dt){ updateSparks(dt); if(ENG.running){ updSide('red',dt); updSide('blue',dt); } },
+    draw(g){ divider(g,eng); drawSide(g,'red'); drawSide(g,'blue'); drawSparks(g); banner(g,eng,cfg.foot||'LEFT / RIGHT pick a tile · FIRE places it next'); }
+  };
+}
+
+/* =====================================================================
+   ENGINE C · CATCH TO BUILD   (collect the right falling items)
+   cfg = { rounds:[{label, good:[str], bad:[str]}], need, prompt }
+   Slide the basket, catch items that belong, avoid the rest. Fill the
+   quota to score a point. First to target wins.
+   ===================================================================== */
+function Catch(eng, cfg){
+  function mkSide(){ return {bx:0.5, items:[], got:0, round:null, spawn:0, flash:0, flashC:'' }; }
+  const S={red:mkSide(), blue:mkSide()};
+  function newRound(p){ const s=S[p]; s.round=cfg.rounds[Math.random()*cfg.rounds.length|0]; s.got=0; s.items=[]; s.spawn=0; }
+  newRound('red'); newRound('blue');
+  function updSide(p,dt){ const s=S[p], R=halfRect(eng,p);
+    if(s.flash>0) s.flash-=dt;
+    const speed=0.9;
+    if(IN.held(p,'left'))  s.bx-=speed*dt;
+    if(IN.held(p,'right')) s.bx+=speed*dt;
+    s.bx=Math.max(0.08,Math.min(0.92,s.bx));
+    s.spawn-=dt;
+    if(s.spawn<=0){ s.spawn=0.62+Math.random()*0.5;
+      const useGood=Math.random()<0.62;
+      const pool=useGood?s.round.good:s.round.bad;
+      const lbl=pool[Math.random()*pool.length|0];
+      s.items.push({x:0.1+Math.random()*0.8, y:-0.05, vy:0.32+Math.random()*0.14, good:useGood, lbl});
+    }
+    const basketY=eng.H-58;
+    for(let i=s.items.length-1;i>=0;i--){ const it=s.items[i]; it.y+=it.vy*dt;
+      const px=R.x+it.x*R.w, py=it.y*eng.H;
+      if(py>basketY-18 && py<basketY+22 && Math.abs(it.x-s.bx)<0.12){
+        if(it.good){ s.got++; s.flash=0.3; s.flashC=C.good; spark(px,py,col(p),10); if(s.got>=cfg.need){ eng.score(p,1); if(ENG.running) newRound(p); } }
+        else { s.got=Math.max(0,s.got-1); s.flash=0.3; s.flashC=C.bad; }
+        s.items.splice(i,1); continue;
+      }
+      if(it.y>1.1) s.items.splice(i,1);
+    }
+  }
+  function drawSide(g,p){ const s=S[p], R=halfRect(eng,p), cx=R.x+R.w/2;
+    text(g,cfg.prompt,cx,54,11.5,C.mut,700,'center','var(--mono)');
+    fillRR(g,cx-Math.min(R.w-46,300)/2,72,Math.min(R.w-46,300),30,9, s.flash>0?s.flashC:'rgba(30,44,66,.8)');
+    text(g,'COLLECT: '+s.round.label, cx, 87, 14, s.flash>0?'#0d1420':colL(p), 800,'center','var(--mono)');
+    // progress dots
+    for(let i=0;i<cfg.need;i++){ const dx=cx-(cfg.need*16)/2+i*16+8; fillRR(g,dx-5,112,10,10,3, i<s.got?col(p):'rgba(255,255,255,.14)'); }
+    // items
+    for(const it of s.items){ const px=R.x+it.x*R.w, py=it.y*eng.H;
+      const tw=g.ctx.measureText?0:0; const bw=Math.max(52, it.lbl.length*8+16);
+      fillRR(g,px-bw/2,py-13,bw,26,7, it.good?'rgba(63,148,87,.28)':'rgba(226,85,74,.22)');
+      g.ctx.lineWidth=1.5; rr(g,px-bw/2,py-13,bw,26,7); g.ctx.strokeStyle=it.good?'rgba(120,210,150,.7)':'rgba(240,150,140,.6)'; g.ctx.stroke();
+      text(g,it.lbl,px,py,11.5,C.ink,700,'center');
+    }
+    // basket
+    const bxp=R.x+s.bx*R.w, by=eng.H-58;
+    fillRR(g,bxp-34,by,68,20,7,col(p));
+    fillRR(g,bxp-34,by-8,68,8,4,colD(p));
+    if(ST.touch){ padButton(g,p,'left',R.x+16,eng.H-120,54,40,'\u25C0'); padButton(g,p,'right',R.x+R.w-70,eng.H-120,54,40,'\u25B6'); }
+  }
+  return {
+    onResize(){},
+    update(dt){ updateSparks(dt); if(ENG.running){ updSide('red',dt); updSide('blue',dt); } },
+    draw(g){ divider(g,eng); drawSide(g,'red'); drawSide(g,'blue'); drawSparks(g);
+      sideLabel(g,'red','\u2190 A/D',eng); sideLabel(g,'blue','\u2190/\u2192',eng); }
+  };
+}
+
+/* =====================================================================
+   ENGINE D · MEMORY MATCH   (concentration — pair term & meaning)
+   cfg = { pairs:[[a,b],...], prompt }
+   ===================================================================== */
+function MemoryMatch(eng, cfg){
+  const COLS=4, ROWS=3, PAIRS=6;
+  function mkSide(){ return {cards:[], cur:0, flipped:[], lock:0}; }
+  const S={red:mkSide(), blue:mkSide()};
+  function build(p){ const s=S[p];
+    const idx=cfg.pairs.map((_,i)=>i); for(let i=idx.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[idx[i],idx[j]]=[idx[j],idx[i]];}
+    const use=idx.slice(0,PAIRS);
+    let cards=[];
+    use.forEach(pi=>{ cards.push({pid:pi,side:0,done:false,face:false}); cards.push({pid:pi,side:1,done:false,face:false}); });
+    for(let i=cards.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[cards[i],cards[j]]=[cards[j],cards[i]];}
+    s.cards=cards; s.cur=0; s.flipped=[]; s.lock=0;
+  }
+  build('red'); build('blue');
+  function updSide(p,dt){ const s=S[p];
+    if(s.lock>0){ s.lock-=dt; if(s.lock<=0){ // resolve mismatch
+        if(s.flipped.length===2){ const [a,b]=s.flipped; if(!(s.cards[a].pid===s.cards[b].pid)){ s.cards[a].face=false; s.cards[b].face=false; } }
+        s.flipped=[]; } return; }
+    if(s.cards.every(c=>c.done)){ if(ENG.running){ eng.score(p,1); build(p); } return; }
+    if(IN.pressed(p,'left'))  s.cur=(s.cur-1+s.cards.length)%s.cards.length;
+    if(IN.pressed(p,'right')) s.cur=(s.cur+1)%s.cards.length;
+    if(IN.pressed(p,'up'))    s.cur=(s.cur-COLS+s.cards.length)%s.cards.length;
+    if(IN.pressed(p,'down'))  s.cur=(s.cur+COLS)%s.cards.length;
+    if(IN.pressed(p,'fire')){ const c=s.cards[s.cur];
+      if(!c.done && !c.face && s.flipped.length<2){ c.face=true; s.flipped.push(s.cur);
+        if(s.flipped.length===2){ const [a,b]=s.flipped;
+          if(s.cards[a].pid===s.cards[b].pid){ s.cards[a].done=true; s.cards[b].done=true; const R=halfRect(eng,p); spark(R.x+R.w/2,eng.H*0.5,col(p),14); eng.score(p,1); s.flipped=[]; }
+          else s.lock=0.85;
+        }
+      }
+    }
+  }
+  function drawSide(g,p){ const s=S[p], R=halfRect(eng,p), cx=R.x+R.w/2;
+    text(g,cfg.prompt,cx,52,11.5,C.mut,700,'center','var(--mono)');
+    const gw=Math.min(R.w-40,360), gh=eng.H-140, cw=gw/COLS-8, ch=gh/ROWS-8, gx=cx-gw/2, gy=74;
+    s.cards.forEach((c,i)=>{ const r=(i/COLS)|0, k=i%COLS, x=gx+k*(cw+8), y=gy+r*(ch+8);
+      if(c.done){ fillRR(g,x,y,cw,ch,9,'rgba(63,148,87,.16)'); }
+      else if(c.face){ fillRR(g,x,y,cw,ch,9,'rgba(24,38,60,.98)'); g.ctx.lineWidth=2; rr(g,x,y,cw,ch,9); g.ctx.strokeStyle=colL(p); g.ctx.stroke(); }
+      else { fillRR(g,x,y,cw,ch,9, i===s.cur?'rgba(50,70,100,.98)':'rgba(34,50,74,.9)'); }
+      if(i===s.cur && !c.done){ g.ctx.lineWidth=2.5; rr(g,x,y,cw,ch,9); g.ctx.strokeStyle='#fff'; g.ctx.stroke(); }
+      if(c.face||c.done){ g.ctx.save(); wrapText(g,cfg.pairs[c.pid][c.side], x+cw/2, y+ch/2, cw-10, 14, c.side===0?13:11, c.done?'#8fe0aa':C.ink, c.side===0?800:600,'center'); g.ctx.restore(); }
+      else text(g,'?',x+cw/2,y+ch/2,20,'#5f7089',800,'center');
+    });
+    if(ST.touch) dpad(g,p,eng,true);
+  }
+  return {
+    onResize(){},
+    update(dt){ updateSparks(dt); if(ENG.running){ updSide('red',dt); updSide('blue',dt); } },
+    draw(g){ divider(g,eng); drawSide(g,'red'); drawSide(g,'blue'); drawSparks(g); banner(g,eng,'MOVE with your keys · FIRE flips a card · match SYMBOL to MEANING'); }
+  };
+}
+
+/* =====================================================================
+   BESPOKE · PUNNETT SQUARE DUEL   (S7L3 — heredity)
+   A monohybrid cross is shown filled in; read the square and pick the
+   right ratio/count. Wrong -> freeze + correct answer.
+   ===================================================================== */
+function PunnettDuel(eng){
+  const PARENTS=['BB','Bb','bb'];
+  function combos(a,b){ // returns 4 offspring genotypes
+    const out=[]; for(const x of a) for(const y of b){ let g=[x,y].sort((m,n)=>(m<n?-1:1)).join(''); g=g==='Bb'?'Bb':(g==='bB'?'Bb':g); out.push(g); } return out;
+  }
+  function mkSide(){ return {p1:'',p2:'',kids:[],qtype:0,opts:[],correct:0,exp:'',freeze:0}; }
+  const S={red:mkSide(), blue:mkSide()};
+  function gen(p){ const s=S[p];
+    s.p1=PARENTS[Math.random()*3|0]; s.p2=PARENTS[Math.random()*3|0];
+    s.kids=combos(s.p1,s.p2);
+    const dom=s.kids.filter(k=>k.indexOf('B')>=0).length; // shows dominant
+    const rec=4-dom;
+    const asks=[
+      {q:'How many of the 4 boxes show the DOMINANT trait?', val:dom, ex:'A box shows the dominant trait if it has at least one B. Here that is '+dom+' of 4.'},
+      {q:'How many of the 4 boxes are RECESSIVE (bb)?', val:rec, ex:'Only bb shows the recessive trait. Here that is '+rec+' of 4.'},
+    ];
+    const a=asks[Math.random()*asks.length|0];
+    s.qtype=a.q; s.exp=a.ex;
+    // build 4 options 0..4 including correct
+    let set=new Set([a.val]); while(set.size<4){ set.add(Math.random()*5|0); }
+    s.opts=[...set]; for(let i=s.opts.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[s.opts[i],s.opts[j]]=[s.opts[j],s.opts[i]];}
+    s.correct=s.opts.indexOf(a.val); s.freeze=0;
+  }
+  gen('red'); gen('blue');
+  function updSide(p,dt){ const s=S[p];
+    if(s.freeze>0){ s.freeze-=dt; if(s.freeze<=0) gen(p); return; }
+    const idx=IN.answer(p,4);
+    if(idx>=0){ if(idx===s.correct){ const R=halfRect(eng,p); spark(R.x+R.w/2,eng.H*0.4,col(p),16); eng.score(p,1); if(ENG.running) gen(p); } else s.freeze=EXPLAIN_SEC; }
+  }
+  function drawSide(g,p){ const s=S[p], R=halfRect(eng,p), cx=R.x+R.w/2;
+    if(s.freeze>0){ const q={opts:[String(s.opts[s.correct])],correct:0,ex:s.exp}; drawExplainCard(g,{x:R.x,y:46,w:R.w,h:eng.H-46},q,p,s.freeze,EXPLAIN_SEC); return; }
+    text(g,'CROSS  '+s.p1+'  \u00D7  '+s.p2, cx, 60, 15, colL(p), 800,'center','var(--mono)');
+    // 2x2 grid
+    const gs=Math.min(R.w*0.5,150), gx=cx-gs/2, gy=88, cell=gs/2;
+    // header alleles
+    for(let i=0;i<2;i++){ text(g,s.p2[i],gx+cell*i+cell/2,gy-14,15,C.ink,800,'center','var(--mono)'); text(g,s.p1[i],gx-16,gy+cell*i+cell/2,15,C.ink,800,'center','var(--mono)'); }
+    for(let r=0;r<2;r++)for(let k=0;k<2;k++){ const idx=r*2+k, x=gx+k*cell, y=gy+r*cell, kid=s.kids[idx];
+      fillRR(g,x+2,y+2,cell-4,cell-4,8, kid.indexOf('B')>=0?'rgba(63,148,87,.22)':'rgba(226,85,74,.2)');
+      g.ctx.lineWidth=1.5; rr(g,x+2,y+2,cell-4,cell-4,8); g.ctx.strokeStyle='rgba(255,255,255,.2)'; g.ctx.stroke();
+      text(g,kid,x+cell/2,y+cell/2,17,C.ink,800,'center','var(--mono)');
+    }
+    text(g,s.qtype,cx,gy+gs+26,13.5,C.ink,700,'center');
+    // options row (4)
+    const ow=Math.min(R.w-56,300)/4-8, oh=44, oy=gy+gs+50, ox0=cx-(ow*4+24)/2;
+    for(let i=0;i<4;i++){ const ox=ox0+i*(ow+8);
+      fillRR(g,ox,oy,ow,oh,9,'rgba(30,44,66,.9)'); g.ctx.lineWidth=2; rr(g,ox,oy,ow,oh,9); g.ctx.strokeStyle=colL(p); g.ctx.stroke();
+      text(g,IN.glyph(p,i,4),ox+ow/2,oy+13,10,C.mut,700,'center','var(--mono)');
+      text(g,String(s.opts[i]),ox+ow/2,oy+30,17,C.ink,800,'center');
+      IN.addAnsRegion({x:ox,y:oy,w:ow,h:oh,player:p,idx:i});
+    }
+  }
+  return {
+    onResize(){},
+    update(dt){ updateSparks(dt); if(ENG.running){ updSide('red',dt); updSide('blue',dt); } },
+    draw(g){ divider(g,eng); drawSide(g,'red'); drawSide(g,'blue'); drawSparks(g); banner(g,eng,'B = dominant · b = recessive · a box shows the trait if it has at least one B'); }
+  };
+}
+
+/* =====================================================================
+   BESPOKE · PREDATOR & PREY CHASE   (S7L4 — feeding relationships)
+   Shared arena. Each player is a predator hunting drifting prey.
+   Eat prey to score; first to the target wins. (Toxic dots cost you.)
+   ===================================================================== */
+function PredatorPrey(eng){
+  const SPD=430, DAMP=2.4, R=17, PR=9;
+  let W,H, prey=[], hunter={red:null,blue:null};
+  function reset(){ W=eng.W; H=eng.H;
+    hunter.red={x:W*0.25,y:H*0.5,vx:0,vy:0};
+    hunter.blue={x:W*0.75,y:H*0.5,vx:0,vy:0};
+    prey=[];
+    for(let i=0;i<7;i++) spawnPrey(false);
+    for(let i=0;i<2;i++) spawnPrey(true);
+  }
+  function spawnPrey(toxic){ let x,y,tries=0;
+    do{ x=60+Math.random()*(eng.W-120); y=70+Math.random()*(eng.H-140); tries++; }
+    while(tries<20 && ((hunter.red&&Math.hypot(x-hunter.red.x,y-hunter.red.y)<90)||(hunter.blue&&Math.hypot(x-hunter.blue.x,y-hunter.blue.y)<90)));
+    prey.push({x,y, vx:(Math.random()*2-1)*90, vy:(Math.random()*2-1)*90, toxic}); }
+  function move(p,dt){ const h=hunter[p]; let ax=0,ay=0;
+    if(IN.held(p,'left'))ax-=1; if(IN.held(p,'right'))ax+=1; if(IN.held(p,'up'))ay-=1; if(IN.held(p,'down'))ay+=1;
+    const m=Math.hypot(ax,ay)||1; h.vx+=ax/m*SPD*dt; h.vy+=ay/m*SPD*dt;
+    h.vx-=h.vx*DAMP*dt; h.vy-=h.vy*DAMP*dt;
+    h.x+=h.vx*dt; h.y+=h.vy*dt;
+    h.x=Math.max(R,Math.min(eng.W-R,h.x)); h.y=Math.max(52+R,Math.min(eng.H-R,h.y));
+  }
+  return {
+    onResize(){ if(W==null) reset(); else { W=eng.W; H=eng.H; } },
+    update(dt){ updateSparks(dt); if(W==null) reset();
+      if(!ENG.running) return;
+      move('red',dt); move('blue',dt);
+      for(const q of prey){ q.x+=q.vx*dt; q.y+=q.vy*dt;
+        if(q.x<40||q.x>eng.W-40) q.vx*=-1; if(q.y<62||q.y>eng.H-30) q.vy*=-1;
+        q.x=Math.max(40,Math.min(eng.W-40,q.x)); q.y=Math.max(62,Math.min(eng.H-30,q.y));
+      }
+      for(const p of ['red','blue']){ const h=hunter[p];
+        for(let i=prey.length-1;i>=0;i--){ const q=prey[i]; if(Math.hypot(h.x-q.x,h.y-q.y)<R+PR){
+          if(q.toxic){ spark(q.x,q.y,C.bad,12); prey.splice(i,1); spawnPrey(true); }
+          else { spark(q.x,q.y,col(p),14); eng.score(p,1); prey.splice(i,1); spawnPrey(false); }
+        } }
+      }
+    },
+    draw(g){ const c=g.ctx;
+      for(const q of prey){ c.beginPath(); c.arc(q.x,q.y,PR,0,7);
+        c.fillStyle=q.toxic?'#7a3b46':'#6fbf7a'; c.fill();
+        if(q.toxic){ text(g,'\u2620',q.x,q.y,11,'#ffd0d6',800,'center'); } }
+      for(const p of ['red','blue']){ const h=hunter[p];
+        c.beginPath(); c.arc(h.x,h.y,R,0,7); c.fillStyle=col(p); c.fill();
+        c.lineWidth=3; c.beginPath(); c.arc(h.x,h.y,R,0,7); c.strokeStyle=colL(p); c.stroke();
+        text(g,p==='red'?'R':'B',h.x,h.y,14,'#fff',800,'center');
+        dpad(g,p,eng,false);
+      }
+      drawSparks(g);
+      banner(g,eng,'Chase and eat the green PREY to score \u2014 avoid the \u2620 toxic ones. First to the target wins!');
+    }
+  };
+}
+
+/* =====================================================================
+   ART THUMBNAILS
+   ===================================================================== */
+function rB(c,x,y,w,h,col){c.fillStyle=col;c.fillRect(x,y,w,h);}
+function splitBg(c,w,h){ c.fillStyle=C.redBg;c.fillRect(0,0,w/2,h);c.fillStyle=C.blueBg;c.fillRect(w/2,0,w/2,h);
+  c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=2;c.beginPath();c.moveTo(w/2,0);c.lineTo(w/2,h);c.stroke(); }
+
+function artFlash(c,w,h){ c.fillStyle=C.redBg;c.fillRect(0,0,w/2,h);c.fillStyle=C.blueBg;c.fillRect(w/2,0,w/2,h);
+  rB(c,w*0.18,h*0.34,w*0.26,12,C.red); rB(c,w*0.56,h*0.34,w*0.26,12,C.blue);
+  rB(c,w*0.18,h*0.56,w*0.26,12,'#33415a'); rB(c,w*0.56,h*0.56,w*0.26,12,'#33415a'); }
+function artTanks(c,w,h){ c.fillStyle=C.redBg;c.fillRect(0,0,w,h);c.fillStyle='#2f3a24';c.fillRect(0,h*0.7,w,h*0.3);
+  c.fillStyle='#2f3a24';c.beginPath();c.ellipse(w/2,h*0.78,w*0.13,h*0.28,0,Math.PI,0,true);c.fill();
+  c.fillStyle=C.red;rB(c,w*0.12,h*0.6,22,12,C.red); c.fillStyle=C.blue;rB(c,w*0.74,h*0.6,22,12,C.blue);
+  c.strokeStyle='rgba(255,255,255,.5)';c.lineWidth=2;c.beginPath();c.moveTo(w*0.18,h*0.58);c.quadraticCurveTo(w/2,-h*0.1,w*0.8,h*0.58);c.stroke(); }
+function artRace(c,w,h){ c.fillStyle=C.blueBg;c.fillRect(0,0,w,h);
+  c.fillStyle='rgba(47,114,196,.30)';c.fillRect(w*0.16,h*0.16,w*0.22,h*0.2);
+  c.strokeStyle=C.blueL;c.lineWidth=2;c.strokeRect(w*0.16,h*0.16,w*0.22,h*0.2);
+  c.fillStyle='rgba(20,32,52,.9)';c.fillRect(w*0.46,h*0.3,w*0.22,h*0.2);c.strokeStyle='#2a3a52';c.strokeRect(w*0.46,h*0.3,w*0.22,h*0.2);
+  c.fillStyle=C.blue;c.beginPath();c.moveTo(w*0.27,h*0.72);c.lineTo(w*0.22,h*0.9);c.lineTo(w*0.32,h*0.9);c.closePath();c.fill(); }
+
+function artSort(accent){ return function(c,w,h){ splitBg(c,w,h);
+  rB(c,w*0.1,h*0.16,w*0.3,16,'rgba(20,32,52,.9)');
+  c.strokeStyle=accent;c.lineWidth=2;c.strokeRect(w*0.1,h*0.44,w*0.3,h*0.18);c.strokeRect(w*0.1,h*0.68,w*0.3,h*0.18);
+  c.fillStyle=accent;c.fillRect(w*0.1,h*0.44,8,h*0.18);
+  c.fillStyle='#9aa3ab';c.fillRect(w*0.1,h*0.68,8,h*0.18);
+  c.fillStyle=C.blueL;c.beginPath();c.arc(w*0.72,h*0.3,9,0,7);c.fill();
+  c.strokeStyle=accent;c.lineWidth=2;c.strokeRect(w*0.6,h*0.5,w*0.3,h*0.2); }; }
+function artLadder(accent){ return function(c,w,h){ splitBg(c,w,h);
+  for(let i=0;i<4;i++){ c.globalAlpha=0.45+i*0.14; c.fillStyle=accent; c.fillRect(w*0.12,h*0.78-i*h*0.16,w*0.26,h*0.13); }
+  c.globalAlpha=1;
+  for(let i=0;i<4;i++){ c.fillStyle='rgba(30,44,66,.9)'; c.fillRect(w*0.56+i*w*0.09,h*0.6,w*0.075,h*0.2); }
+  c.fillStyle=accent;c.fillRect(w*0.65,h*0.6,w*0.075,h*0.2); }; }
+function artCatch(accent){ return function(c,w,h){ splitBg(c,w,h);
+  c.fillStyle=C.good;c.beginPath();c.arc(w*0.2,h*0.28,7,0,7);c.fill();
+  c.fillStyle='#e2554a';c.beginPath();c.arc(w*0.3,h*0.5,7,0,7);c.fill();
+  c.fillStyle=C.good;c.beginPath();c.arc(w*0.72,h*0.34,7,0,7);c.fill();
+  c.fillStyle=accent;rB(c,w*0.12,h*0.78,w*0.2,10,accent); rB(c,w*0.62,h*0.78,w*0.2,10,accent); }; }
+function artMem(accent){ return function(c,w,h){ splitBg(c,w,h);
+  function grid(x0){ for(let r=0;r<2;r++)for(let k=0;k<3;k++) rB(c,x0+k*(w*0.11),h*0.3+r*(h*0.3),w*0.085,h*0.22,'rgba(30,46,70,.95)'); }
+  grid(w*0.07); grid(w*0.56);
+  rB(c,w*0.07,h*0.3,w*0.085,h*0.22,accent); rB(c,w*0.67,h*0.6,w*0.085,h*0.22,accent); }; }
+function artPunnett(c,w,h){ splitBg(c,w,h);
+  const gx=w*0.3,gy=h*0.28,s=h*0.44;
+  c.strokeStyle='rgba(255,255,255,.4)';c.lineWidth=1.5;
+  c.strokeRect(gx,gy,s,s); c.beginPath();c.moveTo(gx+s/2,gy);c.lineTo(gx+s/2,gy+s);c.moveTo(gx,gy+s/2);c.lineTo(gx+s,gy+s/2);c.stroke();
+  c.fillStyle='rgba(63,148,87,.3)';c.fillRect(gx,gy,s/2,s/2);c.fillRect(gx+s/2,gy,s/2,s/2);c.fillRect(gx,gy+s/2,s/2,s/2);
+  c.fillStyle='rgba(226,85,74,.3)';c.fillRect(gx+s/2,gy+s/2,s/2,s/2);
+  c.fillStyle='#dce6f2';c.font='bold 11px monospace';c.textAlign='center';c.textBaseline='middle';
+  c.fillText('Bb',gx+s*0.25,gy+s*0.25);c.fillText('bb',gx+s*0.75,gy+s*0.75); }
+function artPredator(c,w,h){ c.fillStyle='#0b1a12';c.fillRect(0,0,w,h);
+  for(const q of [[0.5,0.3],[0.66,0.6],[0.4,0.7],[0.8,0.4]]){ c.fillStyle='#6fbf7a';c.beginPath();c.arc(w*q[0],h*q[1],6,0,7);c.fill(); }
+  c.fillStyle=C.red;c.beginPath();c.arc(w*0.24,h*0.5,12,0,7);c.fill();
+  c.fillStyle=C.blue;c.beginPath();c.arc(w*0.82,h*0.55,12,0,7);c.fill(); }
+
+/* =====================================================================
+   GAME REGISTRY
+   ===================================================================== */
+/* =====================================================================
+   SHARED-ARENA GAMES  (single field, both players interact)
+   ===================================================================== */
+function arenaMove(h,p,dt,spd,damp,Rr,eng){ let ax=0,ay=0;
+  if(IN.held(p,'left'))ax-=1; if(IN.held(p,'right'))ax+=1; if(IN.held(p,'up'))ay-=1; if(IN.held(p,'down'))ay+=1;
+  const m=Math.hypot(ax,ay)||1; h.vx+=ax/m*spd*dt; h.vy+=ay/m*spd*dt;
+  h.vx-=h.vx*damp*dt; h.vy-=h.vy*damp*dt; h.x+=h.vx*dt; h.y+=h.vy*dt;
+  h.x=Math.max(Rr,Math.min(eng.W-Rr,h.x)); h.y=Math.max(58+Rr,Math.min(eng.H-Rr,h.y)); }
+function drawAvatar(g,x,y,p,R,label,dim){ const c=g.ctx; c.globalAlpha=dim?0.4:1;
+  c.beginPath();c.arc(x,y,R,0,7);c.fillStyle=col(p);c.fill();
+  c.lineWidth=3;c.beginPath();c.arc(x,y,R,0,7);c.strokeStyle=colL(p);c.stroke();
+  text(g,label,x,y,13,'#fff',800,'center'); c.globalAlpha=1; }
+function arenaHeader(g,eng,txt,accent){ const c=g.ctx; c.save();
+  c.font='800 16px ui-monospace,monospace'; c.textAlign='center'; c.textBaseline='middle';
+  const w=c.measureText(txt).width+28; fillRR(g,eng.W/2-w/2,10,w,30,10,'rgba(10,18,30,.82)');
+  g.ctx.lineWidth=2; rr(g,eng.W/2-w/2,10,w,30,10); g.ctx.strokeStyle=accent||'#5f7089'; g.ctx.stroke();
+  c.fillStyle='#fff'; c.fillText(txt,eng.W/2,26); c.restore(); }
+
+/* ---- GRAB ARENA engine (Kingdom Grab / Organelle Grab / Food Web Tag) ---- */
+function GrabArena(eng, cfg){
+  const R=18, TR=15, SPD=440, DAMP=2.5;
+  let W=null, tokens=[], av={red:null,blue:null}, ci=0;
+  function target(){ return cfg.calls[ci]; }
+  function pickCall(){ ci=Math.random()*cfg.calls.length|0; }
+  function spawnToken(forceKey){ let it;
+    if(forceKey){ const pool=cfg.items.filter(x=>x.key===forceKey); it=pool[Math.random()*pool.length|0]; }
+    else it=cfg.items[Math.random()*cfg.items.length|0];
+    let x,y,tries=0;
+    do{ x=64+Math.random()*(eng.W-128); y=88+Math.random()*(eng.H-158); tries++; }
+    while(tries<15 && ((av.red&&Math.hypot(x-av.red.x,y-av.red.y)<74)||(av.blue&&Math.hypot(x-av.blue.x,y-av.blue.y)<74)));
+    tokens.push({x,y,vx:(Math.random()*2-1)*74,vy:(Math.random()*2-1)*74, name:it.name, key:it.key});
+  }
+  function ensureMatch(){ if(!tokens.some(t=>t.key===target().key)) spawnToken(target().key); }
+  function reset(){ W=eng.W;
+    av.red={x:eng.W*0.25,y:eng.H*0.55,vx:0,vy:0,stun:0};
+    av.blue={x:eng.W*0.75,y:eng.H*0.55,vx:0,vy:0,stun:0};
+    tokens=[]; ci=0; if(!cfg.sequential) pickCall();
+    for(let i=0;i<2;i++) spawnToken(target().key);
+    while(tokens.length<9) spawnToken();
+  }
+  return {
+    onResize(){ if(W!=null) W=eng.W; },
+    update(dt){ updateSparks(dt); if(W==null) reset(); if(!ENG.running) return;
+      for(const p of ['red','blue']){ const h=av[p]; if(h.stun>0) h.stun-=dt; else arenaMove(h,p,dt,SPD,DAMP,R,eng); }
+      for(const t of tokens){ t.x+=t.vx*dt; t.y+=t.vy*dt;
+        if(t.x<44||t.x>eng.W-44)t.vx*=-1; if(t.y<80||t.y>eng.H-40)t.vy*=-1;
+        t.x=Math.max(44,Math.min(eng.W-44,t.x)); t.y=Math.max(80,Math.min(eng.H-40,t.y)); }
+      for(const p of ['red','blue']){ const h=av[p]; if(h.stun>0) continue;
+        for(let i=tokens.length-1;i>=0;i--){ const t=tokens[i]; if(Math.hypot(h.x-t.x,h.y-t.y)<R+TR){
+          if(t.key===target().key){ spark(t.x,t.y,col(p),16); eng.score(p,1); tokens.splice(i,1);
+            if(cfg.sequential){ ci=(ci+1)%cfg.calls.length; } else pickCall();
+            while(tokens.length<9) spawnToken(); ensureMatch();
+          } else { h.stun=0.7; spark(t.x,t.y,C.bad,8); }
+          break;
+        } }
+      }
+    },
+    draw(g){ if(W==null) return;
+      arenaHeader(g,eng,(cfg.verb?cfg.verb+'  ':'')+target().label, cfg.accent);
+      for(const t of tokens){ const bw=Math.max(58,t.name.length*8+18);
+        fillRR(g,t.x-bw/2,t.y-14,bw,28,8,'rgba(24,38,60,.96)');
+        g.ctx.lineWidth=1.5; rr(g,t.x-bw/2,t.y-14,bw,28,8); g.ctx.strokeStyle='rgba(150,175,205,.45)'; g.ctx.stroke();
+        text(g,t.name,t.x,t.y,12,C.ink,700,'center'); }
+      for(const p of ['red','blue']){ const h=av[p]; drawAvatar(g,h.x,h.y,p,R,p==='red'?'R':'B',h.stun>0); dpad(g,p,eng,false); }
+      drawSparks(g); banner(g,eng,cfg.foot);
+    }
+  };
+}
+const KINGDOM_GRAB={ verb:'GRAB A', accent:'#3f9457',
+  foot:'Move onto an organism of the called kingdom and grab it \u2014 a wrong grab stuns you!',
+  calls:[{label:'ANIMAL',key:'animal'},{label:'PLANT',key:'plant'},{label:'FUNGUS',key:'fungi'},{label:'BACTERIA / MICROBE',key:'microbe'}],
+  items:[
+   {name:'Oak tree',key:'plant'},{name:'Fern',key:'plant'},{name:'Cactus',key:'plant'},{name:'Moss',key:'plant'},
+   {name:'Grizzly bear',key:'animal'},{name:'Honeybee',key:'animal'},{name:'Jellyfish',key:'animal'},{name:'Eagle',key:'animal'},
+   {name:'Mushroom',key:'fungi'},{name:'Bread mold',key:'fungi'},{name:'Yeast',key:'fungi'},
+   {name:'E. coli',key:'microbe'},{name:'Streptococcus',key:'microbe'},{name:'Cyanobacterium',key:'microbe'},
+  ]};
+const ORGANELLE_GRAB={ verb:'FIND: organelle that', accent:'#7a4fb0',
+  foot:'Grab the organelle that does the called job \u2014 a wrong grab stuns you!',
+  calls:[{label:'CONTROLS THE CELL',key:'Nucleus'},{label:'RELEASES ENERGY',key:'Mitochondria'},{label:'MAKES FOOD (SUNLIGHT)',key:'Chloroplast'},{label:'CONTROLS IN & OUT',key:'Cell membrane'},{label:'BREAKS DOWN WASTE',key:'Lysosome'},{label:'SUPPORTS THE PLANT CELL',key:'Cell wall'}],
+  items:[
+   {name:'Nucleus',key:'Nucleus'},{name:'Mitochondria',key:'Mitochondria'},{name:'Chloroplast',key:'Chloroplast'},
+   {name:'Cell membrane',key:'Cell membrane'},{name:'Lysosome',key:'Lysosome'},{name:'Cell wall',key:'Cell wall'},
+   {name:'Vacuole',key:'Vacuole'},{name:'Ribosome',key:'Ribosome'},{name:'Cytoplasm',key:'Cytoplasm'},
+  ]};
+const FOODWEB_TAG={ verb:'', accent:'#2f72c4', sequential:true,
+  foot:'Follow the energy up the chain \u2014 grab the correct NEXT consumer each time.',
+  calls:[
+   {label:'GRASS made food \u2014 grab the GRASSHOPPER that eats it',key:'Grasshopper'},
+   {label:'GRASSHOPPER eaten \u2014 grab the FROG next',key:'Frog'},
+   {label:'FROG eaten \u2014 grab the SNAKE next',key:'Snake'},
+   {label:'SNAKE eaten \u2014 grab the HAWK (top predator)',key:'Hawk'},
+  ],
+  items:[
+   {name:'Grasshopper',key:'Grasshopper'},{name:'Frog',key:'Frog'},{name:'Snake',key:'Snake'},{name:'Hawk',key:'Hawk'},
+   {name:'Grass',key:'Grass'},{name:'Rabbit',key:'Rabbit'},{name:'Mushroom',key:'Mushroom'},{name:'Owl',key:'Owl'},
+  ]};
+
+/* ---- MEMBRANE GATE TUG (S7L2) ---- */
+function MembraneGate(eng){
+  const R=18, SPD=440, DAMP=2.5, MR=13;
+  let W=null, av={red:null,blue:null}, mol=[];
+  function bandH(){ return Math.max(46, eng.H*0.15); }
+  function spawn(){ mol.push({x:64+Math.random()*(eng.W-128), y:eng.H/2+(Math.random()*2-1)*eng.H*0.12, vx:(Math.random()*2-1)*40, vy:(Math.random()*2-1)*40, nutrient:Math.random()<0.5, last:null}); }
+  function reset(){ W=eng.W; av.red={x:eng.W*0.3,y:eng.H*0.5,vx:0,vy:0}; av.blue={x:eng.W*0.7,y:eng.H*0.5,vx:0,vy:0}; mol=[]; for(let i=0;i<7;i++) spawn(); }
+  return {
+    onResize(){ if(W!=null) W=eng.W; },
+    update(dt){ updateSparks(dt); if(W==null) reset(); if(!ENG.running) return;
+      for(const p of ['red','blue']) arenaMove(av[p],p,dt,SPD,DAMP,R,eng);
+      const topZ=58+bandH(), botZ=eng.H-bandH();
+      for(let i=mol.length-1;i>=0;i--){ const mo=mol[i];
+        for(const p of ['red','blue']){ const h=av[p]; const dx=mo.x-h.x, dy=mo.y-h.y, d=Math.hypot(dx,dy);
+          if(d<R+MR+6){ const f=520/(d+8); mo.vx+=dx/(d||1)*f; mo.vy+=dy/(d||1)*f; mo.last=p; } }
+        mo.vx-=mo.vx*0.6*dt; mo.vy-=mo.vy*0.6*dt; mo.x+=mo.vx*dt; mo.y+=mo.vy*dt;
+        if(mo.x<44){mo.x=44;mo.vx*=-.6;} if(mo.x>eng.W-44){mo.x=eng.W-44;mo.vx*=-.6;}
+        if(mo.y<topZ){ if(mo.nutrient&&mo.last){ eng.score(mo.last,1); spark(mo.x,mo.y,col(mo.last),12); } mol.splice(i,1); spawn(); continue; }
+        if(mo.y>botZ){ if(!mo.nutrient&&mo.last){ eng.score(mo.last,1); spark(mo.x,mo.y,col(mo.last),12); } mol.splice(i,1); spawn(); continue; }
+      }
+    },
+    draw(g){ if(W==null) return; const c=g.ctx, bh=bandH();
+      fillRR(g,0,58,eng.W,bh-2,0,'rgba(63,148,87,.16)');
+      fillRR(g,0,eng.H-bh,eng.W,bh,0,'rgba(160,116,63,.16)');
+      text(g,'\u25B2 INTO CELL  \u2014 push NUTRIENTS up here',eng.W/2,58+bh/2,13.5,'#7fd0a0',800,'center','var(--mono)');
+      text(g,'\u25BC OUT OF CELL  \u2014 push WASTE down here',eng.W/2,eng.H-bh/2,13.5,'#d6b071',800,'center','var(--mono)');
+      c.strokeStyle='rgba(255,255,255,.14)'; c.lineWidth=2; c.setLineDash([8,7]);
+      c.beginPath();c.moveTo(0,58+bh);c.lineTo(eng.W,58+bh);c.moveTo(0,eng.H-bh);c.lineTo(eng.W,eng.H-bh);c.stroke(); c.setLineDash([]);
+      for(const mo of mol){ c.beginPath();c.arc(mo.x,mo.y,MR,0,7); c.fillStyle=mo.nutrient?'#4bb06e':'#a9793f'; c.fill();
+        text(g,mo.nutrient?'N':'W',mo.x,mo.y,11,'#0d1420',800,'center'); }
+      for(const p of ['red','blue']){ const h=av[p]; drawAvatar(g,h.x,h.y,p,R,p==='red'?'R':'B',false); dpad(g,p,eng,false); }
+      drawSparks(g); banner(g,eng,'Bump molecules to herd them \u2014 nutrients IN (top), waste OUT (bottom). Whoever routes it scores.');
+    }
+  };
+}
+
+/* ---- DICHOTOMOUS MAZE (S7L1) ---- */
+function DichotomousMaze(eng){
+  const KEYS=[
+    {name:'FROG', steps:[{q:'Backbone?',opt:['Has a backbone','No backbone'],c:0},{q:'Body covering?',opt:['Moist smooth skin','Dry scales'],c:0},{q:'Life cycle?',opt:['Tadpole in water first','Born on land'],c:0}]},
+    {name:'SHARK', steps:[{q:'Backbone?',opt:['Has a backbone','No backbone'],c:0},{q:'Breathes with?',opt:['Gills','Lungs'],c:0},{q:'Skeleton is made of?',opt:['Cartilage','Solid bone'],c:0}]},
+    {name:'SPIDER', steps:[{q:'Backbone?',opt:['Has a backbone','No backbone'],c:1},{q:'How many legs?',opt:['Eight legs','Six legs'],c:0},{q:'Wings?',opt:['No wings','Has wings'],c:0}]},
+    {name:'BUTTERFLY', steps:[{q:'Backbone?',opt:['Has a backbone','No backbone'],c:1},{q:'How many legs?',opt:['Six legs (insect)','Eight legs'],c:0},{q:'Wings?',opt:['Scaly wings','No wings'],c:0}]},
+    {name:'EAGLE', steps:[{q:'Backbone?',opt:['Has a backbone','No backbone'],c:0},{q:'Body covering?',opt:['Feathers','Fur'],c:0},{q:'Young are?',opt:['Hatched from eggs','Born live'],c:0}]},
+  ];
+  const SPD=360, DAMP=3.2, R=15;
+  let W=null, av={red:null,blue:null}, mystery=0;
+  function reset(){ W=eng.W; mystery=Math.random()*KEYS.length|0;
+    av.red={x:eng.W*0.5,row:0,flash:0}; av.blue={x:eng.W*0.5,row:0,flash:0}; }
+  function rowsN(){ return KEYS[mystery].steps.length; }
+  function rowY(r){ const N=rowsN(); const top=64, bot=eng.H-70; return bot-(r+0.5)*((bot-top)/(N+1)); }
+  function upd(p,dt){ const h=av[p]; if(h.flash>0) h.flash-=dt;
+    if(IN.held(p,'left')) h.x-=SPD*dt; if(IN.held(p,'right')) h.x+=SPD*dt;
+    h.x=Math.max(30,Math.min(eng.W-30,h.x));
+    if(IN.pressed(p,'up')||IN.pressed(p,'fire')){ const step=KEYS[mystery].steps[h.row];
+      const side = h.x<eng.W/2?0:1;
+      if(side===step.c){ h.row++; spark(h.x,rowY(h.row-1),col(p),12);
+        if(h.row>=rowsN()){ eng.score(p,1); h.row=0; if(!ENG.running) return; }
+      } else h.flash=0.5;
+    }
+  }
+  return {
+    onResize(){ if(W!=null) W=eng.W; },
+    update(dt){ updateSparks(dt); if(W==null) reset(); if(!ENG.running) return; upd('red',dt); upd('blue',dt);
+      if(av.red.row===0&&av.blue.row===0){ /* both reset after a win handled inline */ }
+    },
+    draw(g){ if(W==null) return; const c=g.ctx, N=rowsN();
+      arenaHeader(g,eng,'KEY OUT:  '+KEYS[mystery].name,'#3f9457');
+      c.strokeStyle='rgba(255,255,255,.12)'; c.lineWidth=2; c.beginPath(); c.moveTo(eng.W/2,58); c.lineTo(eng.W/2,eng.H-46); c.stroke();
+      for(let r=0;r<N;r++){ const y=rowY(r), step=KEYS[mystery].steps[r];
+        fillRR(g,eng.W*0.05,y-26,eng.W*0.9,52,10,'rgba(18,30,50,.72)');
+        text(g,'Step '+(r+1)+':  '+step.q, eng.W/2, y-14, 11.5, C.mut,700,'center','var(--mono)');
+        for(let s=0;s<2;s++){ const bx=s===0?eng.W*0.09:eng.W*0.55, bw=eng.W*0.36;
+          fillRR(g,bx,y+2,bw,20,6,'rgba(40,58,86,.9)');
+          text(g,(s===0?'\u25C0 ':'')+step.opt[s]+(s===1?' \u25B6':''), bx+bw/2, y+12, 12.5, C.ink,700,'center'); }
+      }
+      for(const p of ['red','blue']){ const h=av[p]; const y=h.row<N?rowY(h.row):rowY(N-1)-30;
+        drawAvatar(g,h.x,y,p,R,p==='red'?'R':'B',false);
+        if(h.flash>0) text(g,'\u2717',h.x,y-24,16,C.bad,800,'center');
+        dpad(g,p,eng,true);
+      }
+      drawSparks(g); banner(g,eng,'Move under the gate that describes the organism, then press UP to climb. First to the top identifies it!');
+    }
+  };
+}
+
+/* ---- LIMITING FACTORS SURVIVAL (S7L4) ---- */
+function LimitingFactors(eng){
+  const R=18, SPD=430, DAMP=2.5, FR=12;
+  let W=null, av={red:null,blue:null}, food=[], spawnT=0, evT=6, ev=0, evName='';
+  function reset(){ W=eng.W; av.red={x:eng.W*0.3,y:eng.H*0.5,vx:0,vy:0,en:1,dead:0}; av.blue={x:eng.W*0.7,y:eng.H*0.5,vx:0,vy:0,en:1,dead:0}; food=[]; spawnT=0; evT=7; ev=0; }
+  function spawn(){ if(food.length>=4) return; food.push({x:64+Math.random()*(eng.W-128), y:80+Math.random()*(eng.H-150), water:Math.random()<0.5}); }
+  return {
+    onResize(){ if(W!=null) W=eng.W; },
+    update(dt){ updateSparks(dt); if(W==null) reset(); if(!ENG.running) return;
+      evT-=dt; if(evT<=0){ if(ev>0){ ev=0; evT=8+Math.random()*4; } else { ev=1; evT=4.5; evName=Math.random()<0.5?'DROUGHT':'DISEASE'; food.length=Math.max(0,food.length-2)&&food.splice(0,2); } }
+      const drain=ev?0.14:0.07;
+      spawnT-=dt; if(spawnT<=0 && !ev){ spawnT=2.4; spawn(); }
+      for(const p of ['red','blue']){ const h=av[p];
+        if(h.dead>0){ h.dead-=dt; if(h.dead<=0) h.en=0.4; continue; }
+        arenaMove(h,p,dt,SPD,DAMP,R,eng);
+        h.en-=drain*dt; if(h.en<=0){ h.en=0; h.dead=3; spark(h.x,h.y,C.bad,14); continue; }
+        for(let i=food.length-1;i>=0;i--){ const f=food[i]; if(Math.hypot(h.x-f.x,h.y-f.y)<R+13){ h.en=Math.min(1,h.en+0.34); eng.score(p,1); spark(f.x,f.y,col(p),12); food.splice(i,1); } }
+      }
+    },
+    draw(g){ if(W==null) return; const c=g.ctx;
+      arenaHeader(g,eng, ev? ('\u26A0 LIMITING FACTOR:  '+evName+'!') : 'SURVIVE \u2014 grab scarce food to keep energy up', ev?'#e2554a':'#2f72c4');
+      for(const f of food){ c.beginPath();c.arc(f.x,f.y,13,0,7); c.fillStyle=f.water?'#4aa8d8':'#6fbf5a'; c.fill(); text(g,f.water?'\uD83D\uDCA7':'',f.x,f.y,12,'#fff',800,'center'); }
+      for(const p of ['red','blue']){ const h=av[p]; drawAvatar(g,h.x,h.y,p,R,p==='red'?'R':'B',h.dead>0);
+        // energy bar
+        const bx=p==='red'?16:eng.W-176, by=52, bw=160;
+        fillRR(g,bx,by,bw,12,6,'rgba(255,255,255,.12)'); fillRR(g,bx,by,bw*Math.max(0,h.en),12,6, h.en<0.3?C.bad:col(p));
+        if(h.dead>0) text(g,'OUT OF ENERGY',h.x,h.y-26,11,C.bad,800,'center','var(--mono)');
+        dpad(g,p,eng,false);
+      }
+      drawSparks(g); banner(g,eng,'Food & water are scarce and shared \u2014 compete for them. Limiting factors drain everyone. Most food eaten wins.');
+    }
+  };
+}
+
+/* ---- CAMOUFLAGE HUNT (S7L5) ---- */
+function CamouflageHunt(eng){
+  const R=17, SPD=440, DAMP=2.5, PR=10, HUES=[120,28,205,285,90,340];
+  let W=null, av={red:null,blue:null}, prey=[], bi=0, gen=1;
+  function bg(){ return HUES[bi%HUES.length]; }
+  function hueDiff(a,b){ let d=Math.abs(a-b)%360; return d>180?360-d:d; }
+  function spawnPrey(hue){ prey.push({x:60+Math.random()*(eng.W-120), y:80+Math.random()*(eng.H-150), vx:(Math.random()*2-1)*80, vy:(Math.random()*2-1)*80, hue}); }
+  function reset(){ W=eng.W; bi=0; gen=1;
+    av.red={x:eng.W*0.25,y:eng.H*0.55,vx:0,vy:0}; av.blue={x:eng.W*0.75,y:eng.H*0.55,vx:0,vy:0}; prey=[];
+    for(let i=0;i<6;i++) spawnPrey((bg()+120+Math.random()*120)%360);
+    for(let i=0;i<4;i++) spawnPrey((bg()+ (Math.random()*40-20)+360)%360);
+  }
+  function visible(q){ return hueDiff(q.hue,bg())>60; }
+  function nextGen(){ // survivors = camouflaged reproduce; bg shifts
+    const survivors=prey.slice(); bi++; gen++;
+    prey=[]; for(const s of survivors){ prey.push(s); if(prey.length<9) spawnPrey((s.hue+(Math.random()*24-12)+360)%360); }
+    for(let i=0;i<3;i++) spawnPrey(Math.random()*360|0);
+  }
+  return {
+    onResize(){ if(W!=null) W=eng.W; },
+    update(dt){ updateSparks(dt); if(W==null) reset(); if(!ENG.running) return;
+      for(const p of ['red','blue']) arenaMove(av[p],p,dt,SPD,DAMP,R,eng);
+      for(const q of prey){ q.x+=q.vx*dt; q.y+=q.vy*dt; if(q.x<40||q.x>eng.W-40)q.vx*=-1; if(q.y<74||q.y>eng.H-34)q.vy*=-1; q.x=Math.max(40,Math.min(eng.W-40,q.x)); q.y=Math.max(74,Math.min(eng.H-34,q.y)); }
+      for(const p of ['red','blue']){ const h=av[p];
+        for(let i=prey.length-1;i>=0;i--){ const q=prey[i]; if(visible(q) && Math.hypot(h.x-q.x,h.y-q.y)<R+PR){ spark(q.x,q.y,col(p),14); eng.score(p,1); prey.splice(i,1); } }
+      }
+      if(!prey.some(visible)) nextGen();
+    },
+    draw(g){ if(W==null) return; const c=g.ctx;
+      c.fillStyle='hsl('+bg()+',42%,13%)'; c.fillRect(0,44,eng.W,eng.H-44);
+      arenaHeader(g,eng,'HUNT the visible prey \u2014 camouflaged ones survive   \u00B7   GEN '+gen,'#b0466f');
+      for(const q of prey){ const vis=visible(q); c.globalAlpha=vis?1:0.5; c.beginPath();c.arc(q.x,q.y,PR,0,7); c.fillStyle='hsl('+(q.hue|0)+',62%,'+(vis?58:40)+'%)'; c.fill(); c.globalAlpha=1; }
+      for(const p of ['red','blue']){ const h=av[p]; drawAvatar(g,h.x,h.y,p,R,p==='red'?'R':'B',false); dpad(g,p,eng,false); }
+      drawSparks(g); banner(g,eng,'You can only catch prey that STAND OUT. The camouflaged survivors breed \u2014 watch selection happen!');
+    }
+  };
+}
+
+/* ---- BEAK BUFFET ARENA (S7L5) ---- */
+function BeakArena(eng){
+  const R=17, SPD=430, DAMP=2.5, FR=13;
+  const SEASONS=[{n:'BALANCED SEASON',seed:0.5},{n:'DROUGHT \u2014 seeds scarce',seed:0.28},{n:'BLOOM \u2014 seeds plentiful',seed:0.72}];
+  let W=null, av={red:null,blue:null}, food=[], si=0, seasonT=9, spawnT=0;
+  function reset(){ W=eng.W; av.red={x:eng.W*0.3,y:eng.H*0.55,vx:0,vy:0}; av.blue={x:eng.W*0.7,y:eng.H*0.55,vx:0,vy:0}; food=[]; si=0; seasonT=9; spawnT=0; for(let i=0;i<8;i++) spawn(); }
+  function spawn(){ if(food.length>=12) return; food.push({x:60+Math.random()*(eng.W-120), y:80+Math.random()*(eng.H-150), seed:Math.random()<SEASONS[si].seed}); }
+  return {
+    onResize(){ if(W!=null) W=eng.W; },
+    update(dt){ updateSparks(dt); if(W==null) reset(); if(!ENG.running) return;
+      seasonT-=dt; if(seasonT<=0){ si=(si+1)%SEASONS.length; seasonT=9; }
+      spawnT-=dt; if(spawnT<=0){ spawnT=0.5; spawn(); }
+      for(const p of ['red','blue']){ const h=av[p]; arenaMove(h,p,dt,SPD,DAMP,R,eng);
+        const wants = p==='red'; // red eats seeds, blue eats bugs
+        for(let i=food.length-1;i>=0;i--){ const f=food[i]; if(Math.hypot(h.x-f.x,h.y-f.y)<R+12){ if(f.seed===wants){ eng.score(p,1); spark(f.x,f.y,col(p),12); food.splice(i,1); } } }
+      }
+    },
+    draw(g){ if(W==null) return; const c=g.ctx;
+      arenaHeader(g,eng,SEASONS[si].n,'#c98a1e');
+      text(g,'RED beak = SEEDS',16,52,12.5,colL('red'),800,'left','var(--mono)');
+      text(g,'BUGS = BLUE beak',eng.W-16,52,12.5,colL('blue'),800,'right','var(--mono)');
+      for(const f of food){ if(f.seed){ c.beginPath();c.arc(f.x,f.y,9,0,7); c.fillStyle='#d8b24a'; c.fill(); } else { c.save();c.translate(f.x,f.y);c.beginPath();c.ellipse(0,0,11,7,0.5,0,7);c.fillStyle='#5a6e3a';c.fill();c.restore(); } }
+      for(const p of ['red','blue']){ const h=av[p]; drawAvatar(g,h.x,h.y,p,R,p==='red'?'\uD83C\uDF3E':'\uD83D\uDC1B',false); dpad(g,p,eng,false); }
+      drawSparks(g); banner(g,eng,'Your beak eats only its food. When the season starves your food, the fitter beak thrives \u2014 natural selection!');
+    }
+  };
+}
+
+/* ---- ARENA THUMBNAILS ---- */
+function artArena(bg, drawFn){ return function(c,w,h){ c.fillStyle=bg; c.fillRect(0,0,w,h); drawFn(c,w,h);
+  c.fillStyle=C.red;c.beginPath();c.arc(w*0.24,h*0.62,11,0,7);c.fill();
+  c.fillStyle=C.blue;c.beginPath();c.arc(w*0.78,h*0.6,11,0,7);c.fill(); }; }
+const artKingGrab=artArena('#0e2016',(c,w,h)=>{ for(const q of [[0.5,0.3],[0.68,0.5],[0.4,0.44]]){ c.fillStyle='rgba(24,38,60,.95)';c.fillRect(w*q[0]-16,h*q[1]-8,32,16); } });
+const artOrgGrab=artArena('#160e24',(c,w,h)=>{ for(const q of [[0.5,0.3],[0.66,0.52],[0.38,0.42]]){ c.fillStyle='rgba(122,79,176,.35)';c.beginPath();c.arc(w*q[0],h*q[1],9,0,7);c.fill(); } });
+const artFoodWeb=artArena('#0a1626',(c,w,h)=>{ c.strokeStyle='rgba(120,160,220,.6)';c.lineWidth=2;c.beginPath();c.moveTo(w*0.3,h*0.7);c.lineTo(w*0.5,h*0.34);c.lineTo(w*0.72,h*0.6);c.stroke();
+  for(const q of [[0.3,0.7],[0.5,0.34],[0.72,0.6]]){ c.fillStyle='#6fbf7a';c.beginPath();c.arc(w*q[0],h*q[1],7,0,7);c.fill(); } });
+function artMaze(c,w,h){ c.fillStyle='#0e2016';c.fillRect(0,0,w,h);
+  c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=2;c.beginPath();c.moveTo(w/2,6);c.lineTo(w/2,h-6);c.stroke();
+  for(let r=0;r<3;r++){ const y=h*0.28+r*h*0.24; c.fillStyle='rgba(40,58,86,.9)';c.fillRect(w*0.08,y,w*0.36,14);c.fillRect(w*0.56,y,w*0.36,14); }
+  c.fillStyle=C.red;c.beginPath();c.arc(w*0.26,h*0.86,8,0,7);c.fill();
+  c.fillStyle=C.blue;c.beginPath();c.arc(w*0.7,h*0.86,8,0,7);c.fill(); }
+function artMembrane(c,w,h){ c.fillStyle='#0a1220';c.fillRect(0,0,w,h);
+  c.fillStyle='rgba(63,148,87,.2)';c.fillRect(0,0,w,h*0.22); c.fillStyle='rgba(160,116,63,.2)';c.fillRect(0,h*0.78,w,h*0.22);
+  c.fillStyle='#4bb06e';c.beginPath();c.arc(w*0.4,h*0.42,9,0,7);c.fill(); c.fillStyle='#a9793f';c.beginPath();c.arc(w*0.62,h*0.56,9,0,7);c.fill();
+  c.fillStyle=C.red;c.beginPath();c.arc(w*0.25,h*0.55,10,0,7);c.fill(); c.fillStyle=C.blue;c.beginPath();c.arc(w*0.78,h*0.5,10,0,7);c.fill(); }
+function artLimiting(c,w,h){ c.fillStyle='#12180a';c.fillRect(0,0,w,h);
+  c.fillStyle='#6fbf5a';c.beginPath();c.arc(w*0.5,h*0.34,8,0,7);c.fill(); c.fillStyle='#4aa8d8';c.beginPath();c.arc(w*0.64,h*0.5,8,0,7);c.fill();
+  c.fillStyle=C.red;c.beginPath();c.arc(w*0.28,h*0.6,10,0,7);c.fill(); c.fillStyle=C.blue;c.beginPath();c.arc(w*0.74,h*0.62,10,0,7);c.fill();
+  c.fillStyle=C.redL;c.fillRect(w*0.06,h*0.1,w*0.3,7); c.fillStyle=C.blueL;c.fillRect(w*0.64,h*0.1,w*0.3,7); }
+function artCamo(c,w,h){ c.fillStyle='hsl(120,42%,15%)';c.fillRect(0,0,w,h);
+  c.fillStyle='hsl(120,50%,30%)';c.beginPath();c.arc(w*0.44,h*0.4,8,0,7);c.fill();
+  c.fillStyle='hsl(28,65%,55%)';c.beginPath();c.arc(w*0.6,h*0.5,8,0,7);c.fill();
+  c.fillStyle='hsl(300,60%,58%)';c.beginPath();c.arc(w*0.32,h*0.62,8,0,7);c.fill();
+  c.fillStyle=C.red;c.beginPath();c.arc(w*0.2,h*0.3,10,0,7);c.fill(); c.fillStyle=C.blue;c.beginPath();c.arc(w*0.8,h*0.7,10,0,7);c.fill(); }
+function artBeak(c,w,h){ c.fillStyle='#1a1408';c.fillRect(0,0,w,h);
+  c.fillStyle='#d8b24a';c.beginPath();c.arc(w*0.42,h*0.36,7,0,7);c.fill(); c.beginPath();c.arc(w*0.58,h*0.62,7,0,7);c.fill();
+  c.fillStyle='#5a6e3a';c.save();c.translate(w*0.34,h*0.58);c.beginPath();c.ellipse(0,0,9,6,0.5,0,7);c.fill();c.restore();
+  c.fillStyle=C.red;c.beginPath();c.arc(w*0.22,h*0.4,10,0,7);c.fill(); c.fillStyle=C.blue;c.beginPath();c.arc(w*0.8,h*0.5,10,0,7);c.fill(); }
+
+
+const G_L1='#3f9457', G_L2='#7a4fb0', G_L3='#c98a1e', G_L4='#2f72c4', G_L5='#b0466f';
+
+const GAMES=[
+  {id:'flash', std:null, name:'Flash-Card Duel', tag:'ANY STANDARD', tagC:C.navy, make:FlashCards,
+   desc:'Fastest correct answers win. Pure speed.', art:artFlash},
+  {id:'tanks', std:null, name:'Tank Artillery', tag:'ANY STANDARD', tagC:C.navy, make:Tanks,
+   desc:'Answer to load a shell, then arc it over the hill onto your rival.', art:artTanks},
+  {id:'race', std:null, name:'Hoop Racer', tag:'ANY STANDARD', tagC:C.navy, make:HoopRace,
+   desc:'Answers drift down slowly \u2014 slide along the bottom and fly through the correct one. First to clear 8 wins.', art:artRace},
+
+  /* ---- S7L1 · CLASSIFICATION & DIVERSITY ---- */
+  {id:'kingdom', std:'S7L1', name:'Kingdom Sorter', tag:'S7L1 \u00B7 KINGDOMS', tagC:G_L1, make:e=>SortBins(e,{
+     prompt:'WHICH KINGDOM?',
+     bins:[{label:'Animal',color:'#d8663a'},{label:'Plant',color:'#3f9457'},{label:'Fungi',color:'#b58a3a'},{label:'Bacteria / Microbe',color:'#6a8fd8'}],
+     items:[
+      {name:'Oak tree',bin:1,ex:'Plants make their own food by photosynthesis \u2014 kingdom Plantae.'},
+      {name:'Mushroom',bin:2,ex:'Fungi absorb nutrients and decompose matter \u2014 kingdom Fungi.'},
+      {name:'Grizzly bear',bin:0,ex:'Animals are multicellular consumers \u2014 kingdom Animalia.'},
+      {name:'E. coli bacterium',bin:3,ex:'Bacteria are single-celled prokaryotes with no nucleus.'},
+      {name:'Fern',bin:1,ex:'Ferns are green plants that photosynthesize \u2014 kingdom Plantae.'},
+      {name:'Bread mold',bin:2,ex:'Molds are fungi \u2014 they decompose their food.'},
+      {name:'Honeybee',bin:0,ex:'Insects are animals \u2014 kingdom Animalia.'},
+      {name:'Cactus',bin:1,ex:'A cactus is a plant that makes its own food \u2014 kingdom Plantae.'},
+      {name:'Yeast',bin:2,ex:'Yeast is a single-celled fungus.'},
+      {name:'Jellyfish',bin:0,ex:'Jellyfish are animals \u2014 they consume other organisms.'},
+      {name:'Streptococcus',bin:3,ex:'These are bacteria \u2014 tiny prokaryotic cells.'},
+      {name:'Moss',bin:1,ex:'Moss is a small green plant \u2014 kingdom Plantae.'},
+     ]}), desc:'Sort each organism into its kingdom: animal, plant, fungi, or microbe.', art:artSort(G_L1)},
+  {id:'vertsort', std:'S7L1', name:'Backbone Sorter', tag:'S7L1 \u00B7 ANIMALS', tagC:G_L1, make:e=>SortBins(e,{
+     prompt:'MAMMAL, BIRD, FISH, OR NO BACKBONE?',
+     bins:[{label:'Mammal',color:'#d8663a'},{label:'Bird',color:'#6a8fd8'},{label:'Fish',color:'#3f9457'},{label:'Invertebrate',color:'#b58a3a'}],
+     items:[
+      {name:'Dolphin',bin:0,ex:'Dolphins are mammals \u2014 warm-blooded, breathe air, feed milk.'},
+      {name:'Eagle',bin:1,ex:'Birds have feathers and lay eggs.'},
+      {name:'Salmon',bin:2,ex:'Fish have gills and live in water.'},
+      {name:'Octopus',bin:3,ex:'An octopus has no backbone \u2014 it is an invertebrate.'},
+      {name:'Bat',bin:0,ex:'Bats are flying mammals \u2014 they feed their young milk.'},
+      {name:'Penguin',bin:1,ex:'A penguin is a bird \u2014 it has feathers, even though it cannot fly.'},
+      {name:'Shark',bin:2,ex:'Sharks are fish that breathe with gills.'},
+      {name:'Earthworm',bin:3,ex:'An earthworm has no backbone \u2014 an invertebrate.'},
+      {name:'Human',bin:0,ex:'Humans are mammals.'},
+      {name:'Butterfly',bin:3,ex:'Insects like butterflies are invertebrates.'},
+      {name:'Owl',bin:1,ex:'Owls are birds with feathers.'},
+      {name:'Goldfish',bin:2,ex:'Goldfish are fish with gills and fins.'},
+     ]}), desc:'Vertebrate or not? Sort animals into mammal, bird, fish, or invertebrate.', art:artSort(G_L1)},
+  {id:'taxa', std:'S7L1', name:'Classification Ladder', tag:'S7L1 \u00B7 TAXONOMY', tagC:G_L1, make:e=>OrderLadder(e,{
+     prompt:'BROADEST (bottom) \u2192 MOST SPECIFIC (top)',
+     seq:[['Domain','#6a8fd8'],['Kingdom','#3f9457'],['Phylum','#5aa89a'],['Class','#b58a3a'],['Order','#c98a1e'],['Family','#d8663a'],['Genus','#b0466f'],['Species','#9a5bb0']],
+     foot:'Order the levels of classification \u2014 Domain is broadest, Species most specific'}),
+     desc:'Stack the classification levels from broadest (Domain) to most specific (Species).', art:artLadder(G_L1)},
+  {id:'kmatch', std:'S7L1', name:'Kingdom Match', tag:'S7L1 \u00B7 DIVERSITY', tagC:G_L1, make:e=>MemoryMatch(e,{
+     prompt:'Match each ORGANISM to its KINGDOM',
+     pairs:[['Maple tree','Plantae'],['Mushroom','Fungi'],['Wolf','Animalia'],['E. coli','Bacteria'],['Amoeba','Protista'],['Fern','Plantae'],['Yeast','Fungi'],['Frog','Animalia']]}),
+     desc:'Flip tiles to pair each organism with the kingdom it belongs to.', art:artMem(G_L1)},
+
+  {id:'prokeuk', std:'S7L1', name:'Cell Type Sorter', tag:'S7L1 \u00B7 CELLS', tagC:G_L1, make:e=>SortBins(e,{
+     prompt:'HAS A NUCLEUS, OR NOT?',
+     bins:[{label:'Prokaryote (no nucleus)',color:'#6a8fd8'},{label:'Eukaryote (has a nucleus)',color:'#3f9457'}],
+     items:[
+      {name:'Bacteria',bin:0,ex:'Bacteria are prokaryotes \u2014 their cells have no nucleus.'},
+      {name:'Human skin cell',bin:1,ex:'Animal cells are eukaryotes with a true nucleus.'},
+      {name:'Archaea',bin:0,ex:'Archaea are prokaryotes \u2014 no nucleus.'},
+      {name:'Oak leaf cell',bin:1,ex:'Plant cells are eukaryotes with a nucleus.'},
+      {name:'E. coli',bin:0,ex:'E. coli is a bacterium \u2014 a prokaryote.'},
+      {name:'Amoeba',bin:1,ex:'Protists like amoebas are eukaryotes.'},
+      {name:'Yeast cell',bin:1,ex:'Yeast is a fungus \u2014 a eukaryote with a nucleus.'},
+      {name:'Cyanobacterium',bin:0,ex:'Cyanobacteria are prokaryotes \u2014 no nucleus.'},
+     ]}), desc:'Does the cell have a nucleus? Sort into prokaryote or eukaryote.', art:artSort(G_L1)},
+
+  {id:'kinggrab', std:'S7L1', name:'Kingdom Grab', tag:'S7L1 · ARENA', tagC:G_L1, make:e=>GrabArena(e,KINGDOM_GRAB),
+   desc:'Shared pond! Race your rival to grab the organism from the called kingdom — wrong grabs stun you.', art:artKingGrab},
+  {id:'dichmaze', std:'S7L1', name:'Dichotomous Maze', tag:'S7L1 · ARENA', tagC:G_L1, make:DichotomousMaze,
+   desc:'Climb the key together — pick the gate that describes the mystery organism and race to the top.', art:artMaze},
+
+  /* ---- S7L2 · CELLS & BODY SYSTEMS ---- */
+  {id:'organelle', std:'S7L2', name:'Organelle Builder', tag:'S7L2 \u00B7 CELLS', tagC:G_L2, make:e=>Catch(e,{
+     prompt:'BUILD THE CELL \u2014 catch the right parts',
+     need:5,
+     rounds:[
+      {label:'CELL PARTS',good:['Nucleus','Mitochondria','Membrane','Cytoplasm','Ribosome','Lysosome'],bad:['Wheel','Engine','Brick','Antenna']},
+      {label:'PLANT CELL PARTS',good:['Chloroplast','Cell wall','Nucleus','Vacuole','Membrane'],bad:['Gears','Battery','Screw','Bolt']},
+     ]}), desc:'Slide your basket to catch real cell organelles \u2014 dodge the junk. Fill the cell to score.', art:artCatch(G_L2)},
+  {id:'orgfunc', std:'S7L2', name:'Organelle Function Match', tag:'S7L2 \u00B7 CELLS', tagC:G_L2, make:e=>MemoryMatch(e,{
+     prompt:'Match each ORGANELLE to its JOB',
+     pairs:[['Nucleus','Controls the cell'],['Mitochondria','Releases energy'],['Chloroplast','Makes food (sunlight)'],['Cell membrane','Controls in & out'],['Cell wall','Supports the plant cell'],['Lysosome','Breaks down waste'],['Vacuole','Stores water'],['Ribosome','Makes proteins']]}),
+     desc:'Pair each organelle with the job it does inside the cell.', art:artMem(G_L2)},
+  {id:'levels', std:'S7L2', name:'Levels of Organization', tag:'S7L2 \u00B7 BODY', tagC:G_L2, make:e=>OrderLadder(e,{
+     prompt:'SMALLEST (bottom) \u2192 LARGEST (top)',
+     seq:[['Cell','#6a8fd8'],['Tissue','#5aa89a'],['Organ','#c98a1e'],['Organ System','#d8663a'],['Organism','#b0466f']],
+     foot:'Cells build tissues \u2192 organs \u2192 organ systems \u2192 the whole organism'}),
+     desc:'Order the levels of the body from a single cell up to the whole organism.', art:artLadder(G_L2)},
+  {id:'bodysys', std:'S7L2', name:'Body System Sorter', tag:'S7L2 \u00B7 SYSTEMS', tagC:G_L2, make:e=>SortBins(e,{
+     prompt:'WHICH BODY SYSTEM?',
+     bins:[{label:'Circulatory',color:'#d8663a'},{label:'Respiratory',color:'#6a8fd8'},{label:'Digestive',color:'#3f9457'},{label:'Nervous',color:'#b0466f'}],
+     items:[
+      {name:'Heart',bin:0,ex:'The heart pumps blood \u2014 circulatory (cardiovascular) system.'},
+      {name:'Lungs',bin:1,ex:'The lungs exchange oxygen and CO\u2082 \u2014 respiratory system.'},
+      {name:'Stomach',bin:2,ex:'The stomach breaks down food \u2014 digestive system.'},
+      {name:'Brain',bin:3,ex:'The brain sends and receives signals \u2014 nervous system.'},
+      {name:'Blood vessels',bin:0,ex:'Arteries and veins carry blood \u2014 circulatory system.'},
+      {name:'Windpipe (trachea)',bin:1,ex:'The trachea carries air to the lungs \u2014 respiratory system.'},
+      {name:'Intestines',bin:2,ex:'The intestines absorb nutrients \u2014 digestive system.'},
+      {name:'Spinal cord',bin:3,ex:'The spinal cord carries nerve signals \u2014 nervous system.'},
+      {name:'Nerves',bin:3,ex:'Nerves carry messages around the body \u2014 nervous system.'},
+      {name:'Esophagus',bin:2,ex:'The esophagus moves food to the stomach \u2014 digestive system.'},
+     ]}), desc:'Sort each organ into the body system it belongs to.', art:artSort(G_L2)},
+  {id:'plantcell', std:'S7L2', name:'Plant or Both?', tag:'S7L2 \u00B7 CELLS', tagC:G_L2, make:e=>SortBins(e,{
+     prompt:'PLANT CELLS ONLY, OR IN BOTH?',
+     bins:[{label:'Plant cells only',color:'#3f9457'},{label:'Both plant & animal',color:'#6a8fd8'}],
+     items:[
+      {name:'Cell wall',bin:0,ex:'Only plant cells have a rigid cell wall.'},
+      {name:'Chloroplast',bin:0,ex:'Chloroplasts (for photosynthesis) are found only in plant cells.'},
+      {name:'Nucleus',bin:1,ex:'Both plant and animal cells have a nucleus.'},
+      {name:'Mitochondria',bin:1,ex:'Both plant and animal cells have mitochondria.'},
+      {name:'Cell membrane',bin:1,ex:'Both cell types have a cell membrane.'},
+      {name:'Cytoplasm',bin:1,ex:'Both have cytoplasm filling the cell.'},
+      {name:'Large central vacuole',bin:0,ex:'A big central vacuole is typical of plant cells.'},
+      {name:'Ribosomes',bin:1,ex:'Both plant and animal cells make proteins with ribosomes.'},
+     ]}), desc:'Is this part found only in plant cells, or in both plant and animal cells?', art:artSort(G_L2)},
+
+  {id:'orggrab', std:'S7L2', name:'Organelle Grab', tag:'S7L2 · ARENA', tagC:G_L2, make:e=>GrabArena(e,ORGANELLE_GRAB),
+   desc:'Shared cytoplasm! A job is called out — dash to grab the organelle that does it before your rival.', art:artOrgGrab},
+  {id:'membrane', std:'S7L2', name:'Membrane Gate Tug', tag:'S7L2 · ARENA', tagC:G_L2, make:MembraneGate,
+   desc:'Bump molecules through the membrane — nutrients IN, waste OUT. Route it right to score.', art:artMembrane},
+
+  /* ---- S7L3 · REPRODUCTION & GENETICS ---- */
+  {id:'punnett', std:'S7L3', name:'Punnett Square Duel', tag:'S7L3 \u00B7 HEREDITY', tagC:G_L3, make:PunnettDuel,
+   desc:'Read the cross, count the offspring, and pick the right ratio. Dominant vs recessive, head to head.', art:artPunnett},
+  {id:'genopheno', std:'S7L3', name:'Genotype \u2192 Trait', tag:'S7L3 \u00B7 HEREDITY', tagC:G_L3, make:e=>SortBins(e,{
+     prompt:'DOMINANT OR RECESSIVE TRAIT?  (B = tall, b = short)',
+     bins:[{label:'Shows DOMINANT (tall)',color:'#3f9457'},{label:'Shows RECESSIVE (short)',color:'#d8663a'}],
+     items:[
+      {name:'BB',bin:0,ex:'BB has two dominant alleles \u2014 shows the dominant (tall) trait.'},
+      {name:'Bb',bin:0,ex:'Bb has one dominant B \u2014 the dominant (tall) trait shows.'},
+      {name:'bb',bin:1,ex:'bb has two recessive alleles \u2014 the recessive (short) trait shows.'},
+      {name:'Bb',bin:0,ex:'One dominant allele is enough to show the dominant trait.'},
+      {name:'bb',bin:1,ex:'Only bb (no dominant allele) shows the recessive trait.'},
+      {name:'BB',bin:0,ex:'Two dominant alleles \u2014 clearly the dominant trait.'},
+      {name:'bb',bin:1,ex:'Recessive traits appear only with two recessive alleles (bb).'},
+      {name:'Bb',bin:0,ex:'The capital B is dominant and masks the recessive b.'},
+     ]}), desc:'Does this genotype show the dominant or recessive trait? Capital beats lowercase.', art:artSort(G_L3)},
+  {id:'inherit', std:'S7L3', name:'Inherited or Learned?', tag:'S7L3 \u00B7 TRAITS', tagC:G_L3, make:e=>SortBins(e,{
+     prompt:'PASSED DOWN, OR LEARNED?',
+     bins:[{label:'Inherited trait',color:'#3f9457'},{label:'Learned behavior',color:'#c98a1e'}],
+     items:[
+      {name:'Eye color',bin:0,ex:'Eye color is coded by genes \u2014 an inherited trait.'},
+      {name:'Riding a bike',bin:1,ex:'Riding a bike is a skill you learn, not inherited.'},
+      {name:'Natural fur color',bin:0,ex:'Fur color is inherited from parents.'},
+      {name:'Speaking a language',bin:1,ex:'Language is learned from your environment.'},
+      {name:'Attached earlobes',bin:0,ex:'Earlobe shape is an inherited trait.'},
+      {name:'A dog doing a trick',bin:1,ex:'Tricks are trained \u2014 a learned behavior.'},
+      {name:'Flower petal color',bin:0,ex:'Petal color is inherited through genes.'},
+      {name:'Reading',bin:1,ex:'Reading is a learned skill.'},
+     ]}), desc:'Is it inherited through genes, or learned during life?', art:artSort(G_L3)},
+  {id:'reprod', std:'S7L3', name:'Sexual or Asexual?', tag:'S7L3 \u00B7 REPRODUCTION', tagC:G_L3, make:e=>SortBins(e,{
+     prompt:'ONE PARENT OR TWO?',
+     bins:[{label:'Asexual (1 parent, clones)',color:'#6a8fd8'},{label:'Sexual (2 parents, variation)',color:'#d8663a'}],
+     items:[
+      {name:'A bacterium splits in two',bin:0,ex:'Binary fission is asexual \u2014 one parent, identical copies.'},
+      {name:'Two dogs have puppies',bin:1,ex:'Two parents combine genes \u2014 sexual reproduction with variation.'},
+      {name:'A strawberry plant sends out runners',bin:0,ex:'Runners are asexual \u2014 the new plants are clones.'},
+      {name:'A flower is pollinated and makes seeds',bin:1,ex:'Pollination joins two parents \u2014 sexual reproduction.'},
+      {name:'A hydra grows a bud',bin:0,ex:'Budding is asexual \u2014 the offspring is a genetic copy.'},
+      {name:'Fish release eggs and sperm',bin:1,ex:'Egg + sperm from two parents is sexual reproduction.'},
+      {name:'A potato grows from an eye',bin:0,ex:'Growing from a tuber is asexual \u2014 a clone of the parent.'},
+      {name:'Humans have a baby',bin:1,ex:'Two parents pass on genes \u2014 sexual reproduction.'},
+     ]}), desc:'Sort each example into asexual (clones, one parent) or sexual (variation, two parents).', art:artSort(G_L3)},
+  {id:'genvocab', std:'S7L3', name:'Genetics Vocab Match', tag:'S7L3 \u00B7 HEREDITY', tagC:G_L3, make:e=>MemoryMatch(e,{
+     prompt:'Match each TERM to its MEANING',
+     pairs:[['Gene','Instructions for a trait'],['Chromosome','Holds many genes'],['Dominant','Trait that shows (capital)'],['Recessive','Hidden trait (lowercase)'],['Trait','An inherited feature'],['Heredity','Passing traits to offspring'],['Genotype','The alleles (e.g. Bb)'],['Phenotype','The trait you see']]}),
+     desc:'Pair each genetics word with what it means.', art:artMem(G_L3)},
+  {id:'dnalevels', std:'S7L3', name:'DNA Zoom Ladder', tag:'S7L3 \u00B7 HEREDITY', tagC:G_L3, make:e=>OrderLadder(e,{
+     prompt:'SMALLEST (bottom) \u2192 LARGEST (top)',
+     seq:[['DNA base','#6a8fd8'],['Gene','#3f9457'],['DNA molecule','#c98a1e'],['Chromosome','#d8663a'],['Nucleus','#b0466f']],
+     foot:'Zoom out: DNA bases form genes, genes sit on chromosomes, inside the nucleus'}),
+     desc:'Order the parts of heredity from a tiny DNA base out to the whole nucleus.', art:artLadder(G_L3)},
+
+  /* ---- S7L4 · ECOLOGY ---- */
+  {id:'foodchain', std:'S7L4', name:'Food Chain Order', tag:'S7L4 \u00B7 ENERGY', tagC:G_L4, make:e=>OrderLadder(e,{
+     prompt:'START OF CHAIN (bottom) \u2192 TOP PREDATOR (top)',
+     seq:[['Sun','#c98a1e'],['Grass (producer)','#3f9457'],['Grasshopper','#5aa89a'],['Frog','#6a8fd8'],['Snake','#b58a3a'],['Hawk','#b0466f']],
+     foot:'Energy flows from the Sun \u2192 producers \u2192 up through the consumers'}),
+     desc:'Build the food chain in order, from the Sun and producers up to the top predator.', art:artLadder(G_L4)},
+  {id:'pyramid', std:'S7L4', name:'Energy Pyramid', tag:'S7L4 \u00B7 ENERGY', tagC:G_L4, make:e=>OrderLadder(e,{
+     prompt:'MOST ENERGY (bottom) \u2192 LEAST ENERGY (top)',
+     seq:[['Producers','#3f9457'],['Primary consumers','#5aa89a'],['Secondary consumers','#c98a1e'],['Tertiary consumers','#b0466f']],
+     foot:'Only ~10% of energy passes up \u2014 producers hold the most, the top the least'}),
+     desc:'Stack the energy pyramid: producers hold the most energy, top consumers the least.', art:artLadder(G_L4)},
+  {id:'biotic', std:'S7L4', name:'Biotic or Abiotic?', tag:'S7L4 \u00B7 ECOSYSTEMS', tagC:G_L4, make:e=>SortBins(e,{
+     prompt:'LIVING OR NONLIVING?',
+     bins:[{label:'Biotic (living / was living)',color:'#3f9457'},{label:'Abiotic (nonliving)',color:'#6a8fd8'}],
+     items:[
+      {name:'Rabbit',bin:0,ex:'A rabbit is a living thing \u2014 biotic.'},
+      {name:'Sunlight',bin:1,ex:'Sunlight is a nonliving factor \u2014 abiotic.'},
+      {name:'Oak tree',bin:0,ex:'Trees are living \u2014 biotic.'},
+      {name:'Water',bin:1,ex:'Water is nonliving \u2014 abiotic.'},
+      {name:'Mushroom',bin:0,ex:'Fungi are living organisms \u2014 biotic.'},
+      {name:'Rock',bin:1,ex:'A rock is nonliving \u2014 abiotic.'},
+      {name:'Temperature',bin:1,ex:'Temperature is a nonliving condition \u2014 abiotic.'},
+      {name:'Earthworm',bin:0,ex:'Worms are living \u2014 biotic.'},
+      {name:'Soil',bin:1,ex:'Soil is mostly nonliving minerals \u2014 abiotic.'},
+      {name:'Bacteria',bin:0,ex:'Bacteria are living organisms \u2014 biotic.'},
+     ]}), desc:'Sort each part of an ecosystem into living (biotic) or nonliving (abiotic).', art:artSort(G_L4)},
+  {id:'consumer', std:'S7L4', name:'Consumer Type Sorter', tag:'S7L4 \u00B7 FEEDING', tagC:G_L4, make:e=>SortBins(e,{
+     prompt:'WHAT DOES IT EAT?',
+     bins:[{label:'Herbivore (plants)',color:'#3f9457'},{label:'Carnivore (meat)',color:'#d8663a'},{label:'Omnivore (both)',color:'#c98a1e'},{label:'Decomposer',color:'#6a8fd8'}],
+     items:[
+      {name:'Rabbit',bin:0,ex:'Rabbits eat only plants \u2014 herbivores.'},
+      {name:'Lion',bin:1,ex:'Lions eat only meat \u2014 carnivores.'},
+      {name:'Bear',bin:2,ex:'Bears eat plants and animals \u2014 omnivores.'},
+      {name:'Mushroom',bin:3,ex:'Fungi break down dead matter \u2014 decomposers.'},
+      {name:'Deer',bin:0,ex:'Deer graze on plants \u2014 herbivores.'},
+      {name:'Shark',bin:1,ex:'Sharks eat other animals \u2014 carnivores.'},
+      {name:'Human',bin:2,ex:'Humans eat both plants and meat \u2014 omnivores.'},
+      {name:'Earthworm',bin:3,ex:'Worms break down dead material \u2014 decomposers.'},
+      {name:'Caterpillar',bin:0,ex:'Caterpillars eat leaves \u2014 herbivores.'},
+      {name:'Soil bacteria',bin:3,ex:'Soil bacteria decompose dead matter.'},
+     ]}), desc:'Sort each organism by what it eats: herbivore, carnivore, omnivore, or decomposer.', art:artSort(G_L4)},
+  {id:'biomematch', std:'S7L4', name:'Biome Match', tag:'S7L4 \u00B7 BIOMES', tagC:G_L4, make:e=>MemoryMatch(e,{
+     prompt:'Match each BIOME to its CLUE',
+     pairs:[['Desert','Hot & very dry'],['Tundra','Frozen & treeless'],['Rain forest','Warm & very wet'],['Grassland','Grasses & grazers'],['Taiga','Cold pine forest'],['Ocean','Salt water'],['Savanna','Grassy, dry season'],['Estuary','Fresh meets salt']]}),
+     desc:'Pair each biome or aquatic ecosystem with the clue that describes it.', art:artMem(G_L4)},
+  {id:'symbiosis', std:'S7L4', name:'Symbiosis Sorter', tag:'S7L4 \u00B7 RELATIONSHIPS', tagC:G_L4, make:e=>SortBins(e,{
+     prompt:'WHO BENEFITS?',
+     bins:[{label:'Mutualism (both win)',color:'#3f9457'},{label:'Commensalism (one wins)',color:'#6a8fd8'},{label:'Parasitism (one harmed)',color:'#d8663a'}],
+     items:[
+      {name:'Bee gets nectar, flower gets pollinated',bin:0,ex:'Both the bee and flower benefit \u2014 mutualism.'},
+      {name:'A tick sucks blood from a dog',bin:2,ex:'The tick benefits and the dog is harmed \u2014 parasitism.'},
+      {name:'A barnacle rides on a whale, unbothered',bin:1,ex:'The barnacle benefits, the whale is unaffected \u2014 commensalism.'},
+      {name:'A tapeworm lives in an intestine',bin:2,ex:'The worm gains, the host is harmed \u2014 parasitism.'},
+      {name:'Clownfish and sea anemone protect each other',bin:0,ex:'Both are protected \u2014 mutualism.'},
+      {name:'A bird nests in a tree, tree unaffected',bin:1,ex:'The bird benefits, the tree is unaffected \u2014 commensalism.'},
+      {name:'Fleas bite a cat',bin:2,ex:'Fleas gain, the cat is harmed \u2014 parasitism.'},
+      {name:'Oxpecker eats ticks off a rhino',bin:0,ex:'Bird gets food, rhino gets cleaned \u2014 mutualism.'},
+     ]}), desc:'Sort each relationship into mutualism, commensalism, or parasitism.', art:artSort(G_L4)},
+  {id:'predprey', std:'S7L4', name:'Predator & Prey Chase', tag:'S7L4 \u00B7 INTERDEPENDENCE', tagC:G_L4, make:PredatorPrey,
+   desc:'Both players are predators! Chase and eat the drifting prey to score \u2014 dodge the toxic ones.', art:artPredator},
+
+  {id:'foodweb', std:'S7L4', name:'Food Web Tag', tag:'S7L4 · ARENA', tagC:G_L4, make:e=>GrabArena(e,FOODWEB_TAG),
+   desc:'Chase the energy up the food chain — grab the correct next consumer at each link.', art:artFoodWeb},
+  {id:'limiting', std:'S7L4', name:'Limiting Factors Survival', tag:'S7L4 · ARENA', tagC:G_L4, make:LimitingFactors,
+   desc:'Food & water are scarce and shared. Outcompete your rival and survive droughts to score.', art:artLimiting},
+
+  /* ---- S7L5 · EVOLUTION & NATURAL SELECTION ---- */
+  {id:'beak', std:'S7L5', name:'Beak Buffet', tag:'S7L5 \u00B7 ADAPTATION', tagC:G_L5, make:e=>Catch(e,{
+     prompt:'YOUR BEAK EATS ONLY ITS FOOD',
+     need:5,
+     rounds:[
+      {label:'SEED-EATER (seeds)',good:['Seed','Nut','Grain','Sunflower seed','Acorn'],bad:['Nectar','Worm','Fish','Insect']},
+      {label:'INSECT-EATER (bugs)',good:['Beetle','Worm','Caterpillar','Ant','Grub'],bad:['Seed','Nut','Nectar','Grain']},
+     ]}), desc:'Only the food that fits your beak counts \u2014 catch it to survive. Adaptation in action.', art:artCatch(G_L5)},
+  {id:'fossil', std:'S7L5', name:'Fossil Layer Dig', tag:'S7L5 \u00B7 FOSSILS', tagC:G_L5, make:e=>OrderLadder(e,{
+     prompt:'OLDEST / DEEPEST (bottom) \u2192 YOUNGEST (top)',
+     seq:[['Trilobite (deepest)','#b58a3a'],['Ancient fish','#c98a1e'],['Early amphibian','#5aa89a'],['Dinosaur','#3f9457'],['Ancient mammal','#6a8fd8'],['Modern human','#b0466f']],
+     foot:'Deeper rock layers are older \u2014 the deepest fossils formed first'}),
+     desc:'Order fossils by rock layer \u2014 the deepest layers hold the oldest life.', art:artLadder(G_L5)},
+  {id:'adaptsort', std:'S7L5', name:'Adaptation Sorter', tag:'S7L5 \u00B7 ADAPTATION', tagC:G_L5, make:e=>SortBins(e,{
+     prompt:'WHICH ENVIRONMENT IS IT ADAPTED TO?',
+     bins:[{label:'Desert',color:'#c98a1e'},{label:'Arctic',color:'#6a8fd8'},{label:'Ocean',color:'#3f9457'}],
+     items:[
+      {name:'Thick white fur',bin:1,ex:'White fur camouflages and insulates in the snowy Arctic.'},
+      {name:'Storing water in a stem',bin:0,ex:'Water storage helps survive the dry desert.'},
+      {name:'Gills and fins',bin:2,ex:'Gills and fins are adaptations for living in the ocean.'},
+      {name:'A blubber layer for warmth',bin:1,ex:'Blubber insulates animals in the freezing Arctic.'},
+      {name:'Being active only at night',bin:0,ex:'Nighttime activity avoids the desert daytime heat.'},
+      {name:'A streamlined body for swimming',bin:2,ex:'A streamlined shape helps move through ocean water.'},
+      {name:'Waxy skin to hold water',bin:0,ex:'Waxy coatings reduce water loss in the desert.'},
+      {name:'Small ears to save heat',bin:1,ex:'Small ears lose less body heat in the cold Arctic.'},
+      {name:'Camouflage to match sand',bin:0,ex:'Sandy colors hide desert animals from predators.'},
+     ]}), desc:'Match each adaptation to the environment it helps an organism survive in.', art:artSort(G_L5)},
+  {id:'adapttype', std:'S7L5', name:'Adaptation Type', tag:'S7L5 \u00B7 ADAPTATION', tagC:G_L5, make:e=>SortBins(e,{
+     prompt:'BODY FEATURE, OR BEHAVIOR?',
+     bins:[{label:'Physical (body part)',color:'#3f9457'},{label:'Behavioral (action)',color:'#c98a1e'}],
+     items:[
+      {name:'Sharp claws',bin:0,ex:'Claws are a body structure \u2014 a physical adaptation.'},
+      {name:'Birds flying south for winter',bin:1,ex:'Migration is an action \u2014 a behavioral adaptation.'},
+      {name:'Thick fur',bin:0,ex:'Fur is a body feature \u2014 physical.'},
+      {name:'A bear hibernating',bin:1,ex:'Hibernating is a behavior \u2014 behavioral.'},
+      {name:'Webbed feet',bin:0,ex:'Webbed feet are a body part \u2014 physical.'},
+      {name:'Wolves hunting in packs',bin:1,ex:'Hunting in groups is a behavior \u2014 behavioral.'},
+      {name:'Camouflage coloring',bin:0,ex:'Color patterns are physical adaptations.'},
+      {name:'A possum playing dead',bin:1,ex:'Playing dead is an action \u2014 behavioral.'},
+     ]}), desc:'Is the adaptation a physical body feature or a behavior?', art:artSort(G_L5)},
+  {id:'evidence', std:'S7L5', name:'Evidence of Evolution Match', tag:'S7L5 \u00B7 EVOLUTION', tagC:G_L5, make:e=>MemoryMatch(e,{
+     prompt:'Match each TERM to its MEANING',
+     pairs:[['Natural selection','Best-adapted survive'],['Variation','Differences in a species'],['Adaptation','Helpful inherited trait'],['Fossil','Preserved evidence of past life'],['Extinction','A species dies out'],['Camouflage','Blending in to hide'],['Charles Darwin','Proposed natural selection'],['Species','Group that breeds together']]}),
+     desc:'Pair each evolution term with its correct meaning.', art:artMem(G_L5)},
+  {id:'camo', std:'S7L5', name:'Camouflage Hunt', tag:'S7L5 · ARENA', tagC:G_L5, make:CamouflageHunt,
+   desc:'You can only catch prey that stand out — the camouflaged survive and breed. Watch selection happen.', art:artCamo},
+  {id:'beakarena', std:'S7L5', name:'Beak Buffet Arena', tag:'S7L5 · ARENA', tagC:G_L5, make:BeakArena,
+   desc:'Red eats seeds, Blue eats bugs. When the season starves your food, the fitter beak thrives.', art:artBeak},
+];
+const SOON=[];
+
+/* =====================================================================
+   UI WIRING
+   ===================================================================== */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  ENG.screen=id;
+}
+/* =====================================================================
+   FREEMIUM  ·  3 core games always free · 2 per-standard free, rotating weekly
+   Change FREE_PER_STANDARD to free up more/fewer per standard.
+   ===================================================================== */
+const CORE_FREE = ['flash','tanks','race'];   // always free, every standard
+const FREE_PER_STANDARD = 2;                  // rotating free games per standard
+const GAME_PRICE = '$2';
+function isoWeekNum(d){
+  const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  const day=t.getUTCDay()||7; t.setUTCDate(t.getUTCDate()+4-day);
+  const ys=new Date(Date.UTC(t.getUTCFullYear(),0,1));
+  return Math.ceil((((t-ys)/86400000)+1)/7);
+}
+function freeGameIds(){
+  const wk=isoWeekNum(new Date());
+  const set=new Set(CORE_FREE);
+  STANDARDS.forEach(s=>{
+    if(s.id==='MIX') return;
+    const pool=GAMES.filter(g=>g.std===s.id).map(g=>g.id);
+    if(pool.length<=FREE_PER_STANDARD){ pool.forEach(id=>set.add(id)); return; }
+    const start=(wk*FREE_PER_STANDARD)%pool.length;   // slides the free window each week
+    for(let i=0;i<FREE_PER_STANDARD;i++) set.add(pool[(start+i)%pool.length]);
+  });
+  return set;
+}
+function isCore(id){ return CORE_FREE.indexOf(id)>=0; }
+
+/* $2 unlock modal — PLACEHOLDER checkout (Phase 2 wires real Stripe + download) */
+function openBuy(gm){
+  let m=document.getElementById('linkModal');
+  if(!m){ m=document.createElement('div'); m.id='linkModal'; document.body.appendChild(m); }
+  m.innerHTML='<div class="lm-card">'+
+    '<div class="lm-h">Unlock &ldquo;'+gm.name+'&rdquo;</div>'+
+    '<div class="lm-sub">'+gm.tag+' &middot; one&#8209;time '+GAME_PRICE+' &middot; yours to keep forever.</div>'+
+    '<div class="buy-box"><div class="buy-price">'+GAME_PRICE+'</div>'+
+      '<ul class="buy-list"><li>Download a single file of this game</li>'+
+      '<li>Works offline &mdash; host it anywhere, forever</li>'+
+      '<li>No subscription, no account needed</li></ul></div>'+
+    '<div class="lm-note">🔒 <b>Paid downloads are opening soon.</b> Very soon you&rsquo;ll be able to buy this game for '+GAME_PRICE+' and download it to keep forever. For now, enjoy the free games — three are always free, and two more per standard unlock free every week.</div>'+
+    '<div class="lm-actions"><button class="btn btn-accent" id="lmClose">Back to the games</button></div>'+
+  '</div>';
+  m.classList.add('on');
+  m.querySelector('#lmClose').onclick=()=>m.classList.remove('on');
+  m.onclick=(e)=>{ if(e.target===m) m.classList.remove('on'); };
+}
+
+function renderHub(){
+  // scoreboard
+  document.getElementById('sbRed').textContent=ST.series.red;
+  document.getElementById('sbBlue').textContent=ST.series.blue;
+  const info = ST.series.red===ST.series.blue ? 'tied — first win takes the lead'
+    : (ST.series.red>ST.series.blue?'Red leads the session':'Blue leads the session');
+  document.getElementById('sbInfo').textContent=info;
+  document.getElementById('modeLabel').textContent='first to '+ST.target;
+
+  // standards
+  const row=document.getElementById('stdRow'); row.innerHTML='';
+  STANDARDS.forEach(s=>{
+    const d=document.createElement('div'); d.className='std-chip'+(s.id===ST.standard?' sel':'');
+    d.innerHTML=`<span>${s.id==='MIX'?'★ Mixed':s.id}</span><small>${s.name}</small>`;
+    d.onclick=()=>{ ST.standard=s.id; renderHub(); };
+    row.appendChild(d);
+  });
+
+  // games (standard-specific ones only show under their standard, or under Mixed)
+  const grid=document.getElementById('gameGrid'); grid.innerHTML='';
+  const FREE=freeGameIds();
+  GAMES.filter(gm=> !gm.std || gm.std===ST.standard || ST.standard==='MIX').forEach(gm=>{
+    const free=FREE.has(gm.id), core=isCore(gm.id);
+    const card=document.createElement('div'); card.className='game-card'+(free?'':' locked');
+    const badge = core ? '<span class="gc-badge free">✓ FREE</span>'
+                 : free ? '<span class="gc-badge week">★ FREE THIS WEEK</span>'
+                        : '<span class="gc-badge lock">🔒 '+GAME_PRICE+'</span>';
+    const action = free ? '<button class="gc-play" type="button">▶ Play</button>'+
+                          '<button class="gc-own" type="button">⬇ Own this game — '+GAME_PRICE+'</button>'
+                        : '<button class="gc-buy" type="button">🔒 Unlock &amp; download — '+GAME_PRICE+'</button>';
+    card.innerHTML=`<div class="gc-art">${badge}</div>
+      <div class="gc-body"><span class="gc-tag" style="background:${gm.tagC}">${gm.tag}</span>
+      <div class="gc-title">${gm.name}</div><div class="gc-desc">${gm.desc}</div>
+      ${action}</div>`;
+    const art=card.querySelector('.gc-art');
+    const ac=document.createElement('canvas'); ac.width=260; ac.height=96; ac.style.width='100%'; ac.style.height='100%';
+    art.appendChild(ac); const acx=ac.getContext('2d'); gm.art(acx,260,96);
+    if(free){
+      card.onclick=()=>ENG.start(gm);
+      const own=card.querySelector('.gc-own'); if(own) own.onclick=(e)=>{ e.stopPropagation(); openBuy(gm); };
+    } else {
+      card.onclick=()=>openBuy(gm);
+      card.querySelector('.gc-buy').onclick=(e)=>{ e.stopPropagation(); openBuy(gm); };
+    }
+    grid.appendChild(card);
+  });
+  SOON.forEach(gm=>{
+    const card=document.createElement('div'); card.className='game-card soon';
+    card.innerHTML=`<div class="gc-art" style="background:#e9edf2"><span class="gc-soon">COMING SOON</span></div>
+      <div class="gc-body"><span class="gc-tag" style="background:${gm.tagC}">${gm.tag}</span>
+      <div class="gc-title">${gm.name}</div><div class="gc-desc">${gm.desc}</div></div>`;
+    grid.appendChild(card);
+  });
+}
+
+document.getElementById('toHub').onclick=()=>{ show('hub'); renderHub(); };
+document.getElementById('hubBrand').onclick=()=>{ show('title'); };
+document.getElementById('quitGame').onclick=()=>ENG.quit();
+document.getElementById('backHub').onclick=()=>{ hideResult(); ENG.quit(); };
+document.getElementById('rematch').onclick=()=>{ hideResult(); ENG.start(ENG.gameDef); };
+document.getElementById('resetScore').onclick=()=>{ ST.series={red:0,blue:0}; renderHub(); };
+document.getElementById('targetSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  document.querySelectorAll('#targetSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  ST.target=+b.dataset.t; renderHub();
+});
+document.getElementById('touchSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  document.querySelectorAll('#touchSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  ST.touch=b.dataset.touch==='1';
+});
+
+addEventListener('resize', ()=>{ if(ENG.screen==='game') ENG.resize(); });
+
+function openLink(gm){
+  const base=location.origin+location.pathname;
+  const std=gm.std||ST.standard;
+  const url=base+'?game='+gm.id+'&std='+std;
+  const embed='<iframe src="'+url+'" width="960" height="600" style="border:0;border-radius:12px;max-width:100%" allow="fullscreen"></iframe>';
+  let m=document.getElementById('linkModal');
+  if(!m){ m=document.createElement('div'); m.id='linkModal'; document.body.appendChild(m); }
+  m.innerHTML='<div class="lm-card">'+
+    '<div class="lm-h">Share &ldquo;'+gm.name+'&rdquo;</div>'+
+    '<div class="lm-sub">Opens straight into this game'+(gm.std?(' · '+gm.tag):(' on the '+std+' questions'))+'.</div>'+
+    '<label class="lm-lbl">Direct link (for a lesson or LMS)</label>'+
+    '<div class="lm-row"><input class="lm-in" id="lmUrl" readonly value="'+url+'"><button class="btn" data-copy="lmUrl">Copy</button></div>'+
+    '<label class="lm-lbl">Embed on your website (paste this HTML)</label>'+
+    '<div class="lm-row"><textarea class="lm-in" id="lmEmbed" readonly rows="2">'+embed+'</textarea><button class="btn" data-copy="lmEmbed">Copy</button></div>'+
+    '<div class="lm-note">Host this file on your site (or Google Sites, Canvas, etc.) and the link &amp; embed open this exact game. Add <b>&amp;target=5</b> for first-to-5, or <b>&amp;touch=1</b> for touchscreens.</div>'+
+    '<div class="lm-actions"><button class="btn btn-accent" id="lmClose">Done</button></div>'+
+  '</div>';
+  m.classList.add('on');
+  m.querySelector('#lmClose').onclick=()=>m.classList.remove('on');
+  m.onclick=(e)=>{ if(e.target===m) m.classList.remove('on'); };
+  m.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{
+    const el=document.getElementById(b.dataset.copy); el.focus(); el.select();
+    try{ navigator.clipboard.writeText(el.value); }catch(_){ try{document.execCommand('copy');}catch(__){} }
+    b.textContent='Copied!'; setTimeout(()=>{b.textContent='Copy';},1200);
+  });
+}
+
+IN.init();
+IN.bindCanvas(cv);
+renderHub();
+(function autoLaunch(){
+  const q=new URLSearchParams(location.search), gid=q.get('game');
+  if(!gid) return;
+  const gm=GAMES.find(x=>x.id===gid); if(!gm) return;
+  ST.standard = q.get('std') || gm.std || ST.standard;
+  if(q.get('target')) ST.target=+q.get('target')||ST.target;
+  if(q.get('touch')==='1'){ ST.touch=true; document.querySelectorAll('#touchSeg button').forEach(x=>x.classList.toggle('on', x.dataset.touch==='1')); }
+  ENG.start(gm);
+})();
+})();
+</script>
+</body>
+</html>

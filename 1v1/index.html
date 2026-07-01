@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1v1 Science · Tobin Science</title>
+<style>
+  :root{--ink:#1f2933;--muted:#5b6770;--line:#e3e6ea;--bg:#f6f8fa;--card:#fff;
+        --red:#d83a2f;--blue:#2f72c4;--green:#2f7a4d;--gold:#b8862b;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;padding:46px 18px 70px}
+  .wrap{max-width:1000px;margin:0 auto}
+  .back{display:inline-block;color:var(--muted);text-decoration:none;font-size:14px;font-weight:600;margin-bottom:22px}
+  .back:hover{color:var(--ink)}
+  header{text-align:center;margin-bottom:14px}
+  .logo{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:600}
+  h1{font-size:40px;margin:8px 0 10px;letter-spacing:-0.5px}
+  h1 .r{color:var(--red)} h1 .v{color:#9aa3ab} h1 .b{color:var(--blue)}
+  .tag{font-size:18px;color:var(--muted);max-width:620px;margin:0 auto}
+  .steps{font-size:13.5px;color:var(--muted);text-align:center;margin:14px auto 34px;max-width:640px}
+  .steps b{color:var(--ink)}
+  .grid{display:flex;flex-wrap:wrap;justify-content:center;gap:20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0;display:flex;flex-direction:column;flex:1 1 260px;max-width:300px;overflow:hidden;box-shadow:0 4px 16px rgba(20,30,45,.05)}
+  .cap{height:170px;position:relative;overflow:hidden;background:#0f1a2b}
+  .cap-img{width:100%;height:100%;object-fit:cover;object-position:center 42%;display:block}
+  .grade{position:absolute;top:10px;left:12px;z-index:2;font-size:11px;font-weight:800;letter-spacing:.5px;color:#fff;background:rgba(0,0,0,.6);padding:3px 9px;border-radius:20px}
+  .body{padding:20px 22px 22px;display:flex;flex-direction:column;flex:1}
+  .card h2{font-size:20px;margin:0 0 6px}
+  .card .strands{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px}
+  .card p{color:var(--muted);font-size:14.5px;flex:1}
+  .btn{display:inline-block;margin-top:16px;padding:12px 18px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;text-align:center;color:#fff}
+  .btn.phys{background:var(--blue)} .btn.life{background:var(--green)} .btn.earth{background:var(--gold)}
+  .btn:hover{filter:brightness(1.07)}
+  .soon{margin-top:16px;padding:12px 18px;border-radius:10px;font-weight:700;font-size:15px;text-align:center;color:var(--muted);background:var(--bg);border:1px dashed var(--line)}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin-top:44px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="home.html">← Back to Tobin Science</a>
+  <header>
+    <div class="logo">Tobin Science</div>
+    <h1><span class="r">1</span><span class="v">v</span><span class="b">1</span> Science</h1>
+    <p class="tag">A head-to-head science arcade — Red battles Blue across dozens of standards-aligned mini-games. Two players, one keyboard (or touch).</p>
+    <p class="steps"><b>Pick your class</b> to open its game hub. Three games are always free, two more per standard rotate free every week, and any game can be unlocked and downloaded to keep for <b>$2</b>.</p>
+  </header>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="cap">
+        <span class="grade">8TH GRADE</span>
+        <img class="cap-img" src="assets/covers/physical.jpg" alt="1v1 Physical Science">
+      </div>
+      <div class="body">
+        <h2>Physical Science</h2>
+        <div class="strands">S8P1–S8P5 · matter · energy · force · waves · E&amp;M</div>
+        <p>37 games across all five physical-science standards — atoms, Newton's laws, waves, circuits and more.</p>
+        <a class="btn phys" href="physical.html">Open Physical Science →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="cap">
+        <span class="grade">7TH GRADE</span>
+        <img class="cap-img" src="assets/covers/life.jpg" alt="1v1 Life Science">
+      </div>
+      <div class="body">
+        <h2>Life Science</h2>
+        <div class="strands">S7L1–S7L5 · cells · genetics · ecology · evolution</div>
+        <p>Head-to-head games across all five life-science standards — classification, body systems, heredity and ecosystems.</p>
+        <a class="btn life" href="life.html">Open Life Science →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="cap">
+        <span class="grade">6TH GRADE</span>
+        <img class="cap-img" src="assets/covers/earth.jpg" alt="1v1 Earth and Space Science">
+      </div>
+      <div class="body">
+        <h2>Earth &amp; Space Science</h2>
+        <div class="strands">S6E1–S6E6 · space · moon · water · weather · rocks · resources</div>
+        <p>Head-to-head games across all six Earth &amp; Space standards — the solar system, moon phases, the water cycle, weather, geology and energy resources.</p>
+        <a class="btn earth" href="earth.html">Open Earth &amp; Space →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>© Tobin Science · built for the classroom</footer>
+</div>
+</body>
+</html>
