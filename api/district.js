@@ -1,14 +1,28 @@
 // =====================================================================
 // /api/district   — Cherokee County free-access flow (one function so we
-// stay under Vercel Hobby's 12-function limit).
-//   POST { email }            -> email a signed activation link
-//   GET  ?token=...           -> verify the link, grant free access,
-//                                redirect to the teacher dashboard
+// stay under Vercel Hobby's 12-function limit; site feedback rides along
+// here for the same reason).
+//   POST { email }             -> email a signed activation link
+//   POST { kind:'feedback' }   -> save + email site feedback
+//   GET  ?token=...            -> verify the link, grant free access,
+//                                 redirect to the teacher dashboard
+//   GET  ?fbkey=PASSCODE       -> owner-only: list all feedback
 // =====================================================================
 import { adminDb, provisionOwner, sendEmail, signDistrictToken, verifyDistrictToken, signTrialToken, verifyTrialToken, trialConfirmEmailHtml, TRIAL_SEATS, TRIAL_DAYS, SITE_ORIGIN, corsHeaders, json } from './_shared.js';
+import crypto from 'node:crypto';
 
 const DISTRICT_DOMAIN = '@cherokeek12.net';
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+// --- Site feedback (form on /feedback.html, inbox on /feedback-admin.html).
+// The owner passcode is never stored here, only its SHA-256 fingerprint.
+const FEEDBACK_ADMIN_HASH = '51a2416f200d68d1ffc1063a9c3f396aeb7395e0217055f5ac21843fc3208bd0';
+const FEEDBACK_TO = process.env.FEEDBACK_TO || 'derek.tobin@cherokeek12.net';
+function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function feedbackKeyMatches(key) {
+  const got = crypto.createHash('sha256').update(String(key || '')).digest('hex');
+  try { return crypto.timingSafeEqual(Buffer.from(got), Buffer.from(FEEDBACK_ADMIN_HASH)); } catch (e) { return false; }
+}
 
 function note(message) {
   return new Response(
@@ -27,8 +41,42 @@ export async function OPTIONS(request) {
 export async function POST(request) {
   const origin = request.headers.get('origin');
   try {
-    let { email, kind } = await request.json();
+    const body = await request.json();
+    let { email, kind } = body;
     email = String(email || '').trim().toLowerCase();
+
+    // ---- Site feedback: save to quest_feedback AND email a copy, so it
+    // still arrives even if one of the two paths is down. ----
+    if (kind === 'feedback') {
+      if (body.website) return json({ ok: true }, 200, origin);   // honeypot
+      const message = String(body.message || '').trim().slice(0, 4000);
+      const name = String(body.name || '').trim().slice(0, 120);
+      const page = String(body.page || '').trim().slice(0, 200);
+      const fbEmail = String(body.email || '').trim().slice(0, 200);
+      if (message.length < 3) return json({ error: 'Please write a message first.' }, 400, origin);
+
+      let saved = false, mailed = false;
+      try {
+        const { error } = await adminDb().from('quest_feedback')
+          .insert({ name: name || null, email: fbEmail || null, message, page: page || null });
+        saved = !error;
+      } catch (e) {}
+      try {
+        mailed = await sendEmail({
+          to: FEEDBACK_TO,
+          subject: 'New feedback on TobinScience.com',
+          html: '<div style="font-family:Georgia,serif;max-width:540px;margin:auto;color:#2a2520;line-height:1.6">' +
+            '<h2 style="color:#2456b3;margin:0 0 10px">New feedback</h2>' +
+            '<p style="white-space:pre-wrap;background:#f6f8fb;border:1px solid #e4e9ee;border-radius:8px;padding:14px">' + esc(message) + '</p>' +
+            '<p style="font-size:14px;color:#555;margin:10px 0 0">From: <b>' + (esc(name) || 'no name given') + '</b>' +
+            (fbEmail ? ' &lt;' + esc(fbEmail) + '&gt;' : ' (no email given)') +
+            (page ? '<br>Sent from: ' + esc(page) : '') + '</p>' +
+          '</div>'
+        });
+      } catch (e) {}
+      if (!saved && !mailed) return json({ error: 'Could not send right now — please try again.' }, 500, origin);
+      return json({ ok: true }, 200, origin);
+    }
 
     // ---- Free-trial confirmation: any valid email, 5 seats for a week. ----
     if (kind === 'trial') {
@@ -63,6 +111,17 @@ export async function POST(request) {
 export async function GET(request) {
   try {
     const params = new URL(request.url).searchParams;
+
+    // ---- Feedback inbox (owner only) ----
+    const fbkey = params.get('fbkey');
+    if (fbkey !== null) {
+      if (!feedbackKeyMatches(fbkey)) return json({ error: 'Not authorized' }, 401);
+      const { data, error } = await adminDb().from('quest_feedback')
+        .select('id, created_at, name, email, message, page')
+        .order('created_at', { ascending: false }).limit(500);
+      if (error) return json({ error: 'Could not load feedback (is the quest_feedback table created?)' }, 500);
+      return json({ ok: true, feedback: data || [] }, 200);
+    }
 
     // ---- Free-trial confirmation ----
     const ttoken = params.get('ttoken');

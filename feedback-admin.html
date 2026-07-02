@@ -53,7 +53,7 @@
 function esc(s){ return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 async function load(key){
-  var r = await fetch('/api/feedback?key=' + encodeURIComponent(key));
+  var r = await fetch('/api/district?fbkey=' + encodeURIComponent(key));
   var j = await r.json().catch(function(){ return {}; });
   if (!r.ok) throw new Error(j.error || 'Could not load.');
   return j.feedback || [];

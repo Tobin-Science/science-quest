@@ -67,10 +67,11 @@ async function sendFeedback(){
   if (msg.length < 3) { err.textContent = 'Please write a message first.'; err.style.display = 'block'; return; }
   var b = document.getElementById('fb-send'); b.disabled = true; b.textContent = 'Sending…';
   try {
-    var r = await fetch('/api/feedback', {
+    var r = await fetch('/api/district', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        kind: 'feedback',
         name: document.getElementById('fb-name').value.trim(),
         email: document.getElementById('fb-email').value.trim(),
         message: msg,
