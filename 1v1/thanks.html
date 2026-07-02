@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thank you · 1v1 Science</title>
+<style>
+  :root{--ink:#1f2933;--muted:#5b6770;--line:#e3e6ea;--bg:#f6f8fa;--card:#fff;--red:#d83a2f;--blue:#2f72c4;--green:#2f7a4d}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:36px 34px;max-width:460px;text-align:center;box-shadow:0 12px 40px rgba(20,30,45,.08)}
+  h1{font-size:26px;margin-bottom:8px;letter-spacing:-.5px}
+  h1 .r{color:var(--red)} h1 .b{color:var(--blue)}
+  p{color:var(--muted);font-size:15px;margin-bottom:8px}
+  .btn{display:inline-block;margin:18px 0 6px;padding:13px 24px;border-radius:11px;font-weight:700;font-size:16px;text-decoration:none;color:#fff;background:linear-gradient(135deg,var(--red),var(--blue));cursor:pointer}
+  .note{font-size:13px;color:var(--muted);margin-top:14px}
+  .back{display:inline-block;margin-top:16px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:600}
+  .back:hover{color:var(--ink)}
+  .err{color:var(--red);font-weight:600}
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Thank you! <span class="r">1</span>v<span class="b">1</span></h1>
+    <p id="msg">Your game is downloading now…</p>
+    <a id="dl" class="btn">Download my game</a>
+    <p class="note">Save the file somewhere safe — it's yours forever and works offline on any computer. To use it in class, just open it (or upload it to your site / Google&nbsp;Drive / Canvas).</p>
+    <a class="back" href="/1v1/">← Back to 1v1 Science</a>
+  </div>
+<script>
+  (function(){
+    var s = new URLSearchParams(location.search).get('s');
+    var dl = document.getElementById('dl');
+    var msg = document.getElementById('msg');
+    if(!s){
+      msg.innerHTML = '<span class="err">Missing purchase reference.</span> If you were charged, email derek.tobin@cherokeek12.net.';
+      dl.style.display = 'none';
+      return;
+    }
+    var url = '/api/game?s=' + encodeURIComponent(s);
+    dl.href = url; dl.setAttribute('download','');
+    // Auto-start the download.
+    var a = document.createElement('a');
+    a.href = url; a.setAttribute('download','');
+    document.body.appendChild(a); a.click(); a.remove();
+  })();
+</script>
+</body>
+</html>

@@ -15,6 +15,37 @@ export async function POST(request) {
   try {
     let body = {};
     try { body = await request.json(); } catch (e) {}
+
+    // ---- 1v1 Science: one-time $2 single-game download ----
+    if (body && body.product === '1v1') {
+      const grade = String(body.grade || '').toLowerCase();
+      const game = String(body.game || '').slice(0, 40);
+      const std = String(body.std || '').slice(0, 8);
+      const name = String(body.name || 'Game').slice(0, 60);
+      if (!['physical', 'life', 'earth'].includes(grade) || !game) {
+        return json({ error: 'Sorry — that game could not be found.' }, 400, origin);
+      }
+      const base = SITE_ORIGIN || origin || '';
+      const meta = { product: '1v1_game', grade, game, std, name };
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [{
+          quantity: 1,
+          price_data: {
+            currency: 'usd',
+            unit_amount: 200,
+            product_data: { name: '1v1 Science — ' + name }
+          }
+        }],
+        customer_creation: 'always',      // Stripe emails a receipt
+        success_url: base + '/1v1/thanks.html?s={CHECKOUT_SESSION_ID}',
+        cancel_url: base + '/1v1/' + grade + '.html',
+        metadata: meta,
+        payment_intent_data: { metadata: meta }
+      });
+      return json({ url: session.url }, 200, origin);
+    }
+
     const token = body && body.token;
 
     const base = SITE_ORIGIN || origin || '';

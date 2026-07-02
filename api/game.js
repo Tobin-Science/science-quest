@@ -5,7 +5,55 @@
 // is the credential; the file is streamed from the private bucket and
 // never exposed as a public URL.
 // =====================================================================
-import { adminDb, QUEST_BUCKET } from './_shared.js';
+import { adminDb, QUEST_BUCKET, stripe, SITE_ORIGIN } from './_shared.js';
+
+// ---- 1v1 Science: build a self-contained single-game download ----
+const ES_SHEETS = ['energy_sources','moon_phases','planets','rocks','sky_icons','space_objects'];
+async function fetchDataURI(url, mime) {
+  const r = await fetch(url);
+  if (!r.ok) return null;
+  const buf = Buffer.from(await r.arrayBuffer());
+  return 'data:' + mime + ';base64,' + buf.toString('base64');
+}
+// Reads the (public) grade page + compressed art, inlines everything, and
+// bakes in single-game mode so the file boots into that one game offline.
+async function build1v1File(grade, game, std, name) {
+  const base = SITE_ORIGIN || '';
+  const r = await fetch(base + '/1v1/' + grade + '.html');
+  if (!r.ok) return null;
+  let html = await r.text();
+  const logo = await fetchDataURI(base + '/1v1/dl/tobin-logo.png', 'image/png');
+  if (logo) html = html.split('assets/tobin-logo.png').join(logo);
+  if (grade === 'earth') {
+    for (const n of ES_SHEETS) {
+      const u = await fetchDataURI(base + '/1v1/dl/es/' + n + '.jpg', 'image/jpeg');
+      if (u) html = html.split('assets/es/' + n + '.png').join(u);
+    }
+  }
+  const cfg = '<script>window.__ONLY_GAME__=' + JSON.stringify({ id: game, std: std || null }) + ';</script>';
+  html = html.replace('<body>', '<body>\n' + cfg);
+  const filename = (name || 'game').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '') + '.html';
+  return { body: html, filename };
+}
+async function deliver1v1(sid) {
+  let session;
+  try { session = await stripe.checkout.sessions.retrieve(sid); }
+  catch (e) { return note('We could not verify that purchase. If you were charged, email derek.tobin@cherokeek12.net.'); }
+  if (!session || session.payment_status !== 'paid' || !session.metadata || session.metadata.product !== '1v1_game') {
+    return note('That purchase is not complete yet. If you were charged, email derek.tobin@cherokeek12.net.');
+  }
+  const { grade, game, std, name } = session.metadata;
+  const file = await build1v1File(grade, game, std, name);
+  if (!file) return note('Something went wrong building your download. Please email derek.tobin@cherokeek12.net.');
+  return new Response(file.body, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Content-Disposition': 'attachment; filename="' + file.filename + '"',
+      'Cache-Control': 'no-store'
+    }
+  });
+}
 
 function toPlay() {
   return new Response(null, { status: 302, headers: { Location: '/play.html' } });
@@ -21,6 +69,11 @@ function note(message) {
 export async function GET(request) {
   try {
     const url = new URL(request.url);
+
+    // 1v1 Science single-game download after a paid $2 checkout.
+    const sid = url.searchParams.get('s');
+    if (sid) return await deliver1v1(sid);
+
     const code = (url.searchParams.get('code') || '').trim().toUpperCase();
     if (!code) return toPlay();
 

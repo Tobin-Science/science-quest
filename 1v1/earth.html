@@ -316,7 +316,7 @@ function colL(p){return p==='red'?C.redL:C.blueL;}
 const SHEETS = { planets:{cols:8,rows:1}, moon:{cols:4,rows:2}, space:{cols:6,rows:1},
   rocks:{cols:9,rows:1}, energy:{cols:10,rows:1}, sky:{cols:8,rows:1} };
 const IMG = {};
-function initSprites(){ for(const k in SHEETS){ IMG[k]=document.getElementById('sheet-'+k); } }
+function initSprites(){ for(const k in SHEETS){ const im=document.getElementById('sheet-'+k); IMG[k]=im; if(im){ if(im.decode) im.decode().catch(()=>{}); if(!im.complete){ const f=()=>{}; im.addEventListener('load',f,{once:true}); } } } }
 /* draw sprite cell `idx` from `sheet`, centered at (dx,dy), fit inside dw x dh */
 function drawSprite(g, sheet, idx, dx, dy, dw, dh){
   const im=IMG[sheet];
@@ -1815,12 +1815,27 @@ function openBuy(gm){
       '<ul class="buy-list"><li>Download a single file of this game</li>'+
       '<li>Works offline &mdash; host it anywhere, forever</li>'+
       '<li>No subscription, no account needed</li></ul></div>'+
-    '<div class="lm-note">🔒 <b>Paid downloads are opening soon.</b> Very soon you&rsquo;ll be able to buy this game for '+GAME_PRICE+' and download it to keep forever. For now, enjoy the free games — three are always free, and two more per standard unlock free every week.</div>'+
-    '<div class="lm-actions"><button class="btn btn-accent" id="lmClose">Back to the games</button></div>'+
+    '<div class="lm-note" id="buyMsg">Secure checkout by Stripe &middot; you get the download the moment you pay.</div>'+
+    '<div class="lm-actions"><button class="btn" id="lmClose">Close</button> <button class="btn btn-accent" id="lmBuy">Continue to checkout &rarr;</button></div>'+
   '</div>';
   m.classList.add('on');
   m.querySelector('#lmClose').onclick=()=>m.classList.remove('on');
   m.onclick=(e)=>{ if(e.target===m) m.classList.remove('on'); };
+  const grade = /^S8P/.test(STANDARDS[0].id)?'physical' : /^S7L/.test(STANDARDS[0].id)?'life' : 'earth';
+  const std = gm.std || ST.standard;
+  m.querySelector('#lmBuy').onclick=async function(){
+    const btn=this; btn.disabled=true; btn.textContent='Starting checkout…';
+    try{
+      const res=await fetch('/api/create-checkout',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({product:'1v1',grade:grade,game:gm.id,std:std,name:gm.name})});
+      const data=await res.json();
+      if(data && data.url){ location.href=data.url; return; }
+      throw new Error((data&&data.error)||'no url');
+    }catch(e){
+      document.getElementById('buyMsg').innerHTML='<b style="color:#a82418">Sorry — checkout couldn’t start.</b> Please try again in a moment.';
+      btn.disabled=false; btn.textContent='Continue to checkout →';
+    }
+  };
 }
 
 function renderHub(){
@@ -1929,6 +1944,23 @@ IN.bindCanvas(cv);
 initSprites();
 renderHub();
 (function autoLaunch(){
+  // Single-game download mode: a purchased file bakes in window.__ONLY_GAME__
+  // so it boots straight into that one game with the hub hidden.
+  const ONLY = window.__ONLY_GAME__;
+  if(ONLY && ONLY.id){
+    const only=GAMES.find(x=>x.id===ONLY.id);
+    if(only){
+      ST.single=true;
+      ST.standard = ONLY.std || only.std || ST.standard;
+      if(ONLY.target) ST.target=+ONLY.target||ST.target;
+      const PROMO='https://www.tobinscience.com/1v1/';
+      const relabel=(id,txt)=>{ const b=document.getElementById(id); if(b){ b.textContent=txt; b.onclick=()=>window.open(PROMO,'_blank','noopener'); } };
+      relabel('quitGame','More games →');
+      relabel('backHub','More games →');
+      ENG.start(only);
+      return;
+    }
+  }
   const q=new URLSearchParams(location.search), gid=q.get('game');
   if(!gid) return;
   const gm=GAMES.find(x=>x.id===gid); if(!gm) return;
