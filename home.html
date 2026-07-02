@@ -4,102 +4,259 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="p:domain_verify" content="a86b34da1d21641eb1ad3f8dd1378916"/>
-<title>Tobin Science — classroom science that students actually want to do</title>
+<title>Tobin Science — games, lessons &amp; RPG adventures for the middle-school classroom</title>
+<meta name="description" content="Standards-aligned science and math for grades 6–8: full RPG adventure games, learning hubs with lessons and gradebooks, and a head-to-head science arcade. Built by a Georgia middle-school science teacher.">
+<meta property="og:title" content="Tobin Science — Built For Teachers">
+<meta property="og:description" content="Full RPG adventures, standards-aligned learning hubs, and a head-to-head science arcade for grades 6–8.">
+<meta property="og:image" content="https://tobinscience.com/science-quest-cover.jpg">
+<meta property="og:url" content="https://tobinscience.com/">
+<meta property="og:type" content="website">
 <style>
-  :root{--ink:#1f2933;--muted:#5b6770;--line:#e3e6ea;--bg:#f6f8fa;--card:#fff;--ac:#2f5fd0;--gold:#b8862b;--green:#2f7a4d}
+  :root{
+    --ink:#16232f; --muted:#5a6a78; --faint:#8a97a3;
+    --line:#e4e9ee; --bg:#f6f8fb; --card:#ffffff;
+    --ac:#2456b3; --ac-dark:#1c4693; --green:#2f7a4d;
+    --shadow:0 1px 2px rgba(22,35,47,.05),0 8px 24px rgba(22,35,47,.07);
+    --shadow-lift:0 2px 4px rgba(22,35,47,.06),0 14px 34px rgba(22,35,47,.13);
+  }
   *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);background:var(--bg);line-height:1.5;padding:26px 20px 32px}
-  .wrap{max-width:1480px;margin:0 auto}
-  header{text-align:center;margin-bottom:22px}
-  .logo{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:600}
-  h1{font-size:30px;margin:4px 0 7px;letter-spacing:-0.5px}
-  .tag{font-size:15.5px;color:var(--muted);max-width:640px;margin:0 auto}
-  .grid{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:14px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 18px;display:flex;flex-direction:column;flex:1 1 200px;max-width:234px}
-  .card .ic{font-size:30px}
-  .card h2{font-size:17.5px;margin:10px 0 5px}
-  .card p{color:var(--muted);font-size:13.4px;line-height:1.45;flex:1}
-  .btn{display:inline-block;margin-top:13px;padding:9px 12px;border-radius:9px;font-weight:600;font-size:13.5px;text-decoration:none;text-align:center;color:#fff}
-  .btn.hub{background:var(--ac)}
-  .btn.quest{background:var(--gold)}
-  .btn.tpt{background:#1c9c8b}
-  .soon{margin-top:13px;padding:9px 12px;border-radius:9px;font-weight:600;font-size:13.5px;text-align:center;color:var(--muted);background:var(--bg);border:1px dashed var(--line)}
-  .price{font-size:11.5px;color:var(--muted);margin-top:6px}
-  /* Teachers Pay Teachers — full-width bar across the bottom */
-  .tpt-bar{display:flex;align-items:center;gap:22px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 24px;max-width:1040px;margin:16px auto 0;flex-wrap:wrap}
-  .tpt-bar img{height:66px;width:auto;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.16);flex:none}
-  .tpt-bar .tpt-txt{flex:1 1 300px;min-width:220px}
-  .tpt-bar .tpt-txt h2{font-size:17.5px;margin:0 0 3px}
-  .tpt-bar .tpt-txt p{font-size:13.4px;color:var(--muted);margin:0}
-  .tpt-bar .btn{margin-top:0;flex:none;white-space:nowrap;padding:11px 20px}
-  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
+  html{scroll-behavior:smooth}
+  body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+  a{color:var(--ac)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+
+  /* ---------- top nav ---------- */
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav-in{max-width:1120px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:800;font-size:17px;letter-spacing:-.2px}
+  .brand img{height:34px;width:34px;border-radius:8px}
+  .brand .grn{color:var(--green)}
+  .nav-links{margin-left:auto;display:flex;gap:4px}
+  .nav-links a{text-decoration:none;color:var(--muted);font-weight:600;font-size:14px;padding:8px 12px;border-radius:8px}
+  .nav-links a:hover{background:var(--bg);color:var(--ink)}
+  @media(max-width:560px){.nav-in{flex-wrap:wrap;justify-content:center}.nav-links{margin-left:0}.nav-links a{padding:6px 8px;font-size:13px}}
+
+  /* ---------- hero ---------- */
+  .hero{text-align:center;padding:58px 22px 46px;background:linear-gradient(180deg,#ffffff 0%,var(--bg) 100%);border-bottom:1px solid var(--line)}
+  .hero .kicker{font-size:12.5px;letter-spacing:3px;text-transform:uppercase;color:var(--ac);font-weight:700}
+  h1{font-size:clamp(30px,5vw,46px);line-height:1.12;letter-spacing:-1px;margin:12px auto 14px;max-width:760px}
+  .hero .sub{font-size:clamp(15.5px,2vw,18px);color:var(--muted);max-width:640px;margin:0 auto 26px}
+  .hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-block;padding:12px 22px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;text-align:center;transition:transform .12s ease,box-shadow .12s ease}
+  .btn.primary{background:var(--ac);color:#fff;box-shadow:0 6px 16px rgba(36,86,179,.28)}
+  .btn.primary:hover{background:var(--ac-dark);transform:translateY(-1px)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--faint);transform:translateY(-1px)}
+  .chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+  .chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:30px;padding:7px 14px}
+  .chip .dot{color:var(--green);font-weight:800}
+
+  /* ---------- sections ---------- */
+  section{padding:46px 0 8px}
+  .sec-head{margin-bottom:22px}
+  .sec-head h2{font-size:24px;letter-spacing:-.4px}
+  .sec-head p{color:var(--muted);font-size:15px;margin-top:4px;max-width:640px}
+
+  /* ---------- product cards ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+  .grid.hubs{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform .15s ease,box-shadow .15s ease}
+  .pcard:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift)}
+  .pimg{height:200px;background:linear-gradient(160deg,#eef2f7,#dfe6ee);display:flex;align-items:center;justify-content:center;padding:14px}
+  .pimg img{max-height:100%;max-width:100%;border-radius:8px;box-shadow:0 6px 18px rgba(22,35,47,.22)}
+  .pbody{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
+  .badge{align-self:flex-start;font-size:11.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--ac);background:rgba(36,86,179,.08);border-radius:6px;padding:3px 8px;margin-bottom:9px}
+  .pbody h3{font-size:18px;letter-spacing:-.2px;margin-bottom:5px}
+  .pbody p{color:var(--muted);font-size:13.8px;line-height:1.5;flex:1}
+  .pbody .btn{margin-top:14px;padding:10px 14px;font-size:14px}
+  .price{font-size:12.5px;color:var(--faint);margin-top:8px}
+  .price b{color:var(--muted)}
+  .soon{margin-top:14px;padding:10px 14px;border-radius:10px;font-weight:700;font-size:14px;text-align:center;color:var(--faint);background:var(--bg);border:1px dashed var(--line)}
+
+  /* ---------- district banner ---------- */
+  .district{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;text-align:center;background:rgba(47,122,77,.07);border:1px solid rgba(47,122,77,.25);border-radius:14px;padding:16px 20px;margin:40px auto 0;font-size:15px}
+  .district b{color:var(--green)}
+  .district a{font-weight:700;color:var(--green)}
+
+  /* ---------- TpT band ---------- */
+  .tpt-bar{display:flex;align-items:center;gap:24px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 26px;flex-wrap:wrap;box-shadow:var(--shadow)}
+  .tpt-bar img{height:78px;width:auto;border-radius:10px;box-shadow:0 4px 12px rgba(22,35,47,.18);flex:none}
+  .tpt-txt{flex:1 1 300px;min-width:220px}
+  .tpt-txt h3{font-size:18px;margin-bottom:3px}
+  .tpt-txt p{font-size:14px;color:var(--muted)}
+  .tpt-bar .btn{flex:none;white-space:nowrap}
+
+  /* ---------- footer ---------- */
+  footer{margin-top:56px;border-top:1px solid var(--line);background:#fff}
+  .foot-in{max-width:1120px;margin:0 auto;padding:30px 22px;display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;justify-content:space-between}
+  .foot-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}
+  .foot-brand img{height:30px;width:30px;border-radius:7px}
+  .foot-brand .grn{color:var(--green)}
+  .foot-note{color:var(--faint);font-size:13px;margin-top:8px;max-width:340px}
+  .foot-links{display:flex;gap:44px;flex-wrap:wrap}
+  .foot-links h4{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
+  .foot-links a{display:block;color:var(--muted);text-decoration:none;font-size:13.5px;padding:3px 0}
+  .foot-links a:hover{color:var(--ink)}
+  .foot-base{border-top:1px solid var(--line);text-align:center;color:var(--faint);font-size:12.5px;padding:14px 22px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="logo">Tobin Science</div>
-    <h1>Built For Teachers</h1>
-    <p class="tag">Standards-aligned lessons, games, and a full RPG adventure for the middle-school science and math classroom.</p>
-  </header>
 
-  <div class="grid">
-    <div class="card">
-      <img src="science-hub-cover.jpg" alt="Science Hub" style="display:block;width:auto;max-width:100%;max-height:134px;margin:0 auto 12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.18)">
-      <h2>Science Hub</h2>
-      <p>Lessons, quizzes, minigames, printables, and a paperless gradebook for Physical, Earth, and Life Science — built around the standards.</p>
-      <a class="btn hub" href="https://tobin-science.github.io/science-hub/">Open the Science Hub →</a>
-    </div>
-
-    <div class="card">
-      <img src="science-quest-cover-sm.jpg" alt="Science Quest" style="display:block;width:auto;max-height:134px;margin:0 auto 12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.25)">
-      <h2>Science Quest</h2>
-      <p>The full role-playing game where students level up by mastering 8th-Grade Physical Science. Comes with 150 student codes and a class leaderboard.</p>
-      <a class="btn quest" href="https://quest.tobinscience.com">Get Science Quest →</a>
-      <div class="price">One-time $19.99 · free for Cherokee County teachers</div>
-    </div>
-
-    <div class="card">
-      <img src="earth-quest-cover.png" alt="Earth Quest" style="display:block;width:auto;max-height:134px;margin:0 auto 12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.25)">
-      <h2>Earth Quest</h2>
-      <p>A 6th-Grade Earth Science RPG where students level up by mastering Earth Science across six realms. Comes with 150 student codes and a class leaderboard.</p>
-      <a class="btn quest" href="https://earthquest.tobinscience.com">Get Earth Quest →</a>
-      <div class="price">One-time $19.99 · free for Cherokee County teachers</div>
-    </div>
-
-    <div class="card">
-      <img src="biome-quest-cover.jpg" alt="Biome Quest" style="display:block;width:auto;max-height:134px;margin:0 auto 12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.25)">
-      <h2>Biome Quest</h2>
-      <p>A 7th-Grade Life Science RPG where students level up by mastering Biology across five living realms — classification, cells, genetics, ecology and evolution.</p>
-      <div class="soon">Coming soon</div>
-    </div>
-
-    <div class="card">
-      <img src="math-hub-cover.png" alt="Tobin Math Hub" style="display:block;width:auto;max-width:100%;max-height:134px;margin:0 auto 12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.18)">
-      <h2>Tobin Math Hub</h2>
-      <p>Standards-aligned lessons, quizzes, practice, printables, and a paperless gradebook for 6th, 7th &amp; 8th grade math — one subscription covers all three.</p>
-      <a class="btn hub" href="https://tobin-science.github.io/science-hub/math.html">Open the Math Hub →</a>
-      <div class="price">$4.99 / month or $39.99 / year · free for Cherokee County teachers</div>
-    </div>
-
-    <div class="card">
-      <img src="1v1/assets/covers/1v1.jpg" alt="1v1 Science" style="display:block;width:auto;max-width:100%;max-height:134px;margin:0 auto 12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.25)">
-      <h2>1v1 Science</h2>
-      <p>A head-to-head science arcade for 6th, 7th &amp; 8th Grade — Red vs Blue across dozens of standards-aligned mini-games. Three games always free; unlock any game for $2.</p>
-      <a class="btn" style="background:linear-gradient(135deg,#d83a2f,#2f72c4)" href="1v1/index.html">Open 1v1 Science →</a>
+<nav>
+  <div class="nav-in">
+    <a class="brand" href="/home.html"><img src="tobin-logo.png" alt="Tobin Science logo">Tobin<span class="grn">Science</span></a>
+    <div class="nav-links">
+      <a href="#games">Games</a>
+      <a href="#hubs">Learning Hubs</a>
+      <a href="#tpt">TpT Store</a>
     </div>
   </div>
+</nav>
 
-  <div class="tpt-bar">
-    <img src="tpt-cover.jpg" alt="Teachers Pay Teachers store">
-    <div class="tpt-txt">
-      <h2>Teachers Pay Teachers</h2>
-      <p>Browse my full library of printable lessons, activities, and classroom resources on my TpT store.</p>
-    </div>
-    <a class="btn tpt" href="https://www.teacherspayteachers.com/store/derek-tobin" target="_blank" rel="noopener">Visit my TpT store →</a>
+<div class="hero">
+  <div class="kicker">Middle-School Science &amp; Math · Grades 6–8</div>
+  <h1>Built For Teachers</h1>
+  <p class="sub">Full RPG adventure games, standards-aligned lessons with a paperless gradebook, and a head-to-head science arcade — built for real classrooms by a Georgia middle-school science teacher.</p>
+  <div class="hero-ctas">
+    <a class="btn primary" href="#games">Explore the games</a>
+    <a class="btn ghost" href="#hubs">Open the learning hubs</a>
   </div>
-
-  <footer>© Tobin Science · built for the classroom</footer>
+  <div class="chips">
+    <span class="chip"><span class="dot">✓</span> Standards-aligned (GSE)</span>
+    <span class="chip"><span class="dot">✓</span> No student accounts or logins</span>
+    <span class="chip"><span class="dot">✓</span> Games are one-time purchases</span>
+    <span class="chip"><span class="dot">✓</span> Secure checkout by Stripe</span>
+  </div>
 </div>
+
+<div class="wrap">
+
+  <section id="games">
+    <div class="sec-head">
+      <h2>Classroom Games</h2>
+      <p>Three full RPG adventures where students level up by mastering the standards — each with 150 student play codes and a class leaderboard, bought once and reused every year. Plus 1v1 Science: head-to-head matchups where students compete while learning the 6th, 7th &amp; 8th grade standards.</p>
+    </div>
+    <div class="grid">
+      <div class="pcard">
+        <div class="pimg"><img src="science-quest-cover-sm.jpg" alt="Science Quest cover art"></div>
+        <div class="pbody">
+          <span class="badge">8th Grade · Physical Science</span>
+          <h3>Science Quest</h3>
+          <p>The original adventure — students journey through five realms, leveling up by mastering 8th-grade physical science.</p>
+          <a class="btn primary" href="https://quest.tobinscience.com">Get Science Quest →</a>
+          <div class="price"><b>$19.99 one-time</b> · never a subscription</div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div class="pimg"><img src="earth-quest-cover-sm.jpg" alt="Earth Quest cover art"></div>
+        <div class="pbody">
+          <span class="badge">6th Grade · Earth Science</span>
+          <h3>Earth Quest</h3>
+          <p>Six realms of earth science — astronomy, weather, water, rocks, and more — capped by an epic finale at the Worldspring.</p>
+          <a class="btn primary" href="https://earthquest.tobinscience.com">Get Earth Quest →</a>
+          <div class="price"><b>$19.99 one-time</b> · never a subscription</div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div class="pimg"><img src="biome-quest-cover.jpg" alt="Biome Quest cover art"></div>
+        <div class="pbody">
+          <span class="badge">7th Grade · Life Science</span>
+          <h3>Biome Quest</h3>
+          <p>Five living realms — classification, cells, genetics, ecology, and evolution — in a quest to restore the great Tree.</p>
+          <div class="soon">Coming soon</div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div class="pimg"><img src="1v1/assets/covers/1v1.jpg" alt="1v1 Science arcade cover art"></div>
+        <div class="pbody">
+          <span class="badge">Grades 6–8 · Arcade</span>
+          <h3>1v1 Science</h3>
+          <p>A head-to-head Red-vs-Blue arcade with dozens of standards-aligned mini-games across all three grades.</p>
+          <a class="btn primary" href="1v1/index.html">Play 1v1 Science →</a>
+          <div class="price"><b>3 games always free</b> · own any game for $2</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="hubs">
+    <div class="sec-head">
+      <h2>Learning Hubs</h2>
+      <p>Complete curriculum sites: lessons, quizzes, practice, printables, and a paperless gradebook — organized around the standards.</p>
+    </div>
+    <div class="grid hubs">
+      <div class="pcard">
+        <div class="pimg"><img src="science-hub-cover.jpg" alt="Science Hub cover art"></div>
+        <div class="pbody">
+          <span class="badge">Grades 6–8 · Science</span>
+          <h3>Science Hub</h3>
+          <p>Lessons, quizzes, minigames, printables, and a paperless gradebook for Physical, Earth, and Life Science.</p>
+          <a class="btn primary" href="https://tobin-science.github.io/science-hub/">Open the Science Hub →</a>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div class="pimg"><img src="math-hub-cover-sm.jpg" alt="Math Hub cover art"></div>
+        <div class="pbody">
+          <span class="badge">Grades 6–8 · Math</span>
+          <h3>Math Hub</h3>
+          <p>Standards-aligned lessons, quizzes, practice, and printables for 6th, 7th &amp; 8th grade math — one subscription covers all three grades.</p>
+          <a class="btn primary" href="https://tobin-science.github.io/science-hub/math.html">Open the Math Hub →</a>
+          <div class="price"><b>$4.99 / month</b> or $39.99 / year</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="district">
+      <span>🏫</span>
+      <span><b>Teach in Cherokee County?</b> Every game and hub is free with your school email.</span>
+      <a href="/district.html">Get free access →</a>
+    </div>
+  </section>
+
+  <section id="tpt">
+    <div class="tpt-bar">
+      <img src="tpt-cover.jpg" alt="Teachers Pay Teachers store">
+      <div class="tpt-txt">
+        <h3>Teachers Pay Teachers</h3>
+        <p>Browse the full library of printable lessons, activities, and classroom resources on my TpT store.</p>
+      </div>
+      <a class="btn ghost" href="https://www.teacherspayteachers.com/store/derek-tobin" target="_blank" rel="noopener">Visit the TpT store →</a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="foot-in">
+    <div>
+      <div class="foot-brand"><img src="tobin-logo.png" alt="">Tobin<span class="grn">Science</span></div>
+      <p class="foot-note">Classroom games and curriculum built by a middle-school science teacher — standards-aligned, classroom-tested, and reusable year after year.</p>
+    </div>
+    <div class="foot-links">
+      <div>
+        <h4>Games</h4>
+        <a href="https://quest.tobinscience.com">Science Quest</a>
+        <a href="https://earthquest.tobinscience.com">Earth Quest</a>
+        <a href="1v1/index.html">1v1 Science</a>
+      </div>
+      <div>
+        <h4>Learning Hubs</h4>
+        <a href="https://tobin-science.github.io/science-hub/">Science Hub</a>
+        <a href="https://tobin-science.github.io/science-hub/math.html">Math Hub</a>
+      </div>
+      <div>
+        <h4>More</h4>
+        <a href="https://www.teacherspayteachers.com/store/derek-tobin" target="_blank" rel="noopener">TpT Store</a>
+        <a href="/district.html">Cherokee County access</a>
+      </div>
+    </div>
+  </div>
+  <div class="foot-base">© 2026 Tobin Science · Built for the classroom · Secure checkout by Stripe</div>
+</footer>
+
 </body>
 </html>
