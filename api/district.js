@@ -8,8 +8,19 @@
 //                                 redirect to the teacher dashboard
 //   GET  ?fbkey=PASSCODE       -> owner-only: list all feedback
 // =====================================================================
-import { adminDb, provisionOwner, sendEmail, signDistrictToken, verifyDistrictToken, signTrialToken, verifyTrialToken, trialConfirmEmailHtml, TRIAL_SEATS, TRIAL_DAYS, SITE_ORIGIN, corsHeaders, json } from './_shared.js';
+import { stripe, adminDb, provisionOwner, sendEmail, signDistrictToken, verifyDistrictToken, signTrialToken, verifyTrialToken, trialConfirmEmailHtml, TRIAL_SEATS, TRIAL_DAYS, SITE_ORIGIN, corsHeaders, json } from './_shared.js';
 import crypto from 'node:crypto';
+
+// Re-send email for lost 1v1 Science downloads.
+function recover1v1Html(items) {
+  const rows = items.map(it =>
+    '<p style="margin:10px 0"><a href="' + it.link + '" style="display:inline-block;background:#2f5fd0;color:#fff;font-weight:bold;padding:11px 20px;border-radius:8px;text-decoration:none">Download ' + esc(it.name) + '</a></p>').join('');
+  return '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:520px;margin:auto;color:#1f2933;line-height:1.6">' +
+    '<h1 style="color:#2f5fd0;font-size:22px">Your 1v1 Science downloads</h1>' +
+    '<p>Here ' + (items.length > 1 ? 'are your games' : 'is your game') + ' again. Each is a self-contained file that plays offline forever &mdash; keep this email so you can re-download anytime.</p>' +
+    rows +
+  '</div>';
+}
 
 const DISTRICT_DOMAIN = '@cherokeek12.net';
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -85,6 +96,23 @@ export async function POST(request) {
       }
       const link = (SITE_ORIGIN || '') + '/api/district?ttoken=' + encodeURIComponent(signTrialToken(email));
       await sendEmail({ to: email, subject: 'Confirm your email to start your free week of Science Quest', html: trialConfirmEmailHtml(link) });
+      return json({ ok: true }, 200, origin);
+    }
+
+    // ---- 1v1 Science: re-send a buyer's download link(s) by email. ----
+    if (kind === 'recover1v1') {
+      if (!EMAIL_RE.test(email)) return json({ error: 'Please enter a valid email address.' }, 400, origin);
+      try {
+        const list = await stripe.checkout.sessions.list({ limit: 100 });
+        const mine = (list.data || []).filter(x =>
+          x.payment_status === 'paid' && x.metadata && x.metadata.product === '1v1_game' &&
+          (((x.customer_details && x.customer_details.email) || '').toLowerCase() === email));
+        if (mine.length) {
+          const items = mine.map(x => ({ name: x.metadata.name || 'your game', link: (SITE_ORIGIN || '') + '/api/game?s=' + x.id }));
+          await sendEmail({ to: email, subject: 'Your 1v1 Science download link' + (items.length > 1 ? 's' : ''), html: recover1v1Html(items) });
+        }
+      } catch (e) {}
+      // Always say ok — never reveal whether that email has purchases.
       return json({ ok: true }, 200, origin);
     }
 

@@ -4,7 +4,18 @@
 // access token + their email) and generate their 150 student codes.
 // Registered in Stripe for the single event: checkout.session.completed
 // =====================================================================
-import { stripe, WEBHOOK_SECRET, adminDb, provisionOwner, upgradeOwnerToFull } from './_shared.js';
+import { stripe, WEBHOOK_SECRET, adminDb, provisionOwner, upgradeOwnerToFull, SITE_ORIGIN, sendEmail } from './_shared.js';
+
+// The "here's your download" email for a 1v1 Science single-game purchase.
+function oneVOneEmailHtml(name, link) {
+  const safe = String(name || 'your game').replace(/[<>&]/g, '');
+  return '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:520px;margin:auto;color:#1f2933;line-height:1.6">' +
+    '<h1 style="color:#2f5fd0;font-size:22px">Your 1v1 Science game is ready</h1>' +
+    '<p>Thanks for your purchase! Download <b>' + safe + '</b> below. It’s one self-contained file that plays offline forever &mdash; <b>keep this email</b> so you can re-download anytime, on any computer.</p>' +
+    '<p><a href="' + link + '" style="display:inline-block;background:#2f5fd0;color:#fff;font-weight:bold;padding:12px 22px;border-radius:8px;text-decoration:none">Download my game</a></p>' +
+    '<p style="font-size:13px;color:#666;word-break:break-all">Or paste this link into your browser:<br>' + link + '</p>' +
+  '</div>';
+}
 
 export async function POST(request) {
   const sig = request.headers.get('stripe-signature');
@@ -21,6 +32,22 @@ export async function POST(request) {
     return new Response('ignored', { status: 200 });
   }
   const s = event.data.object;
+
+  // ---- 1v1 Science single-game purchase: email a permanent download link so
+  // it's never lost if the buyer leaves the thank-you page. ----
+  if (s.mode === 'payment' && s.metadata && s.metadata.product === '1v1_game') {
+    try {
+      const to = (s.customer_details && s.customer_details.email) || s.customer_email || '';
+      const link = (SITE_ORIGIN || '') + '/api/game?s=' + s.id;
+      if (to) await sendEmail({
+        to,
+        subject: 'Your 1v1 Science download — ' + (s.metadata.name || 'your game'),
+        html: oneVOneEmailHtml(s.metadata.name, link)
+      });
+    } catch (e) {}
+    return new Response('ok', { status: 200 });
+  }
+
   const isQuest = s.mode === 'payment' && s.metadata && s.metadata.product === 'science_quest';
   if (!isQuest) return new Response('not a quest purchase', { status: 200 });
 
