@@ -230,6 +230,26 @@ export function verifyDistrictToken(token) {
   return data.e;
 }
 
+// 1v1 Science Cherokee all-access pass. Same HMAC scheme, marked k:'1v1'.
+// Long-lived (~400 days) so one activation covers the school year.
+export function sign1v1Pass(email) {
+  const payload = Buffer.from(JSON.stringify({ e: String(email).toLowerCase(), k: '1v1', x: Date.now() + 1000 * 60 * 60 * 24 * 400 })).toString('base64url');
+  const sig = crypto.createHmac('sha256', _districtKey()).update(payload).digest('base64url');
+  return payload + '.' + sig;
+}
+export function verify1v1Pass(token) {
+  const parts = String(token || '').split('.');
+  if (parts.length !== 2) return null;
+  const [payload, sig] = parts;
+  const expect = crypto.createHmac('sha256', _districtKey()).update(payload).digest('base64url');
+  if (sig.length !== expect.length) return null;
+  try { if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expect))) return null; } catch (e) { return null; }
+  let data;
+  try { data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')); } catch (e) { return null; }
+  if (!data || !data.e || data.k !== '1v1' || !data.x || Date.now() > data.x) return null;
+  return data.e;
+}
+
 // Free-trial email-verification token. Same HMAC scheme as the district
 // token, but marked k:'trial' so the two can't be swapped.
 export function signTrialToken(email) {

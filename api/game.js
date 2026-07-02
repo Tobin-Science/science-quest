@@ -5,7 +5,7 @@
 // is the credential; the file is streamed from the private bucket and
 // never exposed as a public URL.
 // =====================================================================
-import { adminDb, QUEST_BUCKET, stripe, SITE_ORIGIN } from './_shared.js';
+import { adminDb, QUEST_BUCKET, stripe, SITE_ORIGIN, verify1v1Pass } from './_shared.js';
 
 // ---- 1v1 Science: build a self-contained single-game download ----
 const ES_SHEETS = ['energy_sources','moon_phases','planets','rocks','sky_icons','space_objects'];
@@ -38,13 +38,13 @@ async function build1v1File(grade, game, std, name) {
 async function deliver1v1(sid) {
   let session;
   try { session = await stripe.checkout.sessions.retrieve(sid); }
-  catch (e) { return note('We could not verify that purchase. If you were charged, email derek.tobin@cherokeek12.net.'); }
+  catch (e) { return note('We could not verify that purchase. If you were charged, re-send your link from <a href="/1v1/recover.html" style="color:#f4e4bc">tobinscience.com/1v1/recover.html</a>.'); }
   if (!session || session.payment_status !== 'paid' || !session.metadata || session.metadata.product !== '1v1_game') {
-    return note('That purchase is not complete yet. If you were charged, email derek.tobin@cherokeek12.net.');
+    return note('That purchase is not complete yet. If you were charged, re-send your link from <a href="/1v1/recover.html" style="color:#f4e4bc">tobinscience.com/1v1/recover.html</a>.');
   }
   const { grade, game, std, name } = session.metadata;
   const file = await build1v1File(grade, game, std, name);
-  if (!file) return note('Something went wrong building your download. Please email derek.tobin@cherokeek12.net.');
+  if (!file) return note('Something went wrong building your download. Please try again in a few minutes, or re-send your link from <a href="/1v1/recover.html" style="color:#f4e4bc">tobinscience.com/1v1/recover.html</a>.');
   return new Response(file.body, {
     status: 200,
     headers: {
@@ -73,6 +73,30 @@ export async function GET(request) {
     // 1v1 Science single-game download after a paid $2 checkout.
     const sid = url.searchParams.get('s');
     if (sid) return await deliver1v1(sid);
+
+    // 1v1 Science free download with a verified Cherokee all-access pass.
+    const pass = url.searchParams.get('pass');
+    if (pass) {
+      const email = verify1v1Pass(pass);
+      if (!email || !email.endsWith('@cherokeek12.net')) {
+        return note('This free-access pass is invalid or has expired. Request a fresh one at <a href="/1v1/cherokee.html" style="color:#f4e4bc">tobinscience.com/1v1/cherokee.html</a>.');
+      }
+      const grade = (url.searchParams.get('grade') || '').toLowerCase();
+      const game = (url.searchParams.get('game') || '').slice(0, 40);
+      const std = (url.searchParams.get('std') || '').slice(0, 8);
+      const name = (url.searchParams.get('name') || 'Game').slice(0, 60);
+      if (!['physical', 'life', 'earth'].includes(grade) || !game) return note('That game could not be found.');
+      const file = await build1v1File(grade, game, std, name);
+      if (!file) return note('Something went wrong building your download. Please try again in a few minutes.');
+      return new Response(file.body, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Content-Disposition': 'attachment; filename="' + file.filename + '"',
+          'Cache-Control': 'no-store'
+        }
+      });
+    }
 
     const code = (url.searchParams.get('code') || '').trim().toUpperCase();
     if (!code) return toPlay();

@@ -8,7 +8,7 @@
 //                                 redirect to the teacher dashboard
 //   GET  ?fbkey=PASSCODE       -> owner-only: list all feedback
 // =====================================================================
-import { stripe, adminDb, provisionOwner, sendEmail, signDistrictToken, verifyDistrictToken, signTrialToken, verifyTrialToken, trialConfirmEmailHtml, TRIAL_SEATS, TRIAL_DAYS, SITE_ORIGIN, corsHeaders, json } from './_shared.js';
+import { stripe, adminDb, provisionOwner, sendEmail, signDistrictToken, verifyDistrictToken, signTrialToken, verifyTrialToken, sign1v1Pass, trialConfirmEmailHtml, TRIAL_SEATS, TRIAL_DAYS, SITE_ORIGIN, corsHeaders, json } from './_shared.js';
 import crypto from 'node:crypto';
 
 // Re-send email for lost 1v1 Science downloads.
@@ -96,6 +96,26 @@ export async function POST(request) {
       }
       const link = (SITE_ORIGIN || '') + '/api/district?ttoken=' + encodeURIComponent(signTrialToken(email));
       await sendEmail({ to: email, subject: 'Confirm your email to start your free week of Science Quest', html: trialConfirmEmailHtml(link) });
+      return json({ ok: true }, 200, origin);
+    }
+
+    // ---- 1v1 Science: Cherokee County all-access pass (every download free). ----
+    if (kind === '1v1cherokee') {
+      if (!email.endsWith(DISTRICT_DOMAIN)) {
+        return json({ error: 'Please use your @cherokeek12.net school email.' }, 400, origin);
+      }
+      const link = (SITE_ORIGIN || '') + '/1v1/?pass=' + encodeURIComponent(sign1v1Pass(email));
+      await sendEmail({
+        to: email,
+        subject: 'Your free 1v1 Science all-access pass',
+        html: '<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:520px;margin:auto;color:#1f2933;line-height:1.6">' +
+          '<h1 style="color:#2f5fd0;font-size:22px">Your 1v1 Science all-access pass</h1>' +
+          '<p>Cherokee County teachers get <b>every 1v1 Science game download free</b> — all three grades. Click below to activate your pass in this browser; every game will then show a <b>Download free</b> button instead of $2.</p>' +
+          '<p><a href="' + link + '" style="display:inline-block;background:#2f5fd0;color:#fff;font-weight:bold;padding:12px 22px;border-radius:8px;text-decoration:none">Activate my free access</a></p>' +
+          '<p style="font-size:13px;color:#666;word-break:break-all">Or paste this link into your browser:<br>' + link + '</p>' +
+          '<p style="font-size:13px;color:#666">The pass lasts the school year and works on the Physical, Life, and Earth &amp; Space hubs. Using another computer later? Just open this same link there (keep this email).</p>' +
+        '</div>'
+      });
       return json({ ok: true }, 200, origin);
     }
 

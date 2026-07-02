@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Get my download · 1v1 Science</title>
+<title>Cherokee County free access · 1v1 Science</title>
 <style>
-  :root{--ink:#1f2933;--muted:#5b6770;--line:#e3e6ea;--bg:#f6f8fa;--card:#fff;--red:#d83a2f;--blue:#2f72c4}
+  :root{--ink:#1f2933;--muted:#5b6770;--line:#e3e6ea;--bg:#f6f8fa;--card:#fff;--red:#d83a2f;--blue:#2f72c4;--green:#2f7a4d}
   *{margin:0;padding:0;box-sizing:border-box}
   body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:34px;max-width:460px;width:100%;box-shadow:0 12px 40px rgba(20,30,45,.08)}
-  h1{font-size:24px;margin-bottom:6px;letter-spacing:-.5px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:34px;max-width:470px;width:100%;box-shadow:0 12px 40px rgba(20,30,45,.08)}
+  h1{font-size:23px;margin-bottom:6px;letter-spacing:-.5px}
   h1 .r{color:var(--red)} h1 .b{color:var(--blue)}
   p{color:var(--muted);font-size:15px;margin-bottom:16px}
   label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
   input{width:100%;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px;font-family:inherit}
   input:focus{outline:none;border-color:var(--blue)}
-  .btn{width:100%;margin-top:14px;padding:13px;border:none;border-radius:11px;font-weight:700;font-size:16px;color:#fff;background:linear-gradient(135deg,var(--red),var(--blue));cursor:pointer}
+  .btn{width:100%;margin-top:14px;padding:13px;border:none;border-radius:11px;font-weight:700;font-size:16px;color:#fff;background:var(--green);cursor:pointer}
   .btn:disabled{opacity:.6;cursor:default}
   .msg{margin-top:16px;font-size:14px;padding:12px 14px;border-radius:10px;display:none}
   .msg.ok{display:block;background:#eaf6ee;color:#1f6b3b;border:1px solid #bfe3cd}
@@ -26,12 +26,12 @@
 </head>
 <body>
   <div class="card">
-    <h1>Get my <span class="r">1</span>v<span class="b">1</span> download</h1>
-    <p>Lost your game, or closed the page before it downloaded? Enter the email you paid with and we'll re-send your download link.</p>
+    <h1>Cherokee County teachers: <span class="r">1</span>v<span class="b">1</span> downloads are free</h1>
+    <p>Confirm your school email once and <b>every game download is free</b> — all three grades, no $2, yours to keep. We'll email you an activation link.</p>
     <form id="f">
-      <label for="email">Email used at checkout</label>
-      <input id="email" type="email" placeholder="you@school.org" autocomplete="email" required>
-      <button class="btn" id="btn" type="submit">Email me my download</button>
+      <label for="email">Your @cherokeek12.net email</label>
+      <input id="email" type="email" placeholder="you@cherokeek12.net" autocomplete="email" required>
+      <button class="btn" id="btn" type="submit">Email me my free-access pass</button>
     </form>
     <div class="msg" id="msg"></div>
     <a class="back" href="/1v1/">← Back to 1v1 Science</a>
@@ -44,16 +44,16 @@
     if(!email) return;
     btn.disabled=true; btn.textContent='Sending…'; msg.className='msg';
     try{
-      const res=await fetch('/api/district',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind:'recover1v1',email:email})});
+      const res=await fetch('/api/district',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind:'1v1cherokee',email:email})});
       const data=await res.json();
       if(res.ok && data && data.ok){
         msg.className='msg ok';
-        msg.textContent='If a purchase was made with that email, your download link is on its way — check your inbox (and spam).';
+        msg.textContent='Check your inbox — your activation link is on its way (look in spam too). Click it and every game shows a "Download free" button.';
       } else { throw new Error((data&&data.error)||'try again'); }
     }catch(err){
-      msg.className='msg err'; msg.textContent='Sorry — something went wrong. Please try again in a moment.';
+      msg.className='msg err'; msg.textContent=String(err.message||'Sorry — something went wrong. Please try again.').replace('Error: ','');
     }
-    btn.disabled=false; btn.textContent='Email me my download';
+    btn.disabled=false; btn.textContent='Email me my free-access pass';
   });
 </script>
 </body>

@@ -4021,9 +4021,31 @@ function freeGameIds(){
 function isCore(id){ return CORE_FREE.indexOf(id)>=0; }
 
 /* $2 unlock modal — PLACEHOLDER checkout (Phase 2 wires real Stripe + download) */
+function getPass(){ try{ return localStorage.getItem('1v1pass')||''; }catch(e){ return ''; } }
 function openBuy(gm){
   let m=document.getElementById('linkModal');
   if(!m){ m=document.createElement('div'); m.id='linkModal'; document.body.appendChild(m); }
+  // Verified Cherokee County teacher: every download is free.
+  const PASS=getPass();
+  if(PASS){
+    const gr = /^S8P/.test(STANDARDS[0].id)?'physical' : /^S7L/.test(STANDARDS[0].id)?'life' : 'earth';
+    const st = gm.std || ST.standard;
+    const dl='/api/game?pass='+encodeURIComponent(PASS)+'&grade='+gr+'&game='+encodeURIComponent(gm.id)+'&std='+encodeURIComponent(st)+'&name='+encodeURIComponent(gm.name);
+    m.innerHTML='<div class="lm-card">'+
+      '<div class="lm-h">Download &ldquo;'+gm.name+'&rdquo;</div>'+
+      '<div class="lm-sub">'+gm.tag+' &middot; free for Cherokee County teachers.</div>'+
+      '<div class="buy-box"><div class="buy-price">FREE</div>'+
+        '<ul class="buy-list"><li>Download a single file of this game</li>'+
+        '<li>Works offline &mdash; host it anywhere, forever</li>'+
+        '<li>Yours to keep</li></ul></div>'+
+      '<div class="lm-note">&#10003; Cherokee County pass active on this device.</div>'+
+      '<div class="lm-actions"><button class="btn" id="lmClose">Close</button> <a class="btn btn-accent" style="display:inline-block;text-decoration:none" href="'+dl+'" download>&#11015; Download free</a></div>'+
+    '</div>';
+    m.classList.add('on');
+    m.querySelector('#lmClose').onclick=()=>m.classList.remove('on');
+    m.onclick=(e)=>{ if(e.target===m) m.classList.remove('on'); };
+    return;
+  }
   m.innerHTML='<div class="lm-card">'+
     '<div class="lm-h">Unlock &ldquo;'+gm.name+'&rdquo;</div>'+
     '<div class="lm-sub">'+gm.tag+' &middot; one&#8209;time '+GAME_PRICE+' &middot; yours to keep forever.</div>'+
@@ -4032,6 +4054,7 @@ function openBuy(gm){
       '<li>Works offline &mdash; host it anywhere, forever</li>'+
       '<li>No subscription, no account needed</li></ul></div>'+
     '<div class="lm-note" id="buyMsg">Secure checkout by Stripe &middot; you get the download the moment you pay.</div>'+
+    '<div class="lm-note">Cherokee County teacher? <a href="/1v1/cherokee.html" style="color:var(--navy);font-weight:700">Every download is free &rarr;</a></div>'+
     '<div class="lm-actions"><button class="btn" id="lmClose">Close</button> <button class="btn btn-accent" id="lmBuy">Continue to checkout &rarr;</button></div>'+
   '</div>';
   m.classList.add('on');
@@ -4081,9 +4104,10 @@ function renderHub(){
     const badge = core ? '<span class="gc-badge free">✓ FREE</span>'
                  : free ? '<span class="gc-badge week">★ FREE THIS WEEK</span>'
                         : '<span class="gc-badge lock">🔒 '+GAME_PRICE+'</span>';
+    const priceTxt = getPass() ? 'FREE (Cherokee)' : GAME_PRICE;
     const action = free ? '<button class="gc-play" type="button">▶ Play</button>'+
-                          '<button class="gc-own" type="button">⬇ Own this game — '+GAME_PRICE+'</button>'
-                        : '<button class="gc-buy" type="button">🔒 Unlock &amp; download — '+GAME_PRICE+'</button>';
+                          '<button class="gc-own" type="button">⬇ Own this game — '+priceTxt+'</button>'
+                        : '<button class="gc-buy" type="button">🔒 Unlock &amp; download — '+priceTxt+'</button>';
     card.innerHTML=`<div class="gc-art">${badge}</div>
       <div class="gc-body"><span class="gc-tag" style="background:${gm.tagC}">${gm.tag}</span>
       <div class="gc-title">${gm.name}</div><div class="gc-desc">${gm.desc}</div>
@@ -4155,6 +4179,11 @@ function openLink(gm){
   });
 }
 
+// Capture a Cherokee all-access pass arriving via ?pass= (from the email link).
+(function(){ try{
+  const q=new URLSearchParams(location.search), p=q.get('pass');
+  if(p){ localStorage.setItem('1v1pass',p); q.delete('pass'); history.replaceState(null,'',location.pathname+(q.toString()?'?'+q.toString():'')); }
+}catch(e){} })();
 IN.init();
 IN.bindCanvas(cv);
 renderHub();
