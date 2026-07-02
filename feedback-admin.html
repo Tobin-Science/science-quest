@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback Inbox — Tobin Science</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root{--ink:#16232f;--muted:#5a6a78;--faint:#8a97a3;--line:#e4e9ee;--bg:#f6f8fb;--card:#fff;--ac:#2456b3;--green:#2f7a4d}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+  .wrap{max-width:760px;margin:0 auto;padding:40px 22px 70px}
+  h1{font-size:26px;letter-spacing:-.5px;margin-bottom:4px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:24px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 1px 2px rgba(22,35,47,.05),0 8px 24px rgba(22,35,47,.07)}
+  input{width:100%;font:inherit;font-size:15px;border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:12px}
+  input:focus{outline:none;border-color:var(--ac)}
+  .btn{display:inline-block;padding:11px 20px;border:none;border-radius:10px;font:inherit;font-weight:700;font-size:14px;color:#fff;background:var(--ac);cursor:pointer}
+  .msg{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:14px}
+  .msg .meta{font-size:12.5px;color:var(--faint);margin-bottom:8px}
+  .msg .meta b{color:var(--ink);font-size:13.5px}
+  .msg .body{white-space:pre-wrap;font-size:15px}
+  .msg .from{font-size:13px;color:var(--muted);margin-top:8px}
+  .err{color:#a33;font-size:14px;margin-top:8px}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+  .count{font-size:13px;color:var(--muted)}
+  .signout{font-size:13px;color:var(--faint);background:none;border:none;cursor:pointer;text-decoration:underline}
+  .empty{text-align:center;color:var(--faint);padding:40px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Feedback inbox</h1>
+  <p class="sub">Private — messages left by teachers on tobinscience.com.</p>
+
+  <div class="card" id="gate">
+    <label style="font-weight:600;font-size:14px;display:block;margin-bottom:6px">Owner passcode</label>
+    <input id="key" type="password" placeholder="TOBIN-XXXX-XXXX-XXXX-XXXX" onkeydown="if(event.key==='Enter')unlock()">
+    <button class="btn" onclick="unlock()">Open inbox</button>
+    <p class="err" id="gateErr"></p>
+  </div>
+
+  <div id="inbox" style="display:none">
+    <div class="bar">
+      <span class="count" id="count"></span>
+      <button class="signout" onclick="signout()">Sign out on this device</button>
+    </div>
+    <div id="list"></div>
+  </div>
+</div>
+
+<script>
+function esc(s){ return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function load(key){
+  var r = await fetch('/api/feedback?key=' + encodeURIComponent(key));
+  var j = await r.json().catch(function(){ return {}; });
+  if (!r.ok) throw new Error(j.error || 'Could not load.');
+  return j.feedback || [];
+}
+
+function render(items){
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('inbox').style.display = 'block';
+  document.getElementById('count').textContent = items.length + (items.length === 1 ? ' message' : ' messages');
+  var list = document.getElementById('list');
+  if (!items.length) { list.innerHTML = '<div class="empty">No feedback yet — check back after teachers start using the link.</div>'; return; }
+  list.innerHTML = items.map(function(m){
+    var when = '';
+    try { when = new Date(m.created_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }); } catch(e) {}
+    return '<div class="msg">' +
+      '<div class="meta"><b>' + (esc(m.name) || 'No name given') + '</b> · ' + when + '</div>' +
+      '<div class="body">' + esc(m.message) + '</div>' +
+      (m.email ? '<div class="from">Reply to: <a href="mailto:' + esc(m.email) + '">' + esc(m.email) + '</a></div>' : '') +
+      (m.page ? '<div class="from">Sent from: ' + esc(m.page) + '</div>' : '') +
+    '</div>';
+  }).join('');
+}
+
+async function unlock(){
+  var key = document.getElementById('key').value.trim();
+  var err = document.getElementById('gateErr');
+  err.textContent = '';
+  try {
+    var items = await load(key);
+    localStorage.setItem('fbKey', key);
+    render(items);
+  } catch(e) { err.textContent = e.message; }
+}
+
+function signout(){ localStorage.removeItem('fbKey'); location.reload(); }
+
+(async function(){
+  var saved = localStorage.getItem('fbKey');
+  if (!saved) return;
+  try { render(await load(saved)); } catch(e) { localStorage.removeItem('fbKey'); }
+})();
+</script>
+</body>
+</html>

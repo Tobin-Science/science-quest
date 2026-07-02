@@ -37,7 +37,7 @@
   @media(max-width:560px){.nav-in{flex-wrap:wrap;justify-content:center}.nav-links{margin-left:0}.nav-links a{padding:6px 8px;font-size:13px}}
 
   /* ---------- hero ---------- */
-  .hero{text-align:center;padding:58px 22px 46px;background:linear-gradient(180deg,#ffffff 0%,var(--bg) 100%);border-bottom:1px solid var(--line)}
+  .hero{text-align:center;padding:44px 22px 38px;background:linear-gradient(180deg,#ffffff 0%,var(--bg) 100%);border-bottom:1px solid var(--line)}
   .hero .kicker{font-size:12.5px;letter-spacing:3px;text-transform:uppercase;color:var(--ac);font-weight:700}
   h1{font-size:clamp(30px,5vw,46px);line-height:1.12;letter-spacing:-1px;margin:12px auto 14px;max-width:760px}
   .hero .sub{font-size:clamp(15.5px,2vw,18px);color:var(--muted);max-width:640px;margin:0 auto 26px}
@@ -73,11 +73,6 @@
   .price b{color:var(--muted)}
   .soon{margin-top:14px;padding:10px 14px;border-radius:10px;font-weight:700;font-size:14px;text-align:center;color:var(--faint);background:var(--bg);border:1px dashed var(--line)}
 
-  /* ---------- district banner ---------- */
-  .district{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;text-align:center;background:rgba(47,122,77,.07);border:1px solid rgba(47,122,77,.25);border-radius:14px;padding:16px 20px;margin:40px auto 0;font-size:15px}
-  .district b{color:var(--green)}
-  .district a{font-weight:700;color:var(--green)}
-
   /* ---------- TpT band ---------- */
   .tpt-bar{display:flex;align-items:center;gap:24px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 26px;flex-wrap:wrap;box-shadow:var(--shadow)}
   .tpt-bar img{height:78px;width:auto;border-radius:10px;box-shadow:0 4px 12px rgba(22,35,47,.18);flex:none}
@@ -106,8 +101,8 @@
   <div class="nav-in">
     <a class="brand" href="/home.html"><img src="tobin-logo.png" alt="Tobin Science logo">Tobin<span class="grn">Science</span></a>
     <div class="nav-links">
-      <a href="#games">Games</a>
       <a href="#hubs">Learning Hubs</a>
+      <a href="#games">Games</a>
       <a href="#tpt">TpT Store</a>
     </div>
   </div>
@@ -116,10 +111,11 @@
 <div class="hero">
   <div class="kicker">Middle-School Science &amp; Math · Grades 6–8</div>
   <h1>Built For Teachers</h1>
-  <p class="sub">Full RPG adventure games, standards-aligned lessons with a paperless gradebook, and a head-to-head science arcade — built for real classrooms by a Georgia middle-school science teacher.</p>
+  <p class="sub">Full RPG adventure games, standards-aligned lessons with a paperless gradebook, and a head-to-head science arcade.</p>
   <div class="hero-ctas">
     <a class="btn primary" href="#games">Explore the games</a>
     <a class="btn ghost" href="#hubs">Open the learning hubs</a>
+    <a class="btn ghost" href="#tpt">Visit the store</a>
   </div>
   <div class="chips">
     <span class="chip"><span class="dot">✓</span> Standards-aligned (GSE)</span>
@@ -130,6 +126,35 @@
 </div>
 
 <div class="wrap">
+
+  <section id="hubs">
+    <div class="sec-head">
+      <h2>Learning Hubs</h2>
+      <p>Complete curriculum sites: lessons, quizzes, practice, printables, and a paperless gradebook — organized around the standards.</p>
+    </div>
+    <div class="grid hubs">
+      <div class="pcard">
+        <div class="pimg"><img src="science-hub-cover.jpg" alt="Science Hub cover art"></div>
+        <div class="pbody">
+          <span class="badge">Grades 6–8 · Science</span>
+          <h3>Science Hub</h3>
+          <p>Lessons, quizzes, minigames, printables, and a paperless gradebook for Physical, Earth, and Life Science.</p>
+          <a class="btn primary" href="https://tobin-science.github.io/science-hub/">Open the Science Hub →</a>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div class="pimg"><img src="math-hub-cover-sm.jpg" alt="Math Hub cover art"></div>
+        <div class="pbody">
+          <span class="badge">Grades 6–8 · Math</span>
+          <h3>Math Hub</h3>
+          <p>Standards-aligned lessons, quizzes, practice, and printables for 6th, 7th &amp; 8th grade math — one subscription covers all three grades.</p>
+          <a class="btn primary" href="https://tobin-science.github.io/science-hub/math.html">Open the Math Hub →</a>
+          <div class="price"><b>$4.99 / month</b> or $39.99 / year</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <section id="games">
     <div class="sec-head">
@@ -182,41 +207,6 @@
     </div>
   </section>
 
-  <section id="hubs">
-    <div class="sec-head">
-      <h2>Learning Hubs</h2>
-      <p>Complete curriculum sites: lessons, quizzes, practice, printables, and a paperless gradebook — organized around the standards.</p>
-    </div>
-    <div class="grid hubs">
-      <div class="pcard">
-        <div class="pimg"><img src="science-hub-cover.jpg" alt="Science Hub cover art"></div>
-        <div class="pbody">
-          <span class="badge">Grades 6–8 · Science</span>
-          <h3>Science Hub</h3>
-          <p>Lessons, quizzes, minigames, printables, and a paperless gradebook for Physical, Earth, and Life Science.</p>
-          <a class="btn primary" href="https://tobin-science.github.io/science-hub/">Open the Science Hub →</a>
-        </div>
-      </div>
-
-      <div class="pcard">
-        <div class="pimg"><img src="math-hub-cover-sm.jpg" alt="Math Hub cover art"></div>
-        <div class="pbody">
-          <span class="badge">Grades 6–8 · Math</span>
-          <h3>Math Hub</h3>
-          <p>Standards-aligned lessons, quizzes, practice, and printables for 6th, 7th &amp; 8th grade math — one subscription covers all three grades.</p>
-          <a class="btn primary" href="https://tobin-science.github.io/science-hub/math.html">Open the Math Hub →</a>
-          <div class="price"><b>$4.99 / month</b> or $39.99 / year</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="district">
-      <span>🏫</span>
-      <span><b>Teach in Cherokee County?</b> Every game and hub is free with your school email.</span>
-      <a href="/district.html">Get free access →</a>
-    </div>
-  </section>
-
   <section id="tpt">
     <div class="tpt-bar">
       <img src="tpt-cover.jpg" alt="Teachers Pay Teachers store">
@@ -251,11 +241,12 @@
       <div>
         <h4>More</h4>
         <a href="https://www.teacherspayteachers.com/store/derek-tobin" target="_blank" rel="noopener">TpT Store</a>
-        <a href="/district.html">Cherokee County access</a>
+        <a href="/district.html">Cherokee County, GA access</a>
+        <a href="/feedback.html">Leave feedback</a>
       </div>
     </div>
   </div>
-  <div class="foot-base">© 2026 Tobin Science · Built for the classroom · Secure checkout by Stripe</div>
+  <div class="foot-base"><a href="/feedback.html" style="font-weight:600">Feedback is encouraged so we can provide the best service possible to our teachers →</a><div style="margin-top:8px">© 2026 Tobin Science · Built for the classroom · Secure checkout by Stripe</div></div>
 </footer>
 
 </body>

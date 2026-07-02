@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leave Feedback — Tobin Science</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{--ink:#16232f;--muted:#5a6a78;--faint:#8a97a3;--line:#e4e9ee;--bg:#f6f8fb;--card:#fff;--ac:#2456b3;--ac-dark:#1c4693;--green:#2f7a4d}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+  nav{background:#fff;border-bottom:1px solid var(--line)}
+  .nav-in{max-width:1120px;margin:0 auto;padding:10px 22px;display:flex;align-items:center}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:800;font-size:17px}
+  .brand img{height:34px;width:34px;border-radius:8px}
+  .brand .grn{color:var(--green)}
+  .wrap{max-width:620px;margin:0 auto;padding:44px 22px 70px}
+  h1{font-size:30px;letter-spacing:-.6px;margin-bottom:8px}
+  .sub{color:var(--muted);font-size:15.5px;margin-bottom:26px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 1px 2px rgba(22,35,47,.05),0 8px 24px rgba(22,35,47,.07)}
+  label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+  input,textarea{width:100%;font:inherit;font-size:15px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:16px}
+  input:focus,textarea:focus{outline:none;border-color:var(--ac)}
+  textarea{min-height:150px;resize:vertical}
+  .hp{position:absolute;left:-9999px;top:-9999px;height:1px;width:1px;opacity:0}
+  .btn{display:inline-block;width:100%;padding:13px;border:none;border-radius:10px;font:inherit;font-weight:700;font-size:15px;color:#fff;background:var(--ac);cursor:pointer}
+  .btn:hover{background:var(--ac-dark)}
+  .btn:disabled{opacity:.7;cursor:default}
+  .note{font-size:13px;color:var(--faint);margin-top:12px;text-align:center}
+  .thanks{display:none;text-align:center;background:rgba(47,122,77,.08);border:1px solid rgba(47,122,77,.3);color:var(--green);border-radius:12px;padding:22px;font-size:16px;font-weight:600}
+  .err{display:none;text-align:center;background:#fdf0f0;border:1px solid #e3b3b3;color:#a33;border-radius:10px;padding:12px;font-size:14px;margin-bottom:14px}
+  .back{display:inline-block;margin-top:22px;font-size:14px;color:var(--muted);text-decoration:none}
+  .back:hover{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<nav><div class="nav-in"><a class="brand" href="/home.html"><img src="tobin-logo.png" alt="Tobin Science logo">Tobin<span class="grn">Science</span></a></div></nav>
+
+<div class="wrap">
+  <h1>Leave feedback</h1>
+  <p class="sub">Feedback is encouraged so we can provide the best service possible to our teachers. Tell us what's working, what isn't, or what you'd like to see next.</p>
+
+  <div class="card" id="formCard">
+    <div class="err" id="err"></div>
+    <label for="fb-name">Your name <span style="font-weight:400;color:var(--faint)">(optional)</span></label>
+    <input id="fb-name" type="text" autocomplete="name" placeholder="Ms. Smith">
+    <label for="fb-email">Your email <span style="font-weight:400;color:var(--faint)">(optional — only if you'd like a reply)</span></label>
+    <input id="fb-email" type="email" autocomplete="email" placeholder="you@school.org">
+    <label for="fb-msg">Your feedback</label>
+    <textarea id="fb-msg" placeholder="What would you like us to know?"></textarea>
+    <input id="fb-web" class="hp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <button class="btn" id="fb-send" onclick="sendFeedback()">Send feedback</button>
+    <p class="note">Your message goes straight to the teacher who builds these tools.</p>
+  </div>
+
+  <div class="thanks" id="thanks">✓ Thank you — your feedback was sent!</div>
+
+  <a class="back" href="/home.html">← Back to TobinScience.com</a>
+</div>
+
+<script>
+async function sendFeedback(){
+  var msg = document.getElementById('fb-msg').value.trim();
+  var err = document.getElementById('err');
+  err.style.display = 'none';
+  if (msg.length < 3) { err.textContent = 'Please write a message first.'; err.style.display = 'block'; return; }
+  var b = document.getElementById('fb-send'); b.disabled = true; b.textContent = 'Sending…';
+  try {
+    var r = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: document.getElementById('fb-name').value.trim(),
+        email: document.getElementById('fb-email').value.trim(),
+        message: msg,
+        page: document.referrer || 'feedback.html',
+        website: document.getElementById('fb-web').value
+      })
+    });
+    var j = await r.json().catch(function(){ return {}; });
+    if (!r.ok) throw new Error(j.error || 'Could not send right now.');
+    document.getElementById('formCard').style.display = 'none';
+    document.getElementById('thanks').style.display = 'block';
+  } catch (e) {
+    err.textContent = e.message; err.style.display = 'block';
+    b.disabled = false; b.textContent = 'Send feedback';
+  }
+}
+</script>
+</body>
+</html>
