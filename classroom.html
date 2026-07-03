@@ -858,17 +858,37 @@ function archiveHTML(i){
     const rows = c.students.slice().sort((x,y)=>(x.last||'').localeCompare(y.last||'')).map(st=>{
       const ded = st.log.filter(e=>e.type==='deduct');
       const pos = st.log.filter(e=>e.type==='note').length;
-      return '<tr><td>'+esc(st.last)+', '+esc(st.first)+'</td>'
+      return '<tr><td><span class="stu-name" onclick="archHistoryModal('+i+',\''+c.id+'\',\''+st.id+'\')">'+esc(st.last)+', '+esc(st.first)+'</span></td>'
         +'<td><span class="score '+scoreClass(st.score)+'">'+st.score+'</span></td>'
         +'<td>'+ded.length+'</td><td>'+ded.reduce((s,e)=>s+e.pts,0)+'</td><td>'+pos+'</td></tr>';
     }).join('');
     return '<div class="card rep-sec"><h3>'+className(c)+'</h3>'
       +'<table><thead><tr><th>Student</th><th>Final score</th><th>Deductions</th><th>Points lost</th><th>Positive notes</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
   }).join('');
-  return '<div class="page-head"><h1>'+esc(a.name)+'</h1><p>'+fmtDate(a.started)+' – '+fmtDate(a.archived)+' · archived window (read-only)</p></div>'
+  return '<div class="page-head"><h1>'+esc(a.name)+'</h1><p>'+fmtDate(a.started)+' – '+fmtDate(a.archived)+' · archived window (read-only) · click a student for their full history</p></div>'
     +'<div class="toolbar no-print"><button class="btn ghost sm" onclick="go({name:\'archives\'})">← Archives</button>'
     +'<span class="spacer"></span><button class="btn ghost sm" onclick="window.print()">🖨 Print</button></div>'
     + secs;
+}
+
+function archHistoryModal(ai, cid, sid){
+  const a = S.archives[ai]; if(!a) return;
+  const c = a.classes.find(x=>x.id===cid);
+  const st = c && c.students.find(x=>x.id===sid);
+  if(!st) return;
+  const entries = st.log.slice().reverse().map(e=>{
+    let what='';
+    if(e.type==='deduct') what = '<span class="pts-d">−'+e.pts+'</span> '+esc(e.infName)+' <span style="color:var(--faint)">('+e.from+' → '+e.to+')</span>'
+      + (e.crossed && e.crossed.length ? ' <span class="flag cons">'+esc(e.crossed.map(x=>x.label).join(', '))+'</span>' : '');
+    else if(e.type==='note') what = '<span class="pts-n">★</span> '+esc(e.note);
+    else if(e.type==='adjust') what = '<b>Score corrected</b> '+e.from+' → '+e.to + (e.note? ' — '+esc(e.note):'');
+    return '<div class="log-entry"><span class="when">'+fmtDT(e.t)+'</span><span class="what">'+what+'</span></div>';
+  }).join('');
+  const ded = st.log.filter(e=>e.type==='deduct');
+  modal('<h3>'+esc(studentName(st))+'</h3>'
+    +'<div class="hint">'+esc(a.name)+' ('+className(c)+') · final score <b>'+st.score+'</b> · '+ded.length+' deduction'+(ded.length===1?'':'s')+', '+ded.reduce((s,e)=>s+e.pts,0)+' points lost</div>'
+    +(entries || '<div class="rep-empty" style="padding:10px 0">Nothing was recorded for this student in this window.</div>')
+    +'<div class="mbtns"><button class="btn primary sm" onclick="closeModal()">Close</button></div>', 'wide');
 }
 
 /* ================= backup / restore ================= */
@@ -910,7 +930,7 @@ function reallyRestore(){
 Object.assign(window, { go, newClassModal, createClass, editClassModal, saveClassEdit, deleteClass, reallyDeleteClass,
   previewRoster, confirmRoster, pasteMoreModal, addStudentModal, addStudent,
   deductModal, deduct, noteModal, saveNote, adjustModal, saveAdjust, historyModal, undoEntry, removeStudent, reallyRemoveStudent,
-  addInfRow, addThRow, restoreSuggestedInf, saveSettings, newWindowModal, startNewWindow,
+  addInfRow, addThRow, restoreSuggestedInf, saveSettings, newWindowModal, startNewWindow, archHistoryModal,
   backup, restorePick, restoreFile, reallyRestore, closeModal });
 
 render();
