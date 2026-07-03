@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Science Videos — Tobin Science</title>
+<meta name="description" content="Free one-minute videos that break down each 8th grade and High School Physical Science standard into plain language. Organized by Georgia Standards of Excellence.">
+<meta property="og:title" content="Simple Science Videos — Tobin Science">
+<meta property="og:description" content="One-minute videos that explain each Georgia Physical Science standard in plain language — organized by standard for 8th grade and High School.">
+<meta property="og:url" content="https://tobinscience.com/simple-science.html">
+<meta property="og:type" content="website">
+<style>
+  :root{
+    --ink:#16232f; --muted:#5a6a78; --faint:#8a97a3;
+    --line:#e4e9ee; --bg:#f6f8fb; --card:#ffffff;
+    --ac:#2456b3; --ac-dark:#1c4693; --green:#2f7a4d;
+    --shadow:0 1px 2px rgba(22,35,47,.05),0 8px 24px rgba(22,35,47,.07);
+    --shadow-lift:0 2px 4px rgba(22,35,47,.06),0 14px 34px rgba(22,35,47,.13);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+  a{color:var(--ac)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+
+  /* ---------- top nav ---------- */
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav-in{max-width:1120px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:800;font-size:17px;letter-spacing:-.2px}
+  .brand img{height:34px;width:34px;border-radius:8px}
+  .brand .grn{color:var(--green)}
+  .nav-links{margin-left:auto;display:flex;gap:4px}
+  .nav-links a{text-decoration:none;color:var(--muted);font-weight:600;font-size:14px;padding:8px 12px;border-radius:8px}
+  .nav-links a:hover{background:var(--bg);color:var(--ink)}
+  @media(max-width:560px){.nav-in{flex-wrap:wrap;justify-content:center}.nav-links{margin-left:0}.nav-links a{padding:6px 8px;font-size:13px}}
+
+  /* ---------- hero ---------- */
+  .hero{text-align:center;padding:40px 22px 30px;background:linear-gradient(180deg,#ffffff 0%,var(--bg) 100%);border-bottom:1px solid var(--line)}
+  .hero .kicker{font-size:12.5px;letter-spacing:3px;text-transform:uppercase;color:var(--ac);font-weight:700}
+  h1{font-size:clamp(28px,4.5vw,40px);line-height:1.12;letter-spacing:-1px;margin:12px auto 12px;max-width:760px}
+  .hero .sub{font-size:clamp(15px,2vw,17px);color:var(--muted);max-width:660px;margin:0 auto 24px}
+
+  /* ---------- tabs ---------- */
+  .tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .tab-btn{padding:11px 22px;border-radius:10px;font-weight:700;font-size:15px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer;transition:all .12s ease;font-family:inherit}
+  .tab-btn:hover{border-color:var(--faint);color:var(--ink)}
+  .tab-btn.active{background:var(--ac);border-color:var(--ac);color:#fff;box-shadow:0 6px 16px rgba(36,86,179,.28)}
+
+  /* ---------- catalog ---------- */
+  .tab-panel{display:none;padding:8px 0 40px}
+  .tab-panel.active{display:block}
+  .std-group{margin-top:38px}
+  .std-group h2{font-size:20px;letter-spacing:-.3px}
+  .std-group .std-code{color:var(--ac);font-weight:800;margin-right:8px}
+  .std-group .std-text{color:var(--muted);font-size:14px;margin:4px 0 16px;max-width:820px}
+  .vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+  .vcard{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform .15s ease,box-shadow .15s ease}
+  .vcard:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift)}
+  .vmedia{position:relative;width:100%;aspect-ratio:16/9;background:linear-gradient(150deg,#22344a,#16232f)}
+  .vmedia iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .vmedia .soon{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#9fb2c6}
+  .vmedia .soon .play{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;padding-left:4px}
+  .vmedia .soon span{font-size:13px;font-weight:600;letter-spacing:.5px}
+  .vbody{padding:14px 16px 16px;display:flex;flex-direction:column;flex:1;gap:8px}
+  .vbody h3{font-size:15.5px;letter-spacing:-.2px;line-height:1.3}
+  .vbody h3 .ss{color:var(--ac)}
+  .vbody p{color:var(--muted);font-size:13.2px;line-height:1.5;flex:1}
+  .vchips{display:flex;gap:6px;flex-wrap:wrap}
+  .vchip{font-size:11.5px;font-weight:700;letter-spacing:.4px;color:var(--ac);background:rgba(36,86,179,.08);border-radius:6px;padding:3px 8px;cursor:help}
+
+  /* ---------- footer ---------- */
+  footer{margin-top:26px;border-top:1px solid var(--line);background:#fff}
+  .foot-base{text-align:center;color:var(--faint);font-size:12.5px;padding:18px 22px}
+  .foot-base a{color:var(--muted);font-weight:600}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <a class="brand" href="/home.html"><img src="tobin-logo.png" alt="Tobin Science logo">Tobin<span class="grn">Science</span></a>
+    <div class="nav-links">
+      <a href="/home.html#hubs">Learning Hubs</a>
+      <a href="/home.html#games">Games</a>
+      <a href="/home.html#tpt">TpT Store</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="kicker">Free · Physical Science · One Minute Each</div>
+  <h1>Simple Science Videos</h1>
+  <p class="sub">Every Physical Science standard, explained in about a minute — what it means and what students need to know, in plain language. Use them as lesson openers, quick reviews, or test prep. Organized by Georgia Standards of Excellence for 8th grade and High School.</p>
+  <div class="tabs">
+    <button class="tab-btn active" id="btn-g8" onclick="showTab('g8')">8th Grade Standards</button>
+    <button class="tab-btn" id="btn-hs" onclick="showTab('hs')">High School Standards</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="tab-panel active" id="panel-g8"></div>
+  <div class="tab-panel" id="panel-hs"></div>
+</div>
+
+<footer>
+  <div class="foot-base"><a href="/home.html">← Back to Tobin Science</a><div style="margin-top:8px">© 2026 Tobin Science · Built for the classroom</div></div>
+</footer>
+
+<script>
+/* =====================================================================
+   PASTE YOUTUBE VIDEO IDs HERE
+   ---------------------------------------------------------------------
+   For each video, paste the YouTube video ID between the quotes.
+   The ID is the part of the URL after "watch?v=".
+   Example: https://www.youtube.com/watch?v=dQw4w9WgXcQ  →  'dQw4w9WgXcQ'
+   Leave '' (empty) for videos not uploaded yet — the page will show a
+   "Coming soon" placeholder for those automatically.
+   ===================================================================== */
+const YT = {
+  matter:          '',
+  states:          '',
+  propchanges:     '',
+  atom:            '',
+  ptable:          '',
+  conservation:    '',
+  metric:          '',
+  kepe:            '',
+  transform:       '',
+  heattransfer:    '',
+  heatingcurves:   '',
+  specificheat:    '',
+  motiongraphs:    '',
+  newton:          '',
+  simplemachines:  '',
+  wavetypes:       '',
+  waveprops:       '',
+  wavebehavior:    '',
+  emspectrum:      '',
+  lenses:          '',
+  doppler:         '',
+  fields:          '',
+  circuits:        '',
+  electromag:      '',
+  ioniccovalent:   '',
+  ionicformulas:   '',
+  nomenclature:    '',
+  balancing:       '',
+  reactiontypes:   '',
+  fissionfusion:   '',
+  decay:           '',
+  nuclearenergy:   '',
+  solutions:       '',
+  solubility:      '',
+  acidsbases:      '',
+  householdph:     ''
+};
+/* ============== END OF PASTE AREA — no edits needed below ============== */
+
+// Full text of every standard element (shown when hovering a chip)
+const ELS = {
+  'S8P1.a':'Develop and use a model to compare and contrast pure substances (elements and compounds) and mixtures.',
+  'S8P1.b':'Develop and use models to describe the movement of particles in solids, liquids, gases, and plasma states when thermal energy is added or removed.',
+  'S8P1.c':'Plan and carry out investigations to compare and contrast chemical (i.e., reactivity, combustibility) and physical (i.e., density, melting point, boiling point) properties of matter.',
+  'S8P1.d':'Construct an argument based on observational evidence to support the claim that when a change in a substance occurs, it can be classified as either chemical or physical.',
+  'S8P1.e':'Develop models (e.g., atomic-level models, including drawings, and computer representations) by analyzing patterns within the periodic table that illustrate the structure, composition, and characteristics of atoms (protons, neutrons, and electrons) and simple molecules.',
+  'S8P1.f':'Construct an explanation based on evidence to describe conservation of matter in a chemical reaction including the resulting differences between products and reactants.',
+  'S8P2.a':'Analyze and interpret data to create graphical displays that illustrate the relationships of kinetic energy to mass and speed, and potential energy to mass and height of an object.',
+  'S8P2.b':'Plan and carry out an investigation to explain the transformation between kinetic and potential energy within a system (e.g., roller coasters, pendulums, rubber bands, etc.).',
+  'S8P2.c':'Construct an argument to support a claim about the type of energy transformations within a system [e.g., lighting a match (light to heat), turning on a light (electrical to light)].',
+  'S8P2.d':'Plan and carry out investigations on the effects of heat transfer on molecular motion as it relates to the collision of atoms (conduction), through space (radiation), or in currents in a liquid or a gas (convection).',
+  'S8P3.a':'Analyze and interpret data to identify patterns in the relationships between speed and distance, and velocity and acceleration.',
+  'S8P3.b':"Construct an explanation using Newton's Laws of Motion to describe the effects of balanced and unbalanced forces on the motion of an object.",
+  'S8P3.c':'Construct an argument from evidence to support the claim that the amount of force needed to accelerate an object is proportional to its mass (inertia).',
+  'S8P4.a':'Ask questions to develop explanations about the similarities and differences between electromagnetic and mechanical waves.',
+  'S8P4.b':'Construct an explanation using data to illustrate the relationship between the electromagnetic spectrum and energy.',
+  'S8P4.c':'Design a device to illustrate practical applications of the electromagnetic spectrum (e.g., communication, medical, military).',
+  'S8P4.d':'Develop and use a model to compare and contrast how light and sound waves are reflected, refracted, absorbed, diffracted or transmitted through various materials.',
+  'S8P4.e':'Analyze and interpret data to predict patterns in the relationship between density of media and wave behavior (i.e., speed).',
+  'S8P4.f':'Develop and use a model (e.g., simulations, graphs, illustrations) to predict and describe the relationships between wave properties (e.g., frequency, amplitude, and wavelength) and energy.',
+  'S8P4.g':'Develop and use models to demonstrate the effects that lenses have on light (i.e., formation an image) and their possible technological applications.',
+  'S8P5.a':'Construct an argument using evidence to support the claim that fields (i.e., magnetic fields, gravitational fields, and electric fields) exist between objects exerting forces on each other even when the objects are not in contact.',
+  'S8P5.c':'Plan and carry out investigations to identify the factors (e.g., distance between objects, magnetic force produced by an electromagnet with varying number of wire turns, varying number or size of dry cells, and varying size of iron core) that affect the strength of electric and magnetic forces.',
+  'SPS1.a':'Develop and use models to compare and contrast the structure of atoms, ions and isotopes.',
+  'SPS1.b':'Analyze and interpret data to determine trends of: number of valence electrons, types of ions formed by main group elements, location and properties of metals, nonmetals, and metalloids, and phases at room temperature.',
+  'SPS1.c':'Use the Periodic Table as a model to predict the above properties of main group elements.',
+  'SPS2.a':'Analyze and interpret data to predict properties of ionic and covalent compounds.',
+  'SPS2.b':'Develop and use models to predict formulas for stable, binary ionic compounds based on balance of charges.',
+  'SPS2.c':'Use the International Union of Pure and Applied Chemistry (IUPAC) nomenclature for translating between chemical names and chemical formulas.',
+  'SPS3.a':'Plan and carry out investigations to generate evidence supporting the claim that mass is conserved during a chemical reaction.',
+  'SPS3.b':'Develop and use a model of a chemical equation to illustrate how the total number of atoms is conserved during a chemical reaction.',
+  'SPS4.a':'Develop a model that illustrates how the nucleus changes as a result of fission and fusion.',
+  'SPS4.b':'Use mathematics and computational thinking to explain the process of half-life as it relates to radioactive decay.',
+  'SPS4.c':'Construct arguments based on evidence about the applications, benefits, and problems of nuclear energy as an alternative energy source.',
+  'SPS5.a':'Ask questions to compare and contrast models depicting the particle arrangement and motion in solids, liquids, gases, and plasmas.',
+  'SPS6.a':'Develop and use models to explain the properties (solute/solvent, conductivity, and concentration) of solutions.',
+  'SPS6.b':'Plan and carry out investigations to determine how temperature, surface area, and agitation affect the rate solutes dissolve in a specific solvent.',
+  'SPS6.c':'Analyze and interpret data from a solubility curve to determine the effect of temperature on solubility.',
+  'SPS6.d':'Obtain and communicate information to explain the relationship between the structure and properties (e.g., pH, and color change in the presence of an indicator) of acids and bases.',
+  'SPS6.e':'Plan and carry out investigations to detect patterns in order to classify common household substances as acidic, basic, or neutral.',
+  'SPS7.a':'Construct explanations for energy transformations within a system.',
+  'SPS7.b':'Plan and carry out investigations to describe how molecular motion relates to thermal energy changes in terms of conduction, convection, and radiation.',
+  'SPS7.c':'Analyze and interpret specific heat data to justify the selection of a material for a practical application (e.g., insulators and cooking vessels).',
+  'SPS7.d':'Analyze and interpret data to explain the flow of energy during phase changes using heating/cooling curves.',
+  'SPS8.a':'Plan and carry out an investigation to analyze the motion of an object using mathematical and graphical models.',
+  'SPS8.b':"Construct an explanation based on experimental evidence to support the claims presented in Newton's three laws of motion.",
+  'SPS8.c':'Analyze and interpret data to identify the relationship between mass and gravitational force for falling objects.',
+  'SPS8.d':'Use mathematics and computational thinking to identify the relationships between work, mechanical advantage, and simple machines.',
+  'SPS9.a':'Analyze and interpret data to identify the relationships among wavelength, frequency, and energy in electromagnetic waves and amplitude and energy in mechanical waves.',
+  'SPS9.b':'Ask questions to compare and contrast the characteristics of electromagnetic and mechanical waves.',
+  'SPS9.c':'Develop models based on experimental evidence that illustrate the phenomena of reflection, refraction, interference, and diffraction.',
+  'SPS9.d':'Analyze and interpret data to explain how different media affect the speed of sound and light waves.',
+  'SPS9.e':'Develop and use models to explain the changes in sound waves associated with the Doppler Effect.',
+  'SPS10.a':'Use mathematical and computational thinking to support a claim regarding relationships among voltage, current, and resistance.',
+  'SPS10.b':'Develop and use models to illustrate and explain the conventional flow (direct and alternating) of current and the flow of electrons in simple series and parallel circuits.',
+  'SPS10.c':'Plan and carry out investigations to determine the relationship between magnetism and the movement of electrical charge.'
+};
+
+// Standard groups per tab
+const GROUPS_G8 = [
+  {code:'FOUND', name:'Foundations', text:'Measurement and lab skills used in every unit.'},
+  {code:'S8P1',  name:'Matter & the Periodic Table', text:'Obtain, evaluate, and communicate information about the structure and properties of matter.'},
+  {code:'S8P2',  name:'Energy', text:'Obtain, evaluate, and communicate information about the law of conservation of energy to develop arguments that energy can transform from one form to another within a system.'},
+  {code:'S8P3',  name:'Force & Motion', text:'Obtain, evaluate, and communicate information about cause and effect relationships between force, mass, and the motion of objects.'},
+  {code:'S8P4',  name:'Waves', text:'Obtain, evaluate, and communicate information to support the claim that electromagnetic (light) waves behave differently than mechanical (sound) waves.'},
+  {code:'S8P5',  name:'Electricity, Magnetism & Gravity', text:'Obtain, evaluate, and communicate information about gravity, electricity, and magnetism as major forces acting in nature.'}
+];
+const GROUPS_HS = [
+  {code:'FOUND', name:'Foundations', text:'Measurement and lab skills used in every unit.'},
+  {code:'SPS1',  name:'The Periodic Table & Atomic Structure', text:'Obtain, evaluate, and communicate information from the Periodic Table to explain the relative properties of elements based on patterns of atomic structure.'},
+  {code:'SPS2',  name:'Chemical Bonding', text:'Obtain, evaluate, and communicate information to explain how atoms bond to form stable compounds.'},
+  {code:'SPS3',  name:'Conservation of Matter', text:'Obtain, evaluate, and communicate information to support the Law of Conservation of Matter.'},
+  {code:'SPS4',  name:'Nuclear Science', text:'Obtain, evaluate, and communicate information to explain the changes in nuclear structure as a result of fission, fusion and radioactive decay.'},
+  {code:'SPS5',  name:'Phases of Matter', text:'Obtain, evaluate, and communicate information to compare and contrast the phases of matter as they relate to atomic and molecular motion.'},
+  {code:'SPS6',  name:'Solutions, Acids & Bases', text:'Obtain, evaluate, and communicate information to explain the properties of solutions.'},
+  {code:'SPS7',  name:'Energy', text:'Obtain, evaluate, and communicate information to explain transformations and flow of energy within a system.'},
+  {code:'SPS8',  name:'Force & Motion', text:'Obtain, evaluate, and communicate information to explain the relationships among force, mass, and motion.'},
+  {code:'SPS9',  name:'Waves', text:'Obtain, evaluate, and communicate information to explain the properties of waves.'},
+  {code:'SPS10', name:'Electricity & Magnetism', text:'Obtain, evaluate, and communicate information to explain the properties of and relationships between electricity and magnetism.'}
+];
+
+// The catalog: every video, with its group + elements on each tab (null = not on that tab)
+const VIDEOS = [
+  {id:'metric',         t:'The Metric System',                 blurb:'The metric system and scientific measurement — the skills behind every lab and every unit.', g8:{g:'FOUND',els:[]}, hs:{g:'FOUND',els:[]}},
+  {id:'matter',         t:'Matter',                            blurb:'Pure substances — elements and compounds — versus mixtures.', g8:{g:'S8P1',els:['S8P1.a']}, hs:null},
+  {id:'states',         t:'States of Matter',                  blurb:'Solids, liquids, gases, and plasma — and how particles move as thermal energy is added or removed.', g8:{g:'S8P1',els:['S8P1.b']}, hs:{g:'SPS5',els:['SPS5.a']}},
+  {id:'propchanges',    t:'Physical & Chemical Changes',       blurb:'Physical and chemical properties of matter, and how to classify a change as physical or chemical.', g8:{g:'S8P1',els:['S8P1.c','S8P1.d']}, hs:null},
+  {id:'atom',           t:'The Atom',                          blurb:'The structure of the atom — protons, neutrons, and electrons.', g8:{g:'S8P1',els:['S8P1.e']}, hs:{g:'SPS1',els:['SPS1.a']}},
+  {id:'ptable',         t:'The Periodic Table',                blurb:'How the periodic table is organized and the patterns it reveals about the elements.', g8:{g:'S8P1',els:['S8P1.e']}, hs:{g:'SPS1',els:['SPS1.b','SPS1.c']}},
+  {id:'conservation',   t:'Conservation of Matter',            blurb:'Atoms are rearranged in chemical reactions — never created or destroyed.', g8:{g:'S8P1',els:['S8P1.f']}, hs:{g:'SPS3',els:['SPS3.a','SPS3.b']}},
+  {id:'balancing',      t:'Balancing Chemical Equations',      blurb:'Balancing equations to show that the total number of atoms is conserved in every reaction.', g8:{g:'S8P1',els:['S8P1.f']}, hs:{g:'SPS3',els:['SPS3.b']}},
+  {id:'heatingcurves',  t:'Heating Curves',                    blurb:'Heating and cooling curves — how energy flows during phase changes.', g8:{g:'S8P1',els:['S8P1.b']}, hs:{g:'SPS7',els:['SPS7.d']}},
+  {id:'kepe',           t:'Kinetic & Potential Energy',        blurb:'How kinetic and potential energy depend on mass, speed, and height — and transform within a system.', g8:{g:'S8P2',els:['S8P2.a','S8P2.b']}, hs:{g:'SPS7',els:['SPS7.a']}},
+  {id:'transform',      t:'Energy Transformations',            blurb:'How energy transforms from one form to another within a system.', g8:{g:'S8P2',els:['S8P2.b','S8P2.c']}, hs:{g:'SPS7',els:['SPS7.a']}},
+  {id:'heattransfer',   t:'Heat Transfer',                     blurb:'Conduction, convection, and radiation — the three ways heat moves.', g8:{g:'S8P2',els:['S8P2.d']}, hs:{g:'SPS7',els:['SPS7.b']}},
+  {id:'specificheat',   t:'Specific Heat',                     blurb:'Why some materials heat up and cool down faster than others — and how that guides material choices.', g8:null, hs:{g:'SPS7',els:['SPS7.c']}},
+  {id:'motiongraphs',   t:'Motion Graphs',                     blurb:'Reading motion graphs — speed, distance, velocity, and acceleration.', g8:{g:'S8P3',els:['S8P3.a']}, hs:{g:'SPS8',els:['SPS8.a']}},
+  {id:'newton',         t:"Newton's Laws of Motion",           blurb:"Newton's three laws — balanced and unbalanced forces, inertia, and force, mass, and acceleration.", g8:{g:'S8P3',els:['S8P3.b','S8P3.c']}, hs:{g:'SPS8',els:['SPS8.b']}},
+  {id:'simplemachines', t:'Simple Machines',                   blurb:'Levers, pulleys, ramps, and more — how simple machines provide mechanical advantage.', g8:null, hs:{g:'SPS8',els:['SPS8.d']}},
+  {id:'fields',         t:'Fields',                            blurb:'Gravitational, electric, and magnetic fields — forces that act even without contact.', g8:{g:'S8P5',els:['S8P5.a']}, hs:{g:'SPS8',els:['SPS8.c']}},
+  {id:'wavetypes',      t:'Types of Waves',                    blurb:'Electromagnetic (light) waves versus mechanical (sound) waves.', g8:{g:'S8P4',els:['S8P4.a']}, hs:{g:'SPS9',els:['SPS9.b']}},
+  {id:'waveprops',      t:'Wave Properties',                   blurb:'Frequency, amplitude, and wavelength — and how each relates to a wave&rsquo;s energy.', g8:{g:'S8P4',els:['S8P4.f']}, hs:{g:'SPS9',els:['SPS9.a']}},
+  {id:'wavebehavior',   t:'Wave Behavior',                     blurb:'Reflection, refraction, absorption, diffraction, transmission — and how the medium affects wave speed.', g8:{g:'S8P4',els:['S8P4.d','S8P4.e']}, hs:{g:'SPS9',els:['SPS9.c','SPS9.d']}},
+  {id:'emspectrum',     t:'The Electromagnetic Spectrum',      blurb:'From radio waves to gamma rays — energy across the spectrum and its real-world applications.', g8:{g:'S8P4',els:['S8P4.b','S8P4.c']}, hs:{g:'SPS9',els:['SPS9.a']}},
+  {id:'lenses',         t:'Lenses',                            blurb:'How lenses bend light to form images, and the technology that depends on them.', g8:{g:'S8P4',els:['S8P4.g']}, hs:{g:'SPS9',els:['SPS9.c']}},
+  {id:'doppler',        t:'The Doppler Effect',                blurb:'Why sound changes pitch as its source moves toward or away from you.', g8:null, hs:{g:'SPS9',els:['SPS9.e']}},
+  {id:'circuits',       t:'Circuits',                          blurb:'Voltage, current, resistance, and how series and parallel circuits work.', g8:{g:'S8P5',els:['S8P5.c']}, hs:{g:'SPS10',els:['SPS10.a','SPS10.b']}},
+  {id:'electromag',     t:'Electromagnetism',                  blurb:'The connection between electricity and magnetism — electromagnets and what affects their strength.', g8:{g:'S8P5',els:['S8P5.c']}, hs:{g:'SPS10',els:['SPS10.c']}},
+  {id:'ioniccovalent',  t:'Ionic vs. Covalent Bonds',          blurb:'Comparing ionic and covalent compounds and the properties each type of bond produces.', g8:null, hs:{g:'SPS2',els:['SPS2.a']}},
+  {id:'ionicformulas',  t:'Writing Ionic Formulas',            blurb:'Writing formulas for stable, binary ionic compounds by balancing charges.', g8:null, hs:{g:'SPS2',els:['SPS2.b']}},
+  {id:'nomenclature',   t:'Chemical Nomenclature',             blurb:'Naming compounds — translating between chemical names and formulas with IUPAC rules.', g8:null, hs:{g:'SPS2',els:['SPS2.c']}},
+  {id:'reactiontypes',  t:'Types of Chemical Reactions',       blurb:'Synthesis, decomposition, single and double replacement, and combustion.', g8:null, hs:{g:'SPS3',els:['SPS3.b']}},
+  {id:'fissionfusion',  t:'Fission & Fusion',                  blurb:'How the nucleus changes in nuclear fission and fusion.', g8:null, hs:{g:'SPS4',els:['SPS4.a']}},
+  {id:'decay',          t:'Nuclear Decay',                     blurb:'Radioactive decay and half-life — how unstable nuclei change over time.', g8:null, hs:{g:'SPS4',els:['SPS4.b']}},
+  {id:'nuclearenergy',  t:'Nuclear Energy',                    blurb:'Nuclear power as an alternative energy source — applications, benefits, and problems.', g8:null, hs:{g:'SPS4',els:['SPS4.c']}},
+  {id:'solutions',      t:'Solutions',                         blurb:'Solutes, solvents, concentration, conductivity, and what affects how fast things dissolve.', g8:null, hs:{g:'SPS6',els:['SPS6.a','SPS6.b']}},
+  {id:'solubility',     t:'Solubility Curves',                 blurb:'Reading solubility curves — how temperature changes how much solute can dissolve.', g8:null, hs:{g:'SPS6',els:['SPS6.c']}},
+  {id:'acidsbases',     t:'Acids & Bases',                     blurb:'pH, indicators, and how structure determines the properties of acids and bases.', g8:null, hs:{g:'SPS6',els:['SPS6.d']}},
+  {id:'householdph',    t:'pH of Household Substances',        blurb:'Classifying everyday household substances as acidic, basic, or neutral.', g8:null, hs:{g:'SPS6',els:['SPS6.d','SPS6.e']}}
+];
+
+function mediaHTML(v){
+  const yt = YT[v.id];
+  if(yt){
+    return '<iframe src="https://www.youtube-nocookie.com/embed/' + yt + '" title="Simple Science: ' + v.t.replace(/"/g,'&quot;') + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+  }
+  return '<div class="soon"><div class="play">▶</div><span>COMING SOON</span></div>';
+}
+
+function cardHTML(v, key){
+  const els = v[key].els;
+  const chips = els.map(function(e){
+    return '<span class="vchip" title="' + (ELS[e]||'').replace(/"/g,'&quot;') + '">' + e + '</span>';
+  }).join('');
+  return '<div class="vcard">' +
+    '<div class="vmedia">' + mediaHTML(v) + '</div>' +
+    '<div class="vbody">' +
+      '<h3><span class="ss">Simple Science:</span> ' + v.t + '</h3>' +
+      (chips ? '<div class="vchips">' + chips + '</div>' : '') +
+      '<p>' + v.blurb + '</p>' +
+    '</div></div>';
+}
+
+function renderTab(panelId, groups, key){
+  const panel = document.getElementById(panelId);
+  let html = '';
+  groups.forEach(function(grp){
+    const vids = VIDEOS.filter(function(v){ return v[key] && v[key].g === grp.code; });
+    if(!vids.length) return;
+    const codeLabel = grp.code === 'FOUND' ? '' : '<span class="std-code">' + grp.code + '</span>';
+    html += '<div class="std-group">' +
+      '<h2>' + codeLabel + grp.name + '</h2>' +
+      '<p class="std-text">' + grp.text + '</p>' +
+      '<div class="vgrid">' + vids.map(function(v){ return cardHTML(v, key); }).join('') + '</div>' +
+    '</div>';
+  });
+  panel.innerHTML = html;
+}
+
+function showTab(which){
+  document.getElementById('panel-g8').classList.toggle('active', which==='g8');
+  document.getElementById('panel-hs').classList.toggle('active', which==='hs');
+  document.getElementById('btn-g8').classList.toggle('active', which==='g8');
+  document.getElementById('btn-hs').classList.toggle('active', which==='hs');
+}
+
+renderTab('panel-g8', GROUPS_G8, 'g8');
+renderTab('panel-hs', GROUPS_HS, 'hs');
+
+// Show video counts on the tab buttons
+const n8 = VIDEOS.filter(function(v){return v.g8;}).length;
+const nhs = VIDEOS.filter(function(v){return v.hs;}).length;
+document.getElementById('btn-g8').textContent = '8th Grade Standards (' + n8 + ' videos)';
+document.getElementById('btn-hs').textContent = 'High School Standards (' + nhs + ' videos)';
+</script>
+
+</body>
+</html>

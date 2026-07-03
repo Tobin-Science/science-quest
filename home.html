@@ -73,13 +73,17 @@
   .price b{color:var(--muted)}
   .soon{margin-top:14px;padding:10px 14px;border-radius:10px;font-weight:700;font-size:14px;text-align:center;color:var(--faint);background:var(--bg);border:1px dashed var(--line)}
 
-  /* ---------- TpT band ---------- */
-  .tpt-bar{display:flex;align-items:center;gap:24px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 26px;flex-wrap:wrap;box-shadow:var(--shadow)}
-  .tpt-bar img{height:78px;width:auto;border-radius:10px;box-shadow:0 4px 12px rgba(22,35,47,.18);flex:none}
-  .tpt-txt{flex:1 1 300px;min-width:220px}
+  /* ---------- TpT + videos band ---------- */
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:820px){.duo{grid-template-columns:1fr}}
+  .tpt-bar{display:flex;flex-direction:column;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;box-shadow:var(--shadow);transition:transform .15s ease,box-shadow .15s ease}
+  .tpt-bar:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift)}
+  .tpt-bar img{height:78px;width:auto;border-radius:10px;box-shadow:0 4px 12px rgba(22,35,47,.18);align-self:flex-start}
+  .play-tile{height:78px;width:118px;border-radius:10px;background:linear-gradient(150deg,#2456b3,#173a7c);box-shadow:0 4px 12px rgba(22,35,47,.18);display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px}
+  .tpt-txt{flex:1}
   .tpt-txt h3{font-size:18px;margin-bottom:3px}
   .tpt-txt p{font-size:14px;color:var(--muted)}
-  .tpt-bar .btn{flex:none;white-space:nowrap}
+  .tpt-bar .btn{align-self:flex-start;white-space:nowrap}
 
   /* ---------- footer ---------- */
   footer{margin-top:56px;border-top:1px solid var(--line);background:#fff}
@@ -103,6 +107,7 @@
     <div class="nav-links">
       <a href="#hubs">Learning Hubs</a>
       <a href="#games">Games</a>
+      <a href="/simple-science.html">Videos</a>
       <a href="#tpt">TpT Store</a>
     </div>
   </div>
@@ -209,13 +214,23 @@
   </section>
 
   <section id="tpt">
-    <div class="tpt-bar">
-      <img src="tpt-cover.jpg" alt="Teachers Pay Teachers store">
-      <div class="tpt-txt">
-        <h3>Teachers Pay Teachers</h3>
-        <p>Browse the full library of printable lessons, activities, and classroom resources on my TpT store.</p>
+    <div class="duo">
+      <div class="tpt-bar">
+        <img src="tpt-cover.jpg" alt="Teachers Pay Teachers store">
+        <div class="tpt-txt">
+          <h3>Teachers Pay Teachers</h3>
+          <p>Browse the full library of printable lessons, activities, and classroom resources on my TpT store.</p>
+        </div>
+        <a class="btn ghost" href="https://www.teacherspayteachers.com/store/derek-tobin" target="_blank" rel="noopener">Visit the TpT store →</a>
       </div>
-      <a class="btn ghost" href="https://www.teacherspayteachers.com/store/derek-tobin" target="_blank" rel="noopener">Visit the TpT store →</a>
+      <div class="tpt-bar">
+        <div class="play-tile">▶</div>
+        <div class="tpt-txt">
+          <h3>Simple Science Videos</h3>
+          <p>Free one-minute videos that break down each 8th grade and High School Physical Science standard into plain language — quick lesson openers and reviews, organized standard by standard.</p>
+        </div>
+        <a class="btn ghost" href="/simple-science.html">Browse the videos →</a>
+      </div>
     </div>
   </section>
 
@@ -241,6 +256,7 @@
       </div>
       <div>
         <h4>More</h4>
+        <a href="/simple-science.html">Simple Science Videos</a>
         <a href="https://www.teacherspayteachers.com/store/derek-tobin" target="_blank" rel="noopener">TpT Store</a>
         <a href="/district.html">Cherokee County, GA access</a>
         <a href="/feedback.html">Leave feedback</a>
