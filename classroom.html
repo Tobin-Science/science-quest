@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class Manager — Tobin Science</title>
+<meta name="description" content="Free classroom behavior tracking for teachers: paste in your roster, set your expectations and point values, get instant consequence alerts and a printable daily report. All data stays on your device.">
+<meta property="og:title" content="Class Manager — Tobin Science">
+<meta property="og:description" content="Free behavior tracking for your classroom — roster, points, consequence alerts, and a daily report. No accounts, no student data online.">
+<meta property="og:image" content="https://tobinscience.com/class-manager-cover.jpg">
+<meta property="og:url" content="https://tobinscience.com/classroom.html">
+<meta property="og:type" content="website">
+<style>
+  :root{
+    --ink:#16232f; --muted:#5a6a78; --faint:#8a97a3;
+    --line:#e4e9ee; --bg:#f6f8fb; --card:#ffffff;
+    --ac:#2456b3; --ac-dark:#1c4693; --green:#2f7a4d;
+    --red:#b3392e; --red-bg:#fdf1f0; --amber:#9a6b16; --amber-bg:#fdf6e8; --green-bg:#eef7f1;
+    --shadow:0 1px 2px rgba(22,35,47,.05),0 8px 24px rgba(22,35,47,.07);
+    --shadow-lift:0 2px 4px rgba(22,35,47,.06),0 14px 34px rgba(22,35,47,.13);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+  a{color:var(--ac)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav-in{max-width:1120px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:800;font-size:17px;letter-spacing:-.2px}
+  .brand img{height:34px;width:34px;border-radius:8px}
+  .brand .grn{color:var(--green)}
+  .nav-tag{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:30px;padding:6px 13px}
+  .nav-tag .dot{color:var(--green);font-weight:800}
+
+  .page-head{padding:26px 0 4px}
+  .page-head h1{font-size:clamp(24px,3.5vw,32px);letter-spacing:-.6px}
+  .page-head p{color:var(--muted);font-size:14.5px;margin-top:2px;max-width:640px}
+
+  .btn{display:inline-block;padding:10px 16px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;text-align:center;border:none;cursor:pointer;font-family:inherit;transition:transform .12s ease,box-shadow .12s ease}
+  .btn.primary{background:var(--ac);color:#fff;box-shadow:0 4px 12px rgba(36,86,179,.25)}
+  .btn.primary:hover{background:var(--ac-dark);transform:translateY(-1px)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--faint);transform:translateY(-1px)}
+  .btn.danger{background:#fff;color:var(--red);border:1px solid #eccfcc}
+  .btn.danger:hover{background:var(--red-bg)}
+  .btn.sm{padding:6px 11px;font-size:13px;border-radius:8px}
+  .btn.xs{padding:4px 9px;font-size:12.5px;border-radius:7px}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0 20px}
+  .win-pill{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:30px;padding:7px 15px;font-size:13.5px;font-weight:600;color:var(--muted);box-shadow:var(--shadow)}
+  .win-pill b{color:var(--ink)}
+  .spacer{flex:1}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px}
+  .card h2{font-size:19px;letter-spacing:-.3px;margin-bottom:4px}
+  .card .hint{color:var(--muted);font-size:13.5px;margin-bottom:12px}
+
+  .class-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:18px}
+  .ccard{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px 20px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;position:relative}
+  .ccard:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift)}
+  .ccard .per{font-size:11.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--ac);background:rgba(36,86,179,.08);border-radius:6px;padding:3px 8px;display:inline-block;margin-bottom:8px}
+  .ccard h3{font-size:17px;letter-spacing:-.2px;margin-bottom:3px}
+  .ccard .meta{color:var(--muted);font-size:13px}
+  .ccard .warnband{margin-top:9px;font-size:12.5px;font-weight:600;color:var(--red);background:var(--red-bg);border-radius:8px;padding:4px 9px;display:inline-block}
+  .ccard.newc{border:2px dashed var(--line);background:transparent;box-shadow:none;display:flex;align-items:center;justify-content:center;min-height:110px;color:var(--muted);font-weight:700;font-size:14.5px}
+  .ccard.newc:hover{border-color:var(--ac);color:var(--ac);transform:none;box-shadow:none}
+  .ccard .gear{position:absolute;top:12px;right:12px;background:none;border:none;cursor:pointer;font-size:15px;color:var(--faint);padding:4px;border-radius:6px}
+  .ccard .gear:hover{color:var(--ink);background:var(--bg)}
+
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);font-weight:700;padding:8px 10px;border-bottom:2px solid var(--line)}
+  td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  .score{font-weight:800;font-size:15px;border-radius:8px;padding:3px 10px;display:inline-block;min-width:52px;text-align:center}
+  .score.ok{color:var(--green);background:var(--green-bg)}
+  .score.warn{color:var(--amber);background:var(--amber-bg)}
+  .score.bad{color:var(--red);background:var(--red-bg)}
+  .rowbtns{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+  .stu-name{font-weight:600;cursor:pointer}
+  .stu-name:hover{color:var(--ac);text-decoration:underline}
+  .flag{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;border-radius:5px;padding:2px 6px;margin-left:7px;vertical-align:1px}
+  .flag.cons{color:var(--red);background:var(--red-bg)}
+  .flag.rep{color:var(--amber);background:var(--amber-bg)}
+
+  textarea,input[type=text],input[type=number],input[type=date]{font-family:inherit;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 12px;width:100%}
+  textarea:focus,input:focus{outline:2px solid rgba(36,86,179,.25);border-color:var(--ac)}
+  textarea{resize:vertical;min-height:110px}
+  label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin:12px 0 5px;letter-spacing:.3px}
+  .frow{display:flex;gap:12px}
+  .frow>div{flex:1}
+
+  #modal-wrap{position:fixed;inset:0;z-index:100}
+  #modal-wrap .overlay{position:absolute;inset:0;background:rgba(22,35,47,.45)}
+  .modal{position:relative;max-width:520px;margin:7vh auto 0;background:#fff;border-radius:16px;box-shadow:var(--shadow-lift);padding:24px 26px;max-height:82vh;overflow-y:auto}
+  .modal.wide{max-width:680px}
+  .modal h3{font-size:19px;letter-spacing:-.3px;margin-bottom:4px}
+  .modal .hint{color:var(--muted);font-size:13.5px;margin-bottom:10px}
+  .modal .mbtns{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+  .modal.alertm{border-top:6px solid var(--red)}
+  .modal.alertm h3{color:var(--red)}
+  .inf-btn{display:flex;justify-content:space-between;align-items:center;width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-family:inherit;font-size:14.5px;font-weight:600;color:var(--ink);cursor:pointer;margin-bottom:8px;text-align:left}
+  .inf-btn:hover{border-color:var(--ac);background:rgba(36,86,179,.04)}
+  .inf-btn .pts{color:var(--red);font-weight:800;white-space:nowrap;margin-left:12px}
+  .inf-btn .cnt{font-size:12px;font-weight:700;color:var(--amber);background:var(--amber-bg);border-radius:6px;padding:2px 7px;margin-left:8px}
+
+  .setrow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  .setrow input.nm{flex:1}
+  .setrow input.num{width:84px;text-align:center}
+  .setrow .del{background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:4px 7px;border-radius:6px}
+  .setrow .del:hover{color:var(--red);background:var(--red-bg)}
+
+  .log-entry{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .log-entry:last-child{border-bottom:none}
+  .log-entry .when{color:var(--faint);white-space:nowrap;min-width:118px}
+  .log-entry .what{flex:1}
+  .log-entry .pts-d{color:var(--red);font-weight:700}
+  .log-entry .pts-n{color:var(--green);font-weight:700}
+  .log-entry .undo{background:none;border:none;color:var(--faint);cursor:pointer;font-size:12.5px;font-weight:600;padding:2px 6px;border-radius:6px}
+  .log-entry .undo:hover{color:var(--red);background:var(--red-bg)}
+
+  .rep-sec{margin-bottom:22px}
+  .rep-sec h3{font-size:16px;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid var(--line)}
+  .rep-empty{color:var(--faint);font-size:13.5px;font-style:italic}
+  .rep-stats{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 20px}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 18px;box-shadow:var(--shadow);min-width:120px}
+  .stat b{display:block;font-size:24px;letter-spacing:-.5px}
+  .stat span{font-size:12px;color:var(--muted);font-weight:600}
+  .stat.r b{color:var(--red)} .stat.g b{color:var(--green)} .stat.a b{color:var(--amber)}
+
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:14px}
+  .step{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .step b{display:block;font-size:14px;margin-bottom:3px}
+  .step .n{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--ac);color:#fff;font-weight:800;font-size:13px;align-items:center;justify-content:center;margin-bottom:8px}
+  .step p{font-size:13px;color:var(--muted)}
+
+  footer{margin-top:56px;border-top:1px solid var(--line);background:#fff}
+  .foot-base{text-align:center;color:var(--faint);font-size:12.5px;padding:16px 22px}
+  .foot-base a{color:var(--muted)}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:13.5px;font-weight:600;border-radius:10px;padding:10px 18px;box-shadow:var(--shadow-lift);z-index:200;opacity:0;transition:opacity .25s ease}
+  .toast.show{opacity:1}
+
+  @media(max-width:640px){
+    .modal{margin:3vh 12px 0;max-width:none}
+    td,th{padding:7px 6px}
+    .rowbtns{justify-content:flex-start}
+  }
+  @media print{
+    nav,footer,.no-print{display:none !important}
+    body{background:#fff}
+    .wrap{max-width:none;padding:0}
+    .card,.stat{box-shadow:none;border-color:#bbb}
+    .score{border:1px solid #bbb}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <a class="brand" href="/home.html"><img src="tobin-logo.png" alt="Tobin Science logo">Tobin<span class="grn">Science</span></a>
+    <span class="nav-tag"><span class="dot">✓</span> Free · all data stays on this device</span>
+  </div>
+</nav>
+
+<div class="wrap" id="app"></div>
+
+<footer>
+  <div class="foot-base">
+    Class Manager is free for every teacher. Your rosters and behavior data are saved only in this browser on this device — nothing is uploaded.<br>
+    <div style="margin-top:8px">© 2026 <a href="/home.html">Tobin Science</a> · Built for the classroom · <a href="/feedback.html">Leave feedback</a></div>
+  </div>
+</footer>
+
+<script>
+'use strict';
+/* ================= storage ================= */
+const LS_KEY = 'tobin_class_manager_v1';
+const MAX_CLASSES = 10;
+
+function suggestedInfractions(){
+  return [
+    {id:uid(), name:'Disrupting class', pts:2},
+    {id:uid(), name:'Talking out of turn', pts:1},
+    {id:uid(), name:'Off task', pts:1},
+    {id:uid(), name:'Unprepared for class', pts:1},
+    {id:uid(), name:'Out of seat', pts:1},
+    {id:uid(), name:'Not following directions', pts:2},
+    {id:uid(), name:'Phone / device misuse', pts:2},
+    {id:uid(), name:'Disrespectful behavior', pts:3},
+    {id:uid(), name:'Horseplay', pts:3},
+    {id:uid(), name:'Late to class', pts:1}
+  ];
+}
+function suggestedThresholds(){
+  return [
+    {id:uid(), score:90, label:'Silent lunch'},
+    {id:uid(), score:80, label:'Parent contact'},
+    {id:uid(), score:70, label:'Office referral'}
+  ];
+}
+function freshState(){
+  return {
+    v:1,
+    settings:{ startingScore:100, infractions:suggestedInfractions(), thresholds:suggestedThresholds() },
+    win:{ name:'Quarter 1', started:new Date().toISOString() },
+    classes:[],
+    archives:[]
+  };
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){ const s = JSON.parse(raw); if(s && s.settings && Array.isArray(s.classes)) return s; }
+  }catch(e){}
+  return freshState();
+}
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify(S)); }
+
+/* ================= helpers ================= */
+const $ = s=>document.querySelector(s);
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function dayKey(d){ const x = d ? new Date(d) : new Date(); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); }
+function fmtDate(iso){ return new Date(iso).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); }
+function fmtTime(iso){ return new Date(iso).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}); }
+function fmtDT(iso){ return fmtDate(iso)+' '+fmtTime(iso); }
+function cls(id){ return S.classes.find(c=>c.id===id); }
+function stu(c,id){ return c.students.find(s=>s.id===id); }
+function studentName(s){ return (s.first+' '+s.last).trim(); }
+function sortRoster(c){ c.students.sort((a,b)=> (a.last||'').localeCompare(b.last||'') || (a.first||'').localeCompare(b.first||'')); }
+function className(c){ return esc(c.subject) + (c.period ? ' — Period '+esc(c.period) : ''); }
+function minThreshold(){ return S.settings.thresholds.length ? Math.min(...S.settings.thresholds.map(t=>t.score)) : -Infinity; }
+function maxThreshold(){ return S.settings.thresholds.length ? Math.max(...S.settings.thresholds.map(t=>t.score)) : -Infinity; }
+function scoreClass(v){
+  if(!S.settings.thresholds.length) return 'ok';
+  if(v <= minThreshold()) return 'bad';
+  if(v <= maxThreshold()) return 'warn';
+  return 'ok';
+}
+function toast(msg){
+  let t = $('#toast'); if(t) t.remove();
+  t = document.createElement('div'); t.id='toast'; t.className='toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),300); }, 2600);
+}
+/* count of a given infraction for a student in the current window */
+function infCount(st, infName){ return st.log.filter(e=>e.type==='deduct' && e.infName===infName).length; }
+/* repeat issues for a class or all classes: same infraction 2+ times this window */
+function repeatIssues(classes){
+  const out = [];
+  for(const c of classes){
+    for(const st of c.students){
+      const byInf = {};
+      for(const e of st.log){ if(e.type==='deduct'){ (byInf[e.infName] = byInf[e.infName]||[]).push(e); } }
+      for(const [name, entries] of Object.entries(byInf)){
+        if(entries.length >= 2){
+          out.push({ cls:c, st, infName:name, count:entries.length,
+            today: entries.some(e=>dayKey(e.t)===dayKey()),
+            last: entries[entries.length-1].t });
+        }
+      }
+    }
+  }
+  out.sort((a,b)=> b.count - a.count || (a.st.last||'').localeCompare(b.st.last||''));
+  return out;
+}
+function studentHasRepeat(st){
+  const byInf = {};
+  for(const e of st.log){ if(e.type==='deduct') byInf[e.infName]=(byInf[e.infName]||0)+1; }
+  return Object.values(byInf).some(n=>n>=2);
+}
+
+/* ================= modal ================= */
+function modal(html, extraClass){
+  closeModal();
+  const w = document.createElement('div'); w.id='modal-wrap';
+  w.innerHTML = '<div class="overlay"></div><div class="modal '+(extraClass||'')+'">'+html+'</div>';
+  document.body.appendChild(w);
+  w.querySelector('.overlay').addEventListener('click', closeModal);
+  const f = w.querySelector('input,textarea'); if(f) f.focus();
+}
+function closeModal(){ const m = $('#modal-wrap'); if(m) m.remove(); }
+
+/* ================= routing / render ================= */
+let S = load();
+let view = { name:'home' };
+function go(v){ view = v; render(); window.scrollTo(0,0); }
+
+function render(){
+  const app = $('#app');
+  if(view.name==='home') app.innerHTML = homeHTML();
+  else if(view.name==='class'){ const c = cls(view.id); app.innerHTML = c ? classHTML(c) : homeHTML(); }
+  else if(view.name==='settings') app.innerHTML = settingsHTML();
+  else if(view.name==='report') app.innerHTML = reportHTML();
+  else if(view.name==='archives') app.innerHTML = archivesHTML();
+  else if(view.name==='archive') app.innerHTML = archiveHTML(view.i);
+}
+
+/* ================= HOME ================= */
+function homeHTML(){
+  const canAdd = S.classes.length < MAX_CLASSES;
+  let cards = S.classes.map(c=>{
+    const flagged = c.students.filter(s=>s.score <= maxThreshold()).length;
+    return '<div class="ccard" onclick="go({name:\'class\',id:\''+c.id+'\'})">'
+      + '<button class="gear" title="Edit class" onclick="event.stopPropagation();editClassModal(\''+c.id+'\')">✎</button>'
+      + '<span class="per">'+(c.period?'Period '+esc(c.period):'Class')+'</span>'
+      + '<h3>'+esc(c.subject)+'</h3>'
+      + '<div class="meta">'+c.students.length+' student'+(c.students.length===1?'':'s')+'</div>'
+      + (flagged>0 ? '<div class="warnband">⚠ '+flagged+' at or below a consequence line</div>' : '')
+      + '</div>';
+  }).join('');
+  if(canAdd) cards += '<div class="ccard newc" onclick="newClassModal()">+ New class</div>';
+
+  const intro = S.classes.length===0 ? (
+    '<div class="card"><h2>Welcome to Class Manager</h2>'
+    +'<div class="hint">A free behavior-points tracker: every student starts at '+S.settings.startingScore+', points come off for infractions you define, and you get alerts and a printable daily report. Everything is saved on this device only.</div>'
+    +'<div class="steps">'
+    +'<div class="step"><span class="n">1</span><b>Create a class</b><p>Just a subject and a period — up to '+MAX_CLASSES+' classes.</p></div>'
+    +'<div class="step"><span class="n">2</span><b>Paste your roster</b><p>Copy names straight from your gradebook — they sort by last name automatically.</p></div>'
+    +'<div class="step"><span class="n">3</span><b>Check Settings</b><p>Infraction list, point values, consequence lines, and starting score are all customizable.</p></div>'
+    +'<div class="step"><span class="n">4</span><b>Track &amp; report</b><p>Tap a student to take points or leave a positive note, then print the daily report.</p></div>'
+    +'</div></div>'
+  ) : '';
+
+  return ''
+    +'<div class="page-head"><h1>Class Manager</h1><p>Behavior points, consequence alerts, and a daily report — free, and nothing leaves this device.</p></div>'
+    +'<div class="toolbar">'
+    +'<span class="win-pill">📅 <b>'+esc(S.win.name)+'</b>&nbsp;· started '+fmtDate(S.win.started)+'</span>'
+    +'<span class="spacer"></span>'
+    +'<button class="btn primary" onclick="go({name:\'report\'})">Generate Daily Report</button>'
+    +'<button class="btn ghost" onclick="go({name:\'settings\'})">⚙ Settings</button>'
+    +'<button class="btn ghost" onclick="newWindowModal()">Archive &amp; start new window</button>'
+    +(S.archives.length? '<button class="btn ghost" onclick="go({name:\'archives\'})">Archives ('+S.archives.length+')</button>':'')
+    +'</div>'
+    + intro
+    +'<div class="class-grid">'+cards+'</div>'
+    +'<div class="toolbar no-print" style="margin-top:6px">'
+    +'<span style="font-size:12.5px;color:var(--faint)">Back up your data now and then — it lives only in this browser.</span>'
+    +'<span class="spacer"></span>'
+    +'<button class="btn ghost sm" onclick="backup()">⬇ Back up to file</button>'
+    +'<button class="btn ghost sm" onclick="restorePick()">⬆ Restore from file</button>'
+    +'<input type="file" id="restore-file" accept=".json,application/json" style="display:none" onchange="restoreFile(this)">'
+    +'</div>';
+}
+
+/* ---- class create / edit ---- */
+function newClassModal(){
+  if(S.classes.length >= MAX_CLASSES){ toast('Limit of '+MAX_CLASSES+' classes reached'); return; }
+  modal('<h3>New class</h3><div class="hint">Just the subject and the period — you\'ll paste the roster next.</div>'
+    +'<label class="fl">Subject</label><input type="text" id="nc-subject" placeholder="e.g. 8th Grade Science">'
+    +'<label class="fl">Period</label><input type="text" id="nc-period" placeholder="e.g. 3">'
+    +'<div class="mbtns"><button class="btn ghost" onclick="closeModal()">Cancel</button>'
+    +'<button class="btn primary" onclick="createClass()">Create class</button></div>');
+}
+function createClass(){
+  const subject = $('#nc-subject').value.trim();
+  const period = $('#nc-period').value.trim();
+  if(!subject){ toast('Enter a subject'); return; }
+  const c = { id:uid(), subject, period, students:[] };
+  S.classes.push(c); save(); closeModal();
+  go({name:'class', id:c.id});
+}
+function editClassModal(id){
+  const c = cls(id); if(!c) return;
+  modal('<h3>Edit class</h3>'
+    +'<label class="fl">Subject</label><input type="text" id="ec-subject" value="'+esc(c.subject)+'">'
+    +'<label class="fl">Period</label><input type="text" id="ec-period" value="'+esc(c.period)+'">'
+    +'<div class="mbtns">'
+    +'<button class="btn danger" onclick="deleteClass(\''+id+'\')">Delete class</button>'
+    +'<span class="spacer"></span>'
+    +'<button class="btn ghost" onclick="closeModal()">Cancel</button>'
+    +'<button class="btn primary" onclick="saveClassEdit(\''+id+'\')">Save</button></div>');
+}
+function saveClassEdit(id){
+  const c = cls(id); if(!c) return;
+  const subject = $('#ec-subject').value.trim(); if(!subject){ toast('Enter a subject'); return; }
+  c.subject = subject; c.period = $('#ec-period').value.trim();
+  save(); closeModal(); render();
+}
+function deleteClass(id){
+  const c = cls(id); if(!c) return;
+  modal('<h3>Delete this class?</h3><div class="hint">"'+className(c)+'" and all of its students and behavior records for the current window will be removed. This cannot be undone.</div>'
+    +'<div class="mbtns"><button class="btn ghost" onclick="closeModal()">Cancel</button>'
+    +'<button class="btn danger" onclick="reallyDeleteClass(\''+id+'\')">Yes, delete it</button></div>');
+}
+function reallyDeleteClass(id){
+  S.classes = S.classes.filter(c=>c.id!==id);
+  save(); closeModal(); go({name:'home'});
+}
+
+/* ================= CLASS VIEW ================= */
+function classHTML(c){
+  sortRoster(c);
+  let body;
+  if(c.students.length===0){
+    body = '<div class="card"><h2>Paste your roster</h2>'
+      +'<div class="hint">Copy your student list from your gradebook, a spreadsheet, or a document and paste it below — one student per line. "Last, First" and "First Last" both work, and it sorts by last name automatically.</div>'
+      +'<textarea id="roster-paste" placeholder="Smith, John&#10;Garcia, Maria&#10;or&#10;John Smith&#10;Maria Garcia"></textarea>'
+      +'<div class="mbtns" style="justify-content:flex-start"><button class="btn primary" onclick="previewRoster(\''+c.id+'\')">Add these students →</button></div>'
+      +'</div>';
+  } else {
+    const rows = c.students.map(st=>{
+      const consequence = st.score <= maxThreshold();
+      const repeat = studentHasRepeat(st);
+      return '<tr>'
+        +'<td><span class="stu-name" onclick="historyModal(\''+c.id+'\',\''+st.id+'\')">'+esc(st.last)+', '+esc(st.first)+'</span>'
+        +(consequence?'<span class="flag cons">consequence</span>':'')
+        +(repeat?'<span class="flag rep">repeat</span>':'')
+        +'</td>'
+        +'<td><span class="score '+scoreClass(st.score)+'">'+st.score+'</span></td>'
+        +'<td><div class="rowbtns">'
+        +'<button class="btn danger xs" onclick="deductModal(\''+c.id+'\',\''+st.id+'\')">− Points</button>'
+        +'<button class="btn ghost xs" onclick="noteModal(\''+c.id+'\',\''+st.id+'\')">+ Note</button>'
+        +'<button class="btn ghost xs" onclick="historyModal(\''+c.id+'\',\''+st.id+'\')">History</button>'
+        +'</div></td></tr>';
+    }).join('');
+    body = '<div class="card">'
+      +'<table><thead><tr><th>Student ('+c.students.length+')</th><th>Score</th><th style="text-align:right">Actions</th></tr></thead>'
+      +'<tbody>'+rows+'</tbody></table></div>'
+      +'<div class="toolbar no-print">'
+      +'<button class="btn ghost sm" onclick="addStudentModal(\''+c.id+'\')">+ Add a student</button>'
+      +'<button class="btn ghost sm" onclick="pasteMoreModal(\''+c.id+'\')">Paste more names</button>'
+      +'</div>';
+  }
+  return ''
+    +'<div class="page-head"><h1>'+className(c)+'</h1>'
+    +'<p>'+esc(S.win.name)+' · everyone starts at '+S.settings.startingScore+' · click a name for full history</p></div>'
+    +'<div class="toolbar">'
+    +'<button class="btn ghost sm" onclick="go({name:\'home\'})">← All classes</button>'
+    +'<span class="spacer"></span>'
+    +'<button class="btn primary sm" onclick="go({name:\'report\'})">Generate Daily Report</button>'
+    +'</div>'
+    + body;
+}
+
+/* ---- roster paste ---- */
+function parseRoster(text){
+  const out = [];
+  for(let raw of text.split(/\r?\n/)){
+    let line = raw.trim();
+    if(!line) continue;
+    const cells = line.split('\t').map(x=>x.trim()).filter(Boolean);
+    let name = cells[0] || '';
+    // spreadsheet with Last | First in two columns
+    if(cells.length>=2 && !/[ ,]/.test(cells[0]) && /^[A-Za-z'’.\-]+$/.test(cells[1])) name = cells[0]+', '+cells[1];
+    name = name.replace(/^\s*\d+[.)]?\s*/,'').trim();       // strip "1." numbering
+    if(!name) continue;
+    const bare = name.toLowerCase().replace(/[^a-z]/g,'');
+    if(['name','student','students','studentname','lastname','firstname','lastfirst','firstlast','roster','period','class'].includes(bare)) continue;
+    let first='', last='';
+    if(name.includes(',')){
+      const i = name.indexOf(',');
+      last = name.slice(0,i).trim();
+      first = name.slice(i+1).trim();
+    } else {
+      const parts = name.split(/\s+/);
+      if(parts.length===1){ first = parts[0]; last=''; }
+      else { last = parts[parts.length-1]; first = parts.slice(0,-1).join(' '); }
+    }
+    if(!first && !last) continue;
+    out.push({first, last});
+  }
+  return out;
+}
+function previewRoster(cid){
+  const text = $('#roster-paste').value;
+  const parsed = parseRoster(text);
+  if(!parsed.length){ toast('No names found — paste one student per line'); return; }
+  const list = parsed.map(p=>'<li>'+esc(p.last? p.last+', '+p.first : p.first)+'</li>').join('');
+  modal('<h3>Add '+parsed.length+' student'+(parsed.length===1?'':'s')+'?</h3>'
+    +'<div class="hint">Here\'s how the names were read (last name, first name). If something looks off, cancel and fix that line.</div>'
+    +'<ol style="padding-left:22px;font-size:14px;max-height:40vh;overflow-y:auto">'+list+'</ol>'
+    +'<div class="mbtns"><button class="btn ghost" onclick="closeModal()">Cancel</button>'
+    +'<button class="btn primary" onclick="confirmRoster(\''+cid+'\')">Looks right — add them</button></div>');
+  window._pendingRoster = parsed;
+}
+function confirmRoster(cid){
+  const c = cls(cid); if(!c || !window._pendingRoster) return;
+  for(const p of window._pendingRoster){
+    const dup = c.students.some(s=>s.first.toLowerCase()===p.first.toLowerCase() && s.last.toLowerCase()===p.last.toLowerCase());
+    if(dup) continue;
+    c.students.push({ id:uid(), first:p.first, last:p.last, score:S.settings.startingScore, log:[] });
+  }
+  window._pendingRoster = null;
+  sortRoster(c); save(); closeModal(); render();
+  toast('Roster added — sorted by last name');
+}
+function pasteMoreModal(cid){
+  modal('<h3>Paste more names</h3><div class="hint">New names are added to the existing roster; exact duplicates are skipped.</div>'
+    +'<textarea id="roster-paste" placeholder="Smith, John"></textarea>'
+    +'<div class="mbtns"><button class="btn ghost" onclick="closeModal()">Cancel</button>'
+    +'<button class="btn primary" onclick="previewRoster(\''+cid+'\')">Add these students →</button></div>');
+}
+function addStudentModal(cid){
+  modal('<h3>Add a student</h3>'
+    +'<div class="frow"><div><label class="fl">First name</label><input type="text" id="as-first"></div>'
+    +'<div><label class="fl">Last name</label><input type="text" id="as-last"></div></div>'
+    +'<div class="mbtns"><button class="btn ghost" onclick="closeModal()">Cancel</button>'
+    +'<button class="btn primary" onclick="addStudent(\''+cid+'\')">Add</button></div>');
+}
+function addStudent(cid){
+  const c = cls(cid); if(!c) return;
+  const first = $('#as-first').value.trim(), last = $('#as-last').value.trim();
+  if(!first && !last){ toast('Enter a name'); return; }
+  c.students.push({ id:uid(), first, last, score:S.settings.startingScore, log:[] });
+  sortRoster(c); save(); closeModal(); render();
+}
+
+/* ---- deduct ---- */
+function deductModal(cid, sid){
+  const c = cls(cid), st = stu(c,sid);
+  if(!S.settings.infractions.length){
+    modal('<h3>No infractions set up</h3><div class="hint">Add at least one behavior in Settings first.</div>'
+      +'<div class="mbtns"><button class="btn ghost" onclick="closeModal()">Close</button>'
+      +'<button class="btn primary" onclick="go({name:\'settings\'});closeModal()">Open Settings</button></div>');
+    return;
+  }
+  const btns = S.settings.infractions.map(inf=>{
+    const n = infCount(st, inf.name);
+    return '<button class="inf-btn" onclick="deduct(\''+cid+'\',\''+sid+'\',\''+inf.id+'\')">'
+      +'<span>'+esc(inf.name)+(n>0?'<span class="cnt">'+(n+1)+(n===1?'nd':n===2?'rd':'th')+' time</span>':'')+'</span>'
+      +'<span class="pts">−'+inf.pts+'</span></button>';
+  }).join('');
+  modal('<h3>Take points — '+esc(studentName(st))+'</h3>'
+    +'<div class="hint">Current score: <b>'+st.score+'</b>. Tap the behavior:</div>'
+    + btns
+    +'<div class="mbtns"><button class="btn ghost" onclick="closeModal()">Cancel</button></div>');
+}
+function deduct(cid, sid, infId){
+  const c = cls(cid), st = stu(c,sid);
+  const inf = S.settings.infractions.find(i=>i.id===infId);
+  if(!c || !st || !inf) return;
+  const from = st.score;
+  st.score = from - inf.pts;
+  const crossed = S.settings.thresholds
+    .filter(t=> from > t.score && st.score <= t.score)
+    .sort((a,b)=>b.score-a.score)
+    .map(t=>({label:t.label, score:t.score}));
+  st.log.push({ id:uid(), t:new Date().toISOString(), type:'deduct', infName:inf.name, pts:inf.pts, from, to:st.score, crossed });
+  save(); closeModal(); render();
+  if(crossed.length){
+    modal('<h3>⚠ Consequence reached</h3>'
+      +'<div class="hint" style="font-size:15px;color:var(--ink)"><b>'+esc(studentName(st))+'</b> ('+className(c)+') just dropped to <b>'+st.score+'</b>:</div>'
+      + crossed.map(x=>'<div style="font-size:16px;font-weight:700;color:var(--red);background:var(--red-bg);border-radius:10px;padding:10px 14px;margin-top:8px">'+esc(x.label)+' <span style="font-weight:600;font-size:13px;color:var(--muted)">(at or below '+x.score+')</span></div>').join('')
+      +'<div class="hint" style="margin-top:12px">This will also appear in today\'s report under consequence follow-ups.</div>'
+      +'<div class="mbtns"><button class="btn primary" onclick="closeModal()">Got it</button></div>', 'alertm');
+  } else {
+    const repeatN = infCount(st, inf.name);
+    toast('−'+inf.pts+' '+studentName(st)+' → '+st.score + (repeatN>=2 ? ' · repeat: '+inf.name.toLowerCase()+' ×'+repeatN : ''));
+  }
+}
+
+/* ---- positive note ---- */
+function noteModal(cid, sid){
+  const c = cls(cid), st = stu(c,sid);
+  modal('<h3>Positive note — '+esc(studentName(st))+'</h3>'
+    +'<div class="hint">A quick record of a good moment. It shows in the student\'s history and in today\'s report (no points change).</div>'
+    +'<textarea id="pn-text" placeholder="e.g. Helped a classmate finish the lab and cleaned up without being asked."></textarea>'
+    +'<div class="mbtns"><button class="btn ghost" onclick="closeModal()">Cancel</button>'
+    +'<button class="btn primary" onclick="saveNote(\''+cid+'\',\''+sid+'\')">Save note</button></div>');
+}
+function saveNote(cid, sid){
+  const c = cls(cid), st = stu(c,sid);
+  const txt = $('#pn-text').value.trim();
+  if(!txt){ toast('Write a quick note first'); return; }
+  st.log.push({ id:uid(), t:new Date().toISOString(), type:'note', note:txt });
+  save(); closeModal(); render();
+  toast('Positive note saved for '+studentName(st));
+}
+
+/* ---- manual adjust ---- */
+function adjustModal(cid, sid){
+  const c = cls(cid), st = stu(c,sid);
+  modal('<h3>Fix score — '+esc(studentName(st))+'</h3>'
+    +'<div class="hint">For corrections only (wrong student, double-tap, fresh start). Positive behavior is meant for notes, not bonus points.</div>'
+    +'<label class="fl">New score (currently '+st.score+')</label><input type="number" id="adj-score" value="'+st.score+'">'
+    +'<label class="fl">Reason (shows in the report)</label><input type="text" id="adj-reason" placeholder="e.g. tapped the wrong student">'
+    +'<div class="mbtns"><button class="btn ghost" onclick="closeModal()">Cancel</button>'
+    +'<button class="btn primary" onclick="saveAdjust(\''+cid+'\',\''+sid+'\')">Save correction</button></div>');
+}
+function saveAdjust(cid, sid){
+  const c = cls(cid), st = stu(c,sid);
+  const v = parseFloat($('#adj-score').value);
+  if(isNaN(v)){ toast('Enter a number'); return; }
+  const reason = $('#adj-reason').value.trim();
+  const from = st.score;
+  if(v === from){ closeModal(); return; }
+  st.score = v;
+  const crossed = S.settings.thresholds
+    .filter(t=> from > t.score && st.score <= t.score)
+    .sort((a,b)=>b.score-a.score)
+    .map(t=>({label:t.label, score:t.score}));
+  st.log.push({ id:uid(), t:new Date().toISOString(), type:'adjust', from, to:v, note:reason, crossed });
+  save(); closeModal(); render();
+  if(crossed.length){
+    modal('<h3>⚠ Consequence reached</h3>'
+      +'<div class="hint" style="font-size:15px;color:var(--ink)"><b>'+esc(studentName(st))+'</b> is now at <b>'+st.score+'</b>: '
+      + crossed.map(x=>esc(x.label)).join(', ')+'</div>'
+      +'<div class="mbtns"><button class="btn primary" onclick="closeModal()">Got it</button></div>', 'alertm');
+  } else toast('Score set to '+v+' for '+studentName(st));
+}
+
+/* ---- history ---- */
+function historyModal(cid, sid){
+  const c = cls(cid), st = stu(c,sid);
+  const entries = st.log.slice().reverse().map(e=>{
+    let what='';
+    if(e.type==='deduct') what = '<span class="pts-d">−'+e.pts+'</span> '+esc(e.infName)+' <span style="color:var(--faint)">('+e.from+' → '+e.to+')</span>'
+      + (e.crossed && e.crossed.length ? ' <span class="flag cons">'+esc(e.crossed.map(x=>x.label).join(', '))+'</span>' : '');
+    else if(e.type==='note') what = '<span class="pts-n">★</span> '+esc(e.note);
+    else if(e.type==='adjust') what = '<b>Score corrected</b> '+e.from+' → '+e.to + (e.note? ' — '+esc(e.note):'');
+    const undo = (e.type!=='note')
+      ? '<button class="undo" title="Remove this entry and restore the points" onclick="undoEntry(\''+cid+'\',\''+sid+'\',\''+e.id+'\')">undo</button>'
+      : '<button class="undo" onclick="undoEntry(\''+cid+'\',\''+sid+'\',\''+e.id+'\')">remove</button>';
+    return '<div class="log-entry"><span class="when">'+fmtDT(e.t)+'</span><span class="what">'+what+'</span>'+undo+'</div>';
+  }).join('');
+  modal('<h3>'+esc(studentName(st))+'</h3>'
+    +'<div class="hint">'+esc(S.win.name)+' · current score <b>'+st.score+'</b></div>'
+    +(entries || '<div class="rep-empty" style="padding:10px 0">Nothing recorded yet this window.</div>')
+    +'<div class="mbtns">'
+    +'<button class="btn danger sm" onclick="removeStudent(\''+cid+'\',\''+sid+'\')">Remove student</button>'
+    +'<span class="spacer"></span>'
+    +'<button class="btn ghost sm" onclick="adjustModal(\''+cid+'\',\''+sid+'\')">Fix score</button>'
+    +'<button class="btn primary sm" onclick="closeModal()">Close</button></div>', 'wide');
+}
+function undoEntry(cid, sid, eid){
+  const c = cls(cid), st = stu(c,sid);
+  const i = st.log.findIndex(e=>e.id===eid);
+  if(i<0) return;
+  const e = st.log[i];
+  if(e.type==='deduct') st.score += e.pts;
+  else if(e.type==='adjust') st.score += (e.from - e.to);
+  st.log.splice(i,1);
+  save(); render(); historyModal(cid, sid);
+  toast(e.type==='note' ? 'Note removed' : 'Entry undone — points restored');
+}
+function removeStudent(cid, sid){
+  const c = cls(cid), st = stu(c,sid);
+  modal('<h3>Remove '+esc(studentName(st))+'?</h3><div class="hint">Their score and history for this window will be deleted. (Archived windows are not affected.)</div>'
+    +'<div class="mbtns"><button class="btn ghost" onclick="closeModal()">Cancel</button>'
+    +'<button class="btn danger" onclick="reallyRemoveStudent(\''+cid+'\',\''+sid+'\')">Remove</button></div>');
+}
+function reallyRemoveStudent(cid, sid){
+  const c = cls(cid);
+  c.students = c.students.filter(s=>s.id!==sid);
+  save(); closeModal(); render();
+}
+
+/* ================= SETTINGS ================= */
+function settingsHTML(){
+  const infRows = S.settings.infractions.map(inf=>
+    '<div class="setrow" data-inf="'+inf.id+'">'
+    +'<input type="text" class="nm" value="'+esc(inf.name)+'" placeholder="Behavior">'
+    +'<input type="number" class="num" value="'+inf.pts+'" min="0" max="5" step="1" title="Points (0–5)">'
+    +'<button class="del" title="Remove" onclick="this.parentElement.remove()">✕</button></div>').join('');
+  const thRows = S.settings.thresholds.slice().sort((a,b)=>b.score-a.score).map(t=>
+    '<div class="setrow" data-th="'+t.id+'">'
+    +'<input type="number" class="num" value="'+t.score+'" title="At or below this score…">'
+    +'<input type="text" class="nm" value="'+esc(t.label)+'" placeholder="Consequence (e.g. Silent lunch)">'
+    +'<button class="del" title="Remove" onclick="this.parentElement.remove()">✕</button></div>').join('');
+  return ''
+    +'<div class="page-head"><h1>Settings</h1><p>One setup applies to all of your classes.</p></div>'
+    +'<div class="toolbar"><button class="btn ghost sm" onclick="go({name:\'home\'})">← Back (without saving)</button>'
+    +'<span class="spacer"></span><button class="btn primary" onclick="saveSettings()">Save settings</button></div>'
+
+    +'<div class="card"><h2>Starting score</h2>'
+    +'<div class="hint">Every student begins each grading window with this many points (100 by default). Applies to new students and to the next window you start.</div>'
+    +'<input type="number" id="set-start" value="'+S.settings.startingScore+'" min="1" max="999" style="width:120px;text-align:center">'
+    +'</div>'
+
+    +'<div class="card"><h2>Behavior infractions</h2>'
+    +'<div class="hint">Each behavior takes 0–5 points off a student\'s score. Rename, re-point, remove, or add your own — these are just suggestions.</div>'
+    +'<div id="inf-list">'+infRows+'</div>'
+    +'<div class="mbtns" style="justify-content:flex-start">'
+    +'<button class="btn ghost sm" onclick="addInfRow()">+ Add a behavior</button>'
+    +'<button class="btn ghost sm" onclick="restoreSuggestedInf()">Restore suggested list</button></div>'
+    +'</div>'
+
+    +'<div class="card"><h2>Consequence lines</h2>'
+    +'<div class="hint">When a student\'s score drops <b>to or below</b> a line, you get an on-screen alert right away and a follow-up item in that day\'s report. Add as many lines as your discipline plan uses.</div>'
+    +'<div style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--faint);display:flex;gap:8px;margin-bottom:5px"><span style="width:84px">Score</span><span>Consequence</span></div>'
+    +'<div id="th-list">'+thRows+'</div>'
+    +'<div class="mbtns" style="justify-content:flex-start"><button class="btn ghost sm" onclick="addThRow()">+ Add a consequence line</button></div>'
+    +'</div>';
+}
+function addInfRow(){
+  const d = document.createElement('div'); d.className='setrow'; d.dataset.inf = uid();
+  d.innerHTML = '<input type="text" class="nm" placeholder="Behavior"><input type="number" class="num" value="1" min="0" max="5" step="1"><button class="del" onclick="this.parentElement.remove()">✕</button>';
+  $('#inf-list').appendChild(d); d.querySelector('.nm').focus();
+}
+function addThRow(){
+  const d = document.createElement('div'); d.className='setrow'; d.dataset.th = uid();
+  d.innerHTML = '<input type="number" class="num" placeholder="90"><input type="text" class="nm" placeholder="Consequence (e.g. Silent lunch)"><button class="del" onclick="this.parentElement.remove()">✕</button>';
+  $('#th-list').appendChild(d); d.querySelector('.num').focus();
+}
+function restoreSuggestedInf(){
+  const keep = [];
+  document.querySelectorAll('#inf-list .setrow').forEach(r=>{
+    const nm = r.querySelector('.nm').value.trim();
+    if(nm) keep.push({id:r.dataset.inf, name:nm, pts:clampPts(r.querySelector('.num').value)});
+  });
+  const names = new Set(keep.map(k=>k.name.toLowerCase()));
+  for(const s of suggestedInfractions()){ if(!names.has(s.name.toLowerCase())) keep.push(s); }
+  $('#inf-list').innerHTML = keep.map(inf=>
+    '<div class="setrow" data-inf="'+inf.id+'">'
+    +'<input type="text" class="nm" value="'+esc(inf.name)+'"><input type="number" class="num" value="'+inf.pts+'" min="0" max="5" step="1">'
+    +'<button class="del" onclick="this.parentElement.remove()">✕</button></div>').join('');
+}
+function clampPts(v){ v = Math.round(parseFloat(v)); if(isNaN(v)) v = 1; return Math.max(0, Math.min(5, v)); }
+function saveSettings(){
+  const start = parseInt($('#set-start').value,10);
+  if(isNaN(start) || start < 1){ toast('Starting score must be at least 1'); return; }
+  const infractions = [];
+  document.querySelectorAll('#inf-list .setrow').forEach(r=>{
+    const nm = r.querySelector('.nm').value.trim();
+    if(nm) infractions.push({ id:r.dataset.inf, name:nm, pts:clampPts(r.querySelector('.num').value) });
+  });
+  const thresholds = [];
+  document.querySelectorAll('#th-list .setrow').forEach(r=>{
+    const sc = parseFloat(r.querySelector('.num').value);
+    const lb = r.querySelector('.nm').value.trim();
+    if(!isNaN(sc) && lb) thresholds.push({ id:r.dataset.th, score:sc, label:lb });
+  });
+  thresholds.sort((a,b)=>b.score-a.score);
+  S.settings.startingScore = start;
+  S.settings.infractions = infractions;
+  S.settings.thresholds = thresholds;
+  save(); toast('Settings saved'); go({name:'home'});
+}
+
+/* ================= DAILY REPORT ================= */
+function reportHTML(){
+  const today = dayKey();
+  const deducts = [], notes = [], adjusts = [], followups = [];
+  for(const c of S.classes){
+    for(const st of c.students){
+      for(const e of st.log){
+        if(dayKey(e.t)!==today) continue;
+        if(e.type==='deduct') deducts.push({c, st, e});
+        else if(e.type==='note') notes.push({c, st, e});
+        else if(e.type==='adjust') adjusts.push({c, st, e});
+        if(e.crossed && e.crossed.length) for(const x of e.crossed) followups.push({c, st, e, x});
+      }
+    }
+  }
+  deducts.sort((a,b)=> a.e.t < b.e.t ? -1 : 1);
+  const ptsLost = deducts.reduce((s,d)=>s+d.e.pts, 0);
+  const repeats = repeatIssues(S.classes);
+
+  const dedRows = deducts.map(d=>
+    '<tr><td style="white-space:nowrap;color:var(--faint)">'+fmtTime(d.e.t)+'</td>'
+    +'<td><b>'+esc(d.st.last)+', '+esc(d.st.first)+'</b><div style="font-size:12px;color:var(--faint)">'+className(d.c)+'</div></td>'
+    +'<td>'+esc(d.e.infName)+'</td>'
+    +'<td style="color:var(--red);font-weight:700;white-space:nowrap">−'+d.e.pts+'</td>'
+    +'<td><span class="score '+scoreClass(d.e.to)+'">'+d.e.to+'</span></td></tr>').join('');
+
+  const fuRows = followups.map(f=>
+    '<tr><td><b>'+esc(f.st.last)+', '+esc(f.st.first)+'</b><div style="font-size:12px;color:var(--faint)">'+className(f.c)+'</div></td>'
+    +'<td style="color:var(--red);font-weight:700">'+esc(f.x.label)+'</td>'
+    +'<td>dropped to '+f.e.to+' (line: '+f.x.score+')</td>'
+    +'<td style="white-space:nowrap;color:var(--faint)">'+fmtTime(f.e.t)+'</td></tr>').join('');
+
+  const repRows = repeats.map(r=>
+    '<tr><td><b>'+esc(r.st.last)+', '+esc(r.st.first)+'</b><div style="font-size:12px;color:var(--faint)">'+className(r.cls)+'</div></td>'
+    +'<td>'+esc(r.infName)+'</td>'
+    +'<td style="font-weight:700">'+r.count+'× this window'+(r.today?' <span class="flag rep">again today</span>':'')+'</td>'
+    +'<td style="white-space:nowrap;color:var(--faint)">last: '+fmtDate(r.last)+'</td></tr>').join('');
+
+  const noteRows = notes.map(n=>
+    '<div class="log-entry"><span class="when">'+fmtTime(n.e.t)+'</span>'
+    +'<span class="what"><b>'+esc(n.st.last)+', '+esc(n.st.first)+'</b> <span style="color:var(--faint)">('+className(n.c)+')</span> — '+esc(n.e.note)+'</span></div>').join('');
+
+  const adjRows = adjusts.map(a=>
+    '<div class="log-entry"><span class="when">'+fmtTime(a.e.t)+'</span>'
+    +'<span class="what"><b>'+esc(a.st.last)+', '+esc(a.st.first)+'</b> score corrected '+a.e.from+' → '+a.e.to+(a.e.note?' — '+esc(a.e.note):'')+'</span></div>').join('');
+
+  return ''
+    +'<div class="page-head"><h1>Daily Report — '+new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'})+'</h1>'
+    +'<p>'+esc(S.win.name)+' · all classes</p></div>'
+    +'<div class="toolbar no-print"><button class="btn ghost sm" onclick="go({name:\'home\'})">← Back</button>'
+    +'<span class="spacer"></span><button class="btn primary" onclick="window.print()">🖨 Print this report</button></div>'
+
+    +'<div class="rep-stats">'
+    +'<div class="stat r"><b>'+deducts.length+'</b><span>deductions today</span></div>'
+    +'<div class="stat r"><b>'+ptsLost+'</b><span>points taken today</span></div>'
+    +'<div class="stat a"><b>'+followups.length+'</b><span>consequence follow-ups</span></div>'
+    +'<div class="stat a"><b>'+repeats.length+'</b><span>repeat issues this window</span></div>'
+    +'<div class="stat g"><b>'+notes.length+'</b><span>positive notes today</span></div>'
+    +'</div>'
+
+    +'<div class="card rep-sec"><h3>⚠ Consequence follow-ups today</h3>'
+    +(fuRows ? '<table><thead><tr><th>Student</th><th>Consequence</th><th>What happened</th><th>When</th></tr></thead><tbody>'+fuRows+'</tbody></table>'
+             : '<div class="rep-empty">No students crossed a consequence line today.</div>')+'</div>'
+
+    +'<div class="card rep-sec"><h3>Every point deduction today</h3>'
+    +(dedRows ? '<table><thead><tr><th>Time</th><th>Student</th><th>Behavior</th><th>Points</th><th>New score</th></tr></thead><tbody>'+dedRows+'</tbody></table>'
+              : '<div class="rep-empty">No points were taken today.</div>')+'</div>'
+
+    +'<div class="card rep-sec"><h3>Repeat behavior issues — '+esc(S.win.name)+'</h3>'
+    +(repRows ? '<table><thead><tr><th>Student</th><th>Behavior</th><th>Times</th><th>Most recent</th></tr></thead><tbody>'+repRows+'</tbody></table>'
+              : '<div class="rep-empty">No student has repeated the same infraction this window.</div>')+'</div>'
+
+    +'<div class="card rep-sec"><h3>★ Positive moments today</h3>'
+    +(noteRows || '<div class="rep-empty">No positive notes recorded today — catch somebody doing something right tomorrow!</div>')+'</div>'
+
+    +(adjRows ? '<div class="card rep-sec"><h3>Manual score corrections today</h3>'+adjRows+'</div>' : '');
+}
+
+/* ================= WINDOWS / ARCHIVES ================= */
+function newWindowModal(){
+  const m = /^(.*?)(\d+)\s*$/.exec(S.win.name);
+  const suggestion = m ? m[1] + (parseInt(m[2],10)+1) : '';
+  modal('<h3>Archive "'+esc(S.win.name)+'" and start a new window?</h3>'
+    +'<div class="hint">The current window (scores + full history) is saved to Archives, your rosters stay exactly as they are, and every student starts the new window fresh at '+S.settings.startingScore+' points.</div>'
+    +'<label class="fl">Name of the new window</label>'
+    +'<input type="text" id="nw-name" value="'+esc(suggestion)+'" placeholder="e.g. Quarter 2, Fall Semester, Oct 6 – Nov 14">'
+    +'<div class="mbtns"><button class="btn ghost" onclick="closeModal()">Cancel</button>'
+    +'<button class="btn primary" onclick="startNewWindow()">Archive &amp; start new</button></div>');
+}
+function startNewWindow(){
+  const name = $('#nw-name').value.trim();
+  if(!name){ toast('Give the new window a name'); return; }
+  S.archives.push({
+    name: S.win.name,
+    started: S.win.started,
+    archived: new Date().toISOString(),
+    startingScore: S.settings.startingScore,
+    classes: JSON.parse(JSON.stringify(S.classes))
+  });
+  for(const c of S.classes){ for(const st of c.students){ st.score = S.settings.startingScore; st.log = []; } }
+  S.win = { name, started: new Date().toISOString() };
+  save(); closeModal(); go({name:'home'});
+  toast('"'+name+'" started — previous window is in Archives');
+}
+function archivesHTML(){
+  const rows = S.archives.slice().reverse().map((a,ri)=>{
+    const i = S.archives.length - 1 - ri;
+    const nStu = a.classes.reduce((s,c)=>s+c.students.length,0);
+    const nDed = a.classes.reduce((s,c)=>s+c.students.reduce((x,st)=>x+st.log.filter(e=>e.type==='deduct').length,0),0);
+    return '<tr style="cursor:pointer" onclick="go({name:\'archive\',i:'+i+'})">'
+      +'<td><b>'+esc(a.name)+'</b></td>'
+      +'<td>'+fmtDate(a.started)+' – '+fmtDate(a.archived)+'</td>'
+      +'<td>'+a.classes.length+' classes · '+nStu+' students</td>'
+      +'<td>'+nDed+' deductions</td>'
+      +'<td style="text-align:right"><span class="btn ghost xs">Open →</span></td></tr>';
+  }).join('');
+  return '<div class="page-head"><h1>Archives</h1><p>Past grading windows — read-only.</p></div>'
+    +'<div class="toolbar"><button class="btn ghost sm" onclick="go({name:\'home\'})">← Back</button></div>'
+    +'<div class="card">'+(rows ? '<table><tbody>'+rows+'</tbody></table>' : '<div class="rep-empty">Nothing archived yet.</div>')+'</div>';
+}
+function archiveHTML(i){
+  const a = S.archives[i];
+  if(!a) return archivesHTML();
+  const secs = a.classes.map(c=>{
+    const rows = c.students.slice().sort((x,y)=>(x.last||'').localeCompare(y.last||'')).map(st=>{
+      const ded = st.log.filter(e=>e.type==='deduct');
+      const pos = st.log.filter(e=>e.type==='note').length;
+      return '<tr><td>'+esc(st.last)+', '+esc(st.first)+'</td>'
+        +'<td><span class="score '+scoreClass(st.score)+'">'+st.score+'</span></td>'
+        +'<td>'+ded.length+'</td><td>'+ded.reduce((s,e)=>s+e.pts,0)+'</td><td>'+pos+'</td></tr>';
+    }).join('');
+    return '<div class="card rep-sec"><h3>'+className(c)+'</h3>'
+      +'<table><thead><tr><th>Student</th><th>Final score</th><th>Deductions</th><th>Points lost</th><th>Positive notes</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  }).join('');
+  return '<div class="page-head"><h1>'+esc(a.name)+'</h1><p>'+fmtDate(a.started)+' – '+fmtDate(a.archived)+' · archived window (read-only)</p></div>'
+    +'<div class="toolbar no-print"><button class="btn ghost sm" onclick="go({name:\'archives\'})">← Archives</button>'
+    +'<span class="spacer"></span><button class="btn ghost sm" onclick="window.print()">🖨 Print</button></div>'
+    + secs;
+}
+
+/* ================= backup / restore ================= */
+function backup(){
+  const blob = new Blob([JSON.stringify(S, null, 1)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'class-manager-backup-'+dayKey()+'.json';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+  toast('Backup file downloaded');
+}
+function restorePick(){ $('#restore-file').click(); }
+function restoreFile(input){
+  const f = input.files && input.files[0];
+  if(!f) return;
+  const rd = new FileReader();
+  rd.onload = ()=>{
+    try{
+      const s = JSON.parse(rd.result);
+      if(!s || !s.settings || !Array.isArray(s.classes)) throw new Error('bad file');
+      window._pendingRestore = s;
+      modal('<h3>Restore from backup?</h3><div class="hint">This replaces everything currently in Class Manager on this device with the backup ('+s.classes.length+' classes, window "'+esc(s.win && s.win.name || '?')+'").</div>'
+        +'<div class="mbtns"><button class="btn ghost" onclick="closeModal()">Cancel</button>'
+        +'<button class="btn danger" onclick="reallyRestore()">Replace with backup</button></div>');
+    }catch(e){ toast('That file doesn\'t look like a Class Manager backup'); }
+    input.value = '';
+  };
+  rd.readAsText(f);
+}
+function reallyRestore(){
+  if(!window._pendingRestore) return;
+  S = window._pendingRestore; window._pendingRestore = null;
+  save(); closeModal(); go({name:'home'});
+  toast('Backup restored');
+}
+
+/* expose for inline handlers */
+Object.assign(window, { go, newClassModal, createClass, editClassModal, saveClassEdit, deleteClass, reallyDeleteClass,
+  previewRoster, confirmRoster, pasteMoreModal, addStudentModal, addStudent,
+  deductModal, deduct, noteModal, saveNote, adjustModal, saveAdjust, historyModal, undoEntry, removeStudent, reallyRemoveStudent,
+  addInfRow, addThRow, restoreSuggestedInf, saveSettings, newWindowModal, startNewWindow,
+  backup, restorePick, restoreFile, reallyRestore, closeModal });
+
+render();
+</script>
+</body>
+</html>
