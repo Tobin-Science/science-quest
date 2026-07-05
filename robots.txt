@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Private / account / functional pages — keep out of search results
+Disallow: /feedback-admin.html
+Disallow: /dashboard.html
+Disallow: /auth.html
+Disallow: /play.html
+Disallow: /recover.html
+Disallow: /welcome.html
+Disallow: /1v1/recover.html
+Disallow: /1v1/thanks.html
+Disallow: /1v1/cherokee.html
+Disallow: /api/
+
+Sitemap: https://tobinscience.com/sitemap.xml
