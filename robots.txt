@@ -13,4 +13,4 @@ Disallow: /1v1/thanks.html
 Disallow: /1v1/cherokee.html
 Disallow: /api/
 
-Sitemap: https://tobinscience.com/sitemap.xml
+Sitemap: https://www.tobinscience.com/sitemap.xml
