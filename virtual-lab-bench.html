@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<title>Virtual Lab Bench — free interactive Physical Science labs | Tobin Science</title>
+<meta name="description" content="Nine free interactive Physical Science labs for 8th grade and high school: density, motion graphs, F=ma, waves, circuits, phase changes, energy, electromagnets, and half-life. Students measure with virtual equipment and every student gets different numbers. Works on any Chromebook.">
+<meta property="og:title" content="Virtual Lab Bench — free interactive science labs">
+<meta property="og:description" content="Nine hands-on virtual labs for Physical Science. Real measurements, per-student randomized data, teacher-verifiable progress codes. Free for any teacher.">
+<meta property="og:image" content="https://tobinscience.com/virtual-lab-cover.jpg">
+<meta property="og:url" content="https://tobinscience.com/virtual-lab-bench.html">
+<meta property="og:type" content="website">
+<style>
+:root{
+  --bg:#0e1a2b; --panel:#16283f; --panel2:#1d3350; --ink:#eaf2fb; --dim:#9fb4cc;
+  --accent:#38bdf8; --gold:#fbbf24; --green:#34d399; --red:#f87171; --purple:#a78bfa;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{background:var(--bg); color:var(--ink); font-family:"Segoe UI",system-ui,Arial,sans-serif; min-height:100vh;}
+.wrap{max-width:1020px; margin:0 auto; padding:16px;}
+h1{font-size:1.7em; letter-spacing:.5px;}
+h2{font-size:1.25em;}
+.dim{color:var(--dim);}
+button{font-family:inherit; cursor:pointer; border:none; border-radius:10px; font-size:1em;}
+.btn{background:var(--accent); color:#082033; font-weight:700; padding:10px 18px; transition:transform .1s;}
+.btn:hover{transform:translateY(-2px);}
+.btn.gray{background:#33507a; color:var(--ink);}
+.btn.gold{background:var(--gold); color:#3a2a00;}
+.btn.green{background:var(--green); color:#03301f;}
+.btn.small{padding:6px 12px; font-size:.9em;}
+.btn:disabled{opacity:.45; cursor:default; transform:none;}
+.card{background:var(--panel); border:1px solid #2a4568; border-radius:16px; padding:16px;}
+input[type=text],input[type=number]{background:#0c1626; border:2px solid #2a4568; color:var(--ink); border-radius:8px; padding:8px 10px; font-size:1em; font-family:inherit;}
+input[type=number]{width:110px;}
+input:focus{outline:none; border-color:var(--accent);}
+input[type=range]{accent-color:var(--accent); width:170px; vertical-align:middle;}
+/* ---------- home ---------- */
+#homeHead{text-align:center; padding:22px 10px 8px;}
+#homeHead .flask{font-size:2.6em;}
+#nameGate{max-width:430px; margin:26px auto; text-align:center;}
+#nameGate input{width:100%; margin:12px 0; text-align:center; font-size:1.1em;}
+#labGrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-top:16px;}
+.labCard{position:relative; text-align:left; padding:16px; border-radius:16px; border:2px solid #2a4568; background:var(--panel); color:var(--ink); transition:transform .12s,border-color .12s;}
+.labCard:hover{transform:translateY(-3px); border-color:var(--accent);}
+.labCard .ic{font-size:2.1em;}
+.labCard h3{margin:6px 0 4px; font-size:1.12em;}
+.labCard .std{display:inline-block; background:#0c1626; color:var(--accent); border-radius:999px; padding:2px 10px; font-size:.75em; margin-top:8px; margin-right:4px;}
+.labCard .done{position:absolute; top:10px; right:12px; font-size:1.5em;}
+.labCard.complete{border-color:var(--gold);}
+#progressBar{background:#0c1626; border-radius:999px; height:14px; overflow:hidden; margin:14px 0 4px;}
+#progressFill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--gold)); transition:width .5s;}
+#codeBox{margin-top:14px;}
+.codeChip{font-family:Consolas,monospace; font-size:1.15em; background:#0c1626; border:1px dashed var(--gold); color:var(--gold); padding:8px 14px; border-radius:10px; display:inline-block; letter-spacing:1px;}
+details.teach{margin-top:22px;}
+details.teach summary{cursor:pointer; color:var(--dim); font-size:.9em;}
+/* ---------- lab view ---------- */
+#labHead{display:flex; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap;}
+#labHead h2{flex:1;}
+#simCard{padding:10px;}
+canvas{width:100%; border-radius:12px; display:block; background:#0a1420; touch-action:manipulation;}
+#controls{display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:12px 6px 4px;}
+#controls .cgroup{background:var(--panel2); border-radius:10px; padding:8px 12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+#controls label{font-size:.92em; color:var(--dim); font-weight:600;}
+#controls .val{min-width:52px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums;}
+#workRow{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px;}
+@media(max-width:760px){#workRow{grid-template-columns:1fr;}}
+.qrow{margin:12px 0; padding:10px; background:var(--panel2); border-radius:10px; border-left:4px solid #2a4568;}
+.qrow.right{border-left-color:var(--green);}
+.qrow.wrong{animation:shake .3s;}
+.qrow .qtext{margin-bottom:8px; line-height:1.35;}
+.qrow .mark{font-weight:800; margin-left:8px;}
+.qrow .hint{color:var(--gold); font-size:.85em; margin-top:6px; display:none;}
+.mcopt{display:block; width:100%; text-align:left; margin:5px 0; padding:8px 12px; border-radius:8px; background:#0c1626; color:var(--ink); border:2px solid #2a4568;}
+.mcopt:hover{border-color:var(--accent);}
+.mcopt.right{border-color:var(--green); background:#0d2e22;}
+.mcopt.wrong{border-color:var(--red); background:#331416;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+#doneBanner{display:none; margin-top:14px; text-align:center; padding:18px; border:2px solid var(--gold); border-radius:16px; background:#241d05;}
+#doneBanner h2{color:var(--gold);}
+.pill{display:inline-block; background:#0c1626; border-radius:999px; padding:3px 12px; font-size:.8em; color:var(--dim); margin:2px;}
+.big{font-size:1.5em;}
+#allDone{display:none; border:2px solid var(--gold); background:#241d05; text-align:center; padding:18px; border-radius:16px; margin-top:16px;}
+.readout{font-family:Consolas,monospace; background:#04121f; color:#7dd3fc; border-radius:8px; padding:4px 10px; font-size:1.05em; border:1px solid #1e3a5c;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ================= HOME ================= -->
+<div id="home">
+  <div id="homeHead">
+    <div class="flask">⚗️</div>
+    <h1>Tobin Science — Virtual Lab Bench</h1>
+    <div class="dim">Real measurements. Real data. Your numbers are different from everyone else's — so do the lab!</div>
+  </div>
+
+  <div id="nameGate" class="card">
+    <h2>🥽 Sign in to the lab</h2>
+    <div class="dim">First and last name (this is how your teacher gives you credit)</div>
+    <input type="text" id="nameInput" maxlength="24" placeholder="e.g. Jordan Smith" autocomplete="off">
+    <button class="btn" id="nameGo">Enter the Lab →</button>
+  </div>
+
+  <div id="homeMain" style="display:none">
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <h2 style="flex:1">🧑‍🔬 Scientist: <span id="whoName" style="color:var(--accent)"></span></h2>
+        <button class="btn gray small" id="switchUser">Switch user</button>
+      </div>
+      <div id="progressBar"><div id="progressFill"></div></div>
+      <div class="dim" id="progressText"></div>
+      <div id="codeBox">
+        <span class="dim">Progress code for your teacher: </span>
+        <span class="codeChip" id="progCode"></span>
+      </div>
+    </div>
+
+    <div id="allDone">
+      <h2 style="color:var(--gold)">🏆 MASTER SCIENTIST — ALL LABS COMPLETE!</h2>
+      <div style="margin-top:6px">Show your teacher the progress code above for full credit.</div>
+    </div>
+
+    <div id="labGrid"></div>
+
+    <details class="teach">
+      <summary>🔑 Teacher Tools</summary>
+      <div class="card" style="margin-top:8px">
+        <b>Verify a progress code</b>
+        <div style="margin:8px 0"><input type="text" id="verifyIn" placeholder="Paste student code" style="width:260px"> <button class="btn small" id="verifyBtn">Check</button></div>
+        <div id="verifyOut" class="dim"></div>
+        <hr style="border-color:#2a4568; margin:12px 0">
+        <div class="dim">Codes encode the student's name, which labs are complete, and the date — they can't be shared between students. Each student's measurements are randomized from their name, so answers can't be copied either.</div>
+        <div style="margin-top:10px"><button class="btn gray small" id="resetDevice">Reset all data on this device</button></div>
+      </div>
+    </details>
+  </div>
+</div>
+
+<!-- ================= LAB VIEW ================= -->
+<div id="labView" style="display:none">
+  <div id="labHead">
+    <button class="btn gray" id="backBtn">← Lab Bench</button>
+    <h2 id="labTitle"></h2>
+    <span id="labStd" class="pill"></span>
+  </div>
+  <div class="card" id="simCard">
+    <div class="dim" id="labGoal" style="padding:2px 6px 10px; line-height:1.4;"></div>
+    <canvas id="cv" width="900" height="400"></canvas>
+    <div id="controls"></div>
+  </div>
+  <div id="workRow">
+    <div class="card">
+      <h2>📓 Lab Notebook</h2>
+      <div class="dim" style="margin:4px 0 6px">Use the equipment above to measure, then record your data.</div>
+      <div id="nbArea"></div>
+    </div>
+    <div class="card">
+      <h2>✅ Checkpoint</h2>
+      <div class="dim" style="margin:4px 0 6px">Prove you've got it.</div>
+      <div id="cpArea"></div>
+    </div>
+  </div>
+  <div id="doneBanner">
+    <h2>⭐ LAB COMPLETE! ⭐</h2>
+    <div style="margin-top:6px">Great science! Your progress code has been updated on the Lab Bench.</div>
+    <button class="btn gold" style="margin-top:10px" id="doneBack">← Back to the Lab Bench</button>
+  </div>
+</div>
+
+</div>
+<script>
+"use strict";
+/* ============ util ============ */
+const $=id=>document.getElementById(id);
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(rng,arr){return arr[Math.floor(rng()*arr.length)];}
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function fmt(n){return Math.abs(n-Math.round(n))<1e-9?String(Math.round(n)):String(Math.round(n*100)/100);}
+
+/* ============ state ============ */
+const LABIDS=["density","motion","force","waves","circuit","heat","energy","magnet","decay"];
+let S=null;
+function loadS(){try{S=JSON.parse(localStorage.getItem("tvl_state"))||null;}catch(e){S=null;}
+  if(!S)S={name:"",users:{}};if(!S.users)S.users={};}
+function userLabs(){const k=S.name.toLowerCase();if(!S.users[k])S.users[k]={};return S.users[k];}
+function saveS(){localStorage.setItem("tvl_state",JSON.stringify(S));}
+loadS();
+
+/* ============ progress code ============ */
+function encodeCode(name,mask){
+  const d=new Date(),ds=String(d.getFullYear()%100).padStart(2,"0")+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+  const s=name.toUpperCase().slice(0,24)+"|"+mask+"|"+ds;
+  let k=7,out="",sum=0;
+  for(const ch of s){const c=ch.charCodeAt(0);sum+=c;out+=(c^k).toString(36).padStart(2,"0");k=(k*3+c)%29+1;}
+  return ("TVL-"+out+"-"+(sum%1296).toString(36).padStart(2,"0")).toUpperCase();
+}
+function decodeCode(code){
+  try{
+    const m=code.trim().toUpperCase().match(/^TVL-([0-9A-Z]+)-([0-9A-Z]{2})$/);if(!m)return null;
+    const body=m[1].toLowerCase();if(body.length%2)return null;
+    let k=7,s="",sum=0;
+    for(let i=0;i<body.length;i+=2){const v=parseInt(body.slice(i,i+2),36);const c=v^k;s+=String.fromCharCode(c);sum+=c;k=(k*3+c)%29+1;}
+    if((sum%1296).toString(36).padStart(2,"0").toUpperCase()!==m[2])return null;
+    const parts=s.split("|");if(parts.length!==3)return null;
+    return {name:parts[0],mask:parseInt(parts[1],10),date:parts[2]};
+  }catch(e){return null;}
+}
+
+/* ============ lab registry ============ */
+const LABS={};
+function defLab(id,meta){LABS[id]=meta;}
+
+/* ============ home screen ============ */
+function doneCount(){const L=userLabs();return LABIDS.filter(id=>L[id]&&L[id].done).length;}
+function maskVal(){const L=userLabs();let m=0;LABIDS.forEach((id,i)=>{if(L[id]&&L[id].done)m|=(1<<i);});return m;}
+function renderHome(){
+  $("home").style.display="block";$("labView").style.display="none";
+  stopLoop();
+  if(!S.name){$("nameGate").style.display="block";$("homeMain").style.display="none";return;}
+  $("nameGate").style.display="none";$("homeMain").style.display="block";
+  $("whoName").textContent=S.name;
+  const n=doneCount();
+  $("progressFill").style.width=(n/LABIDS.length*100)+"%";
+  $("progressText").textContent=n+" of "+LABIDS.length+" labs complete";
+  $("progCode").textContent=encodeCode(S.name,maskVal());
+  $("allDone").style.display=n===LABIDS.length?"block":"none";
+  const g=$("labGrid");g.innerHTML="";
+  LABIDS.forEach(id=>{
+    const L=LABS[id],done=userLabs()[id]&&userLabs()[id].done;
+    const b=document.createElement("button");
+    b.className="labCard"+(done?" complete":"");
+    b.innerHTML='<span class="ic">'+L.icon+'</span>'+(done?'<span class="done">⭐</span>':'')+
+      '<h3>'+L.title+'</h3><div class="dim" style="font-size:.9em">'+L.blurb+'</div>'+
+      L.std.map(s=>'<span class="std">'+s+'</span>').join("");
+    b.onclick=()=>openLab(id);
+    g.appendChild(b);
+  });
+}
+$("nameGo").onclick=()=>{const v=$("nameInput").value.trim().replace(/[^A-Za-z .'-]/g,"");if(v.length<3){alert("Please type your first and last name.");return;}S.name=v;saveS();renderHome();};
+$("nameInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("nameGo").click();});
+$("switchUser").onclick=()=>{if(confirm("Switch user? Your progress is saved under your name.")){S.name="";saveS();renderHome();}};
+$("verifyBtn").onclick=()=>{
+  const r=decodeCode($("verifyIn").value);
+  if(!r){$("verifyOut").innerHTML='<span style="color:var(--red)">❌ Invalid or altered code.</span>';return;}
+  const labs=LABIDS.filter((id,i)=>r.mask&(1<<i)).map(id=>LABS[id].icon+" "+LABS[id].title);
+  $("verifyOut").innerHTML='✅ <b style="color:var(--green)">'+r.name+'</b> — '+(labs.length?labs.length+"/"+LABIDS.length+" complete ("+labs.join(", ")+")":"no labs complete yet")+' — 20'+r.date.slice(0,2)+"-"+r.date.slice(2,4)+"-"+r.date.slice(4,6);
+};
+$("resetDevice").onclick=()=>{if(confirm("Erase ALL saved progress on this device?")){localStorage.removeItem("tvl_state");loadS();renderHome();}};
+
+/* ============ lab shell ============ */
+const cv=$("cv"),ctx=cv.getContext("2d");
+let cur=null,rafId=null,lastT=0;
+function stopLoop(){if(rafId){cancelAnimationFrame(rafId);rafId=null;}cur=null;}
+function loop(t){if(!cur)return;const dt=Math.min(.05,(t-lastT)/1000||0);lastT=t;cur.tick(dt);rafId=requestAnimationFrame(loop);}
+function ctrlGroup(html){const d=document.createElement("div");d.className="cgroup";d.innerHTML=html;$("controls").appendChild(d);return d;}
+function slider(labl,min,max,step,val,unit,oninput){
+  const g=ctrlGroup('<label>'+labl+'</label><input type="range" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"><span class="val">'+fmt(val)+unit+'</span>');
+  const r=g.querySelector("input"),v=g.querySelector(".val");
+  r.addEventListener("input",()=>{v.textContent=fmt(parseFloat(r.value))+unit;oninput(parseFloat(r.value));});
+  return r;
+}
+function cbtn(txt,cls,fn){const b=document.createElement("button");b.className="btn "+cls;b.textContent=txt;b.onclick=fn;$("controls").appendChild(b);return b;}
+
+function openLab(id){
+  const L=LABS[id];
+  $("home").style.display="none";$("labView").style.display="block";
+  $("labTitle").textContent=L.icon+" "+L.title;
+  $("labStd").textContent=L.std.join(" · ");
+  $("labGoal").innerHTML="🎯 <b>Mission:</b> "+L.goal;
+  $("controls").innerHTML="";$("doneBanner").style.display="none";
+  window.scrollTo(0,0);
+  const rng=mulberry32(hashStr(S.name.toLowerCase()+"|"+id));
+  stopLoop();
+  const inst=L.build(rng);   // {tick, nb:[fields], cp:[questions]}
+  cur=inst;lastT=performance.now();rafId=requestAnimationFrame(loop);
+  buildQuestions(id,inst);
+}
+$("backBtn").onclick=renderHome;
+$("doneBack").onclick=renderHome;
+
+/* ---- notebook + checkpoint rendering & grading ---- */
+function buildQuestions(id,inst){
+  const UL=userLabs();const st=UL[id]||(UL[id]={done:false,nb:[],cp:[]});
+  if(st.nb.length!==inst.nb.length)st.nb=inst.nb.map(()=>false);
+  if(st.cp.length!==inst.cp.length)st.cp=inst.cp.map(()=>false);
+  renderQ($("nbArea"),inst.nb,st.nb,id,"nb");
+  renderQ($("cpArea"),inst.cp,st.cp,id,"cp");
+  checkDone(id,inst);
+}
+function renderQ(area,qs,stArr,id,kind){
+  area.innerHTML="";
+  qs.forEach((q,i)=>{
+    const row=document.createElement("div");row.className="qrow"+(stArr[i]?" right":"");
+    let inner='<div class="qtext">'+q.q+'</div>';
+    if(stArr[i]){
+      inner+='<div style="color:var(--green);font-weight:700">✔ '+(q.type==="num"?fmt(q.a)+(q.unit||""):q.opts[q.a])+'</div>';
+      row.innerHTML=inner;area.appendChild(row);return;
+    }
+    if(q.type==="num"){
+      inner+='<input type="number" step="any" placeholder="?"> <span class="dim">'+(q.unit||"")+'</span> <button class="btn small">Check</button><span class="mark"></span><div class="hint">💡 '+q.hint+'</div>';
+      row.innerHTML=inner;area.appendChild(row);
+      const inp=row.querySelector("input"),btn=row.querySelector("button"),mark=row.querySelector(".mark");
+      let tries=0;
+      const go=()=>{
+        const v=parseFloat(inp.value);if(isNaN(v))return;
+        if(Math.abs(v-q.a)<=q.tol){stArr[i]=true;saveS();row.className="qrow right";row.innerHTML='<div class="qtext">'+q.q+'</div><div style="color:var(--green);font-weight:700">✔ '+fmt(q.a)+(q.unit||"")+'</div>';checkDone(id,cur);}
+        else{tries++;mark.textContent="✖ try again";mark.style.color="var(--red)";row.classList.remove("wrong");void row.offsetWidth;row.classList.add("wrong");if(tries>=2)row.querySelector(".hint").style.display="block";}
+      };
+      btn.onclick=go;inp.addEventListener("keydown",e=>{if(e.key==="Enter")go();});
+    }else{ // mc
+      row.innerHTML=inner;
+      q.opts.forEach((opt,oi)=>{
+        const b=document.createElement("button");b.className="mcopt";b.textContent=opt;
+        b.onclick=()=>{
+          if(oi===q.a){stArr[i]=true;saveS();b.classList.add("right");setTimeout(()=>{row.className="qrow right";row.innerHTML='<div class="qtext">'+q.q+'</div><div style="color:var(--green);font-weight:700">✔ '+q.opts[q.a]+'</div>';checkDone(id,cur);},350);}
+          else{b.classList.add("wrong");b.disabled=true;row.classList.remove("wrong");void row.offsetWidth;row.classList.add("wrong");}
+        };
+        row.appendChild(b);
+      });
+      area.appendChild(row);
+    }
+  });
+}
+function checkDone(id,inst){
+  const st=userLabs()[id];
+  if(st.nb.every(Boolean)&&st.cp.every(Boolean)&&!st.done){
+    st.done=true;saveS();$("doneBanner").style.display="block";$("doneBanner").scrollIntoView({behavior:"smooth"});
+  }else if(st.done){$("doneBanner").style.display="block";}
+}
+
+/* ---- shared canvas helpers ---- */
+function clearCv(top){const g=ctx.createLinearGradient(0,0,0,400);g.addColorStop(0,top||"#0d1f33");g.addColorStop(1,"#0a1420");ctx.fillStyle=g;ctx.fillRect(0,0,900,400);}
+function label(txt,x,y,size,col,align){ctx.fillStyle=col||"#9fb4cc";ctx.font=(size||14)+"px Segoe UI";ctx.textAlign=align||"left";ctx.fillText(txt,x,y);ctx.textAlign="left";}
+function meter(x,y,w,title,value,col){
+  ctx.fillStyle="#04121f";rr(ctx,x,y,w,52,8);ctx.fill();ctx.strokeStyle="#1e3a5c";ctx.stroke();
+  label(title,x+w/2,y+18,12,"#9fb4cc","center");
+  label(value,x+w/2,y+42,18,col||"#7dd3fc","center");
+}
+
+/* =========================================================
+   LAB 1 — DENSITY DIVE
+========================================================= */
+defLab("density",{
+  icon:"🧊",title:"Density Dive",blurb:"Weigh, dunk, and measure four mystery blocks — then predict which ones float.",
+  std:["S8P1c","SPS2"],
+  goal:"Click a block to pick it up, then use the <b>balance</b> (mass), the <b>graduated cylinder</b> (volume by water displacement), and the <b>tank</b> to test each block. Density = mass ÷ volume.",
+  build(rng){
+    const vols=[20,25,30,40,50,60];
+    const blocks=[
+      {n:"A",col:"#d9a066",d:pick(rng,[0.4,0.55,0.7])},
+      {n:"B",col:"#7dd3fc",d:pick(rng,[1.3,1.6,2.0])},
+      {n:"C",col:"#a3e635",d:pick(rng,[0.95,0.96,0.98])},
+      {n:"D",col:"#c4b5fd",d:pick(rng,[2.7,4.5,7.9])}
+    ];
+    blocks.forEach(b=>{b.v=pick(rng,vols);b.m=Math.round(b.d*b.v*10)/10;});
+    let sel=-1,station="",anim=0,dropY=0;
+    // block home positions
+    const homes=[[70,340],[150,340],[230,340],[310,340]];
+    cv.onclick=e=>{
+      const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*900/r.width,y=(e.clientY-r.top)*400/r.height;
+      blocks.forEach((b,i)=>{const[hx,hy]=homes[i];if(x>hx-28&&x<hx+28&&y>hy-28&&y<hy+28){sel=i;station="";}});
+    };
+    cbtn("⚖️ Balance","gray",()=>{if(sel>=0){station="bal";}});
+    cbtn("🧪 Cylinder","gray",()=>{if(sel>=0){station="cyl";}});
+    cbtn("🌊 Drop in Tank","",()=>{if(sel>=0){station="tank";anim=0;dropY=70;}});
+    ctrlGroup('<label>Tip: water = 1.0 g/cm³ · cylinder starts at 100 mL</label>');
+    function drawBlock(b,x,y,s){s=s||44;ctx.fillStyle=b.col;rr(ctx,x-s/2,y-s/2,s,s,7);ctx.fill();ctx.strokeStyle="rgba(255,255,255,.5)";ctx.lineWidth=2;ctx.stroke();ctx.lineWidth=1;label(b.n,x,y+6,18,"#08202f","center");}
+    const nb=blocks.map((b,i)=>({type:"num",q:"Density of Block <b>"+b.n+"</b>? (measure mass & volume first!)",a:Math.round(b.m/b.v*100)/100,tol:0.06,unit:" g/cm³",hint:"density = mass ÷ volume = "+fmt(b.m)+" ÷ "+fmt(b.v)}));
+    const nm=Math.round((pick(rng,[24,36,48])),0),nv=pick(rng,[8,12,16]);
+    const cp=[
+      {type:"mc",q:"Vegetable oil has a density of 0.92 g/cm³. Which block would <b>float in oil</b>?",opts:["Block A","Block B","Block C","Block D"],a:0},
+      {type:"num",q:"A new block has a mass of "+nm+" g and a volume of "+nv+" cm³. What is its density?",a:Math.round(nm/nv*100)/100,tol:0.05,unit:" g/cm³",hint:"mass ÷ volume"},
+      {type:"mc",q:"You cut Block D exactly in half. The density of each half is…",opts:["Half as much","Twice as much","The same","Zero"],a:2}
+    ];
+    return{nb,cp,tick(dt){
+      clearCv();
+      label("DENSITY DIVE — pick a block, then choose a station",20,28,15,"#eaf2fb");
+      // tray
+      ctx.fillStyle="#152a44";rr(ctx,30,300,320,80,12);ctx.fill();
+      label("Mystery Blocks (click one)",40,294,12);
+      blocks.forEach((b,i)=>{const[hx,hy]=homes[i];if(sel===i&&station){/* at station */}else drawBlock(b,hx,hy);if(sel===i){ctx.strokeStyle="#fbbf24";ctx.lineWidth=3;ctx.strokeRect(hx-30,hy-30,60,60);ctx.lineWidth=1;}});
+      // balance
+      ctx.fillStyle="#152a44";rr(ctx,390,120,150,180,12);ctx.fill();
+      label("⚖️ Balance",465,145,14,"#eaf2fb","center");
+      ctx.fillStyle="#33507a";rr(ctx,420,250,90,14,4);ctx.fill();ctx.fillRect(460,264,10,24);ctx.fillRect(430,288,70,8);
+      if(sel>=0&&station==="bal"){meter(400,158,130,"MASS (g)",fmt(blocks[sel].m),"#fbbf24");drawBlock(blocks[sel],465,228);}
+      else meter(400,158,130,"MASS (g)","---");
+      // cylinder
+      ctx.fillStyle="#152a44";rr(ctx,570,80,140,220,12);ctx.fill();
+      label("🧪 Cylinder (mL)",640,105,14,"#eaf2fb","center");
+      const cx=615,cw=50,cb=285,ch=160; // cylinder body
+      ctx.strokeStyle="#7dd3fc";ctx.strokeRect(cx,cb-ch,cw,ch);
+      const base=100,lvl=sel>=0&&station==="cyl"?base+blocks[sel].v:base;
+      const wh=lvl/200*ch;
+      ctx.fillStyle="rgba(56,189,248,.35)";ctx.fillRect(cx+1,cb-wh,cw-2,wh-1);
+      for(let ml=50;ml<=200;ml+=50){const y=cb-ml/200*ch;ctx.strokeStyle="#33507a";ctx.beginPath();ctx.moveTo(cx,y);ctx.lineTo(cx+8,y);ctx.stroke();label(ml,cx+12,y+4,10);}
+      if(sel>=0&&station==="cyl")drawBlock(blocks[sel],cx+cw/2,cb-wh+18,26);
+      label("reads: "+fmt(lvl)+" mL",640,120,12,"#7dd3fc","center");
+      // tank
+      ctx.fillStyle="#152a44";rr(ctx,740,60,140,240,12);ctx.fill();
+      label("🌊 Water Tank",810,85,14,"#eaf2fb","center");
+      ctx.fillStyle="rgba(56,189,248,.3)";ctx.fillRect(752,140,116,150);
+      ctx.strokeStyle="#7dd3fc";ctx.strokeRect(752,140,116,150);
+      if(sel>=0&&station==="tank"){
+        const b=blocks[sel];anim+=dt;
+        const floatY=155,sinkY=272;
+        const target=b.d<1?floatY:sinkY;
+        dropY+=(target-dropY)*Math.min(1,dt*2.2);
+        drawBlock(b,810,Math.max(110,dropY),36);
+        if(anim>1)label(b.d<1?"FLOATS! (d < 1)":"SINKS! (d > 1)",810,320,13,b.d<1?"#34d399":"#f87171","center");
+      }
+      if(sel<0)label("👆 Click a block in the tray to begin",450,375,14,"#fbbf24","center");
+      else label("Holding Block "+blocks[sel].n+" — choose a station button below",450,375,13,"#fbbf24","center");
+    }};
+  }
+});
+
+/* =========================================================
+   LAB 2 — MOTION GRAPHER
+========================================================= */
+defLab("motion",{
+  icon:"🏎️",title:"Motion Grapher",blurb:"Drive a rover and watch its position-time graph draw itself live. Then catch the Mystery Runner.",
+  std:["S8P3a","SPS8"],
+  goal:"Use the speed slider and <b>Start</b> to drive the rover — its position-time graph draws live. Then press <b>Mystery Runner</b> and use the graph to find its speed (speed = distance ÷ time).",
+  build(rng){
+    let speed=5,run=false,t=0,x=0,trace=[],myst=false,mtrace=[],mx=0;
+    const mv=pick(rng,[2,2.5,3,4,5,6]); // mystery speed
+    const sl=slider("Rover speed",-10,10,1,5," m/s",v=>speed=v);
+    cbtn("▶ Start","green",()=>{run=true;});
+    cbtn("⏸ Pause","gray",()=>{run=false;});
+    cbtn("↺ Reset","gray",()=>{run=false;t=0;x=0;trace=[];myst=false;mtrace=[];mx=0;});
+    cbtn("🕵️ Mystery Runner","gold",()=>{run=false;myst=true;t=0;x=0;mx=0;trace=[];mtrace=[];});
+    const gx=60,gy=380,gw=560,gh=180,tMax=20,xMax=100;
+    function toGX(tt){return gx+tt/tMax*gw;}function toGY(xx){return gy-xx/xMax*gh;}
+    const d4=20;
+    const nb=[
+      {type:"num",q:"Drive the rover at <b>+5 m/s</b> for <b>4 seconds</b> (watch the clock). How far did it travel?",a:d4,tol:1.5,unit:" m",hint:"distance = speed × time = 5 × 4"},
+      {type:"num",q:"Run the <b>Mystery Runner</b>. Use its graph: what is its speed?",a:mv,tol:0.35,unit:" m/s",hint:"Pick a point on its line: speed = distance ÷ time"},
+      {type:"num",q:"How long does the Mystery Runner take to reach <b>60 m</b>?",a:Math.round(60/mv*10)/10,tol:0.8,unit:" s",hint:"time = distance ÷ speed = 60 ÷ its speed"}
+    ];
+    const qa=pick(rng,[[40,8],[30,6],[60,12],[45,9]]);
+    const cp=[
+      {type:"mc",q:"On a position-time graph, a <b>flat (horizontal) line</b> means the object is…",opts:["Speeding up","Moving backward","Not moving","Falling"],a:2},
+      {type:"num",q:"A graph shows a runner going "+qa[0]+" m in "+qa[1]+" s at constant speed. What is the speed?",a:qa[0]/qa[1],tol:0.15,unit:" m/s",hint:"speed = distance ÷ time"},
+      {type:"mc",q:"Two lines on a position-time graph: the <b>steeper</b> line is the object that is…",opts:["Slower","Faster","Heavier","Older"],a:1}
+    ];
+    return{nb,cp,tick(dt){
+      clearCv();
+      // track
+      label("TRACK",20,26,13);
+      ctx.fillStyle="#152a44";rr(ctx,40,34,820,66,10);ctx.fill();
+      for(let m=0;m<=100;m+=10){const px=60+m/100*780;ctx.strokeStyle="#33507a";ctx.beginPath();ctx.moveTo(px,80);ctx.lineTo(px,92);ctx.stroke();label(m,px,74,10,"#9fb4cc","center");}
+      if(run&&!myst){t+=dt;x+=speed*dt;x=Math.max(0,Math.min(100,x));if(t<=tMax)trace.push([t,x]);else run=false;}
+      if(myst){t+=dt;mx=mv*t;if(mx>=100||t>=tMax){myst=false;}mtrace.push([Math.min(t,tMax),Math.min(mx,100)]);}
+      // rover
+      const rx=60+x/100*780;
+      ctx.fillStyle="#38bdf8";rr(ctx,rx-16,52,32,20,5);ctx.fill();
+      ctx.fillStyle="#0a1420";ctx.beginPath();ctx.arc(rx-8,74,5,0,7);ctx.arc(rx+8,74,5,0,7);ctx.fill();
+      label("🛰",rx-8,50,14);
+      // mystery runner on track
+      if(mtrace.length&&(myst||mtrace[mtrace.length-1][1]>0)){const mpx=60+Math.min(100,mtrace[mtrace.length-1][1])/100*780;label("🕵️",mpx-9,50,16);}
+      // graph
+      label("POSITION-TIME GRAPH",gx,150,13);
+      ctx.strokeStyle="#33507a";
+      for(let tt=0;tt<=tMax;tt+=2){ctx.beginPath();ctx.moveTo(toGX(tt),gy);ctx.lineTo(toGX(tt),gy-gh);ctx.stroke();label(tt,toGX(tt),gy+16,10,"#9fb4cc","center");}
+      for(let xx=0;xx<=xMax;xx+=20){ctx.beginPath();ctx.moveTo(gx,toGY(xx));ctx.lineTo(gx+gw,toGY(xx));ctx.stroke();label(xx,gx-10,toGY(xx)+4,10,"#9fb4cc","right");}
+      label("time (s)",gx+gw/2,gy+32,12,"#9fb4cc","center");
+      ctx.save();ctx.translate(18,gy-gh/2);ctx.rotate(-Math.PI/2);label("position (m)",0,0,12,"#9fb4cc","center");ctx.restore();
+      function plot(tr,col){if(tr.length<2)return;ctx.strokeStyle=col;ctx.lineWidth=3;ctx.beginPath();tr.forEach((p,i)=>{const X=toGX(p[0]),Y=toGY(p[1]);i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);});ctx.stroke();ctx.lineWidth=1;}
+      plot(trace,"#38bdf8");plot(mtrace,"#fbbf24");
+      if(mtrace.length)label("— Mystery Runner",gx+gw-130,168,12,"#fbbf24");
+      if(trace.length)label("— Your rover",gx+gw-130,152,12,"#38bdf8");
+      meter(700,190,150,"CLOCK (s)",t.toFixed(1));
+      meter(700,252,150,"POSITION (m)",fmt(Math.round((myst?mx:x)*10)/10),"#fbbf24");
+    }};
+  }
+});
+
+/* =========================================================
+   LAB 3 — FORCE LAB (F = ma)
+========================================================= */
+defLab("force",{
+  icon:"🛷",title:"Push It! Force Lab",blurb:"Push crates across frictionless ice and discover F = ma. Then find the mass of the Mystery Crate.",
+  std:["S8P3b","SPS8"],
+  goal:"Pick a force and a mass, then <b>Push for 2 s</b>. Watch the acceleration meter. Newton's 2nd Law: <b>a = F ÷ m</b>. Finally, use it backwards to find the Mystery Crate's mass!",
+  build(rng){
+    let F=20,m=5,pushing=0,v=0,px=100,acc=0,mystery=false;
+    const mx=pick(rng,[4,5,8,10,16]); // mystery mass
+    slider("Force",5,50,5,20," N",x=>F=x);
+    const ms=slider("Mass",1,20,1,5," kg",x=>{if(!mystery)m=x;});
+    cbtn("👊 Push for 2 s","green",()=>{pushing=2;v=0;px=100;});
+    cbtn("↺ Reset","gray",()=>{pushing=0;v=0;px=100;});
+    const mb=cbtn("🎁 Mystery Crate: OFF","gold",()=>{mystery=!mystery;mb.textContent=mystery?"🎁 Mystery Crate: ON":"🎁 Mystery Crate: OFF";pushing=0;v=0;px=100;});
+    const nb=[
+      {type:"num",q:"Set <b>F = 20 N</b> and <b>m = 5 kg</b>, then push. What acceleration do you measure?",a:4,tol:0.25,unit:" m/s²",hint:"a = F ÷ m = 20 ÷ 5"},
+      {type:"num",q:"Keep F = 20 N but <b>double the mass to 10 kg</b>. New acceleration?",a:2,tol:0.25,unit:" m/s²",hint:"Twice the mass → half the acceleration"},
+      {type:"num",q:"Turn ON the <b>Mystery Crate</b> 🎁. Push it with any force, read the acceleration, and find its mass.",a:mx,tol:0.5,unit:" kg",hint:"m = F ÷ a — divide the force you used by the acceleration you measured"}
+    ];
+    const cf=pick(rng,[[30,6],[40,8],[24,4],[36,9]]);
+    const ca=pick(rng,[[3,4],[5,2],[6,3],[2,7]]);
+    const cp=[
+      {type:"num",q:"A "+cf[1]+" kg crate is pushed with "+cf[0]+" N on frictionless ice. Acceleration?",a:cf[0]/cf[1],tol:0.15,unit:" m/s²",hint:"a = F ÷ m"},
+      {type:"mc",q:"Same push force, but a <b>bigger mass</b>. The acceleration…",opts:["Gets bigger","Gets smaller","Stays the same","Becomes zero"],a:1},
+      {type:"num",q:"What force is needed to accelerate a "+ca[1]+" kg cart at "+ca[0]+" m/s²?",a:ca[0]*ca[1],tol:0.3,unit:" N",hint:"F = m × a"}
+    ];
+    return{nb,cp,tick(dt){
+      clearCv("#0d2233");
+      label("FRICTIONLESS ICE RINK ❄️",20,28,15,"#eaf2fb");
+      // ice
+      const ig=ctx.createLinearGradient(0,220,0,320);ig.addColorStop(0,"#1c3a55");ig.addColorStop(1,"#132a41");
+      ctx.fillStyle=ig;rr(ctx,20,240,860,80,12);ctx.fill();
+      ctx.strokeStyle="rgba(125,211,252,.25)";for(let i=0;i<8;i++){ctx.beginPath();ctx.moveTo(60+i*110,255+(i%3)*18);ctx.lineTo(130+i*110,262+(i%3)*18);ctx.stroke();}
+      const em=mystery?mx:m;
+      if(pushing>0){acc=F/em;v+=acc*dt;pushing-=dt;if(pushing<=0)pushing=0;}
+      px+=v*dt*14;if(px>860){px=100;v=0;pushing=0;}
+      // crate (size ~ mass)
+      const s=30+em*2.2;
+      ctx.fillStyle=mystery?"#a78bfa":"#d9a066";rr(ctx,px-s/2,240-s,s,s,6);ctx.fill();
+      ctx.strokeStyle="rgba(255,255,255,.4)";ctx.strokeRect(px-s/2,240-s,s,s);
+      label(mystery?"?":em+" kg",px,240-s/2+5,14,"#08202f","center");
+      if(pushing>0){label("👊",px-s/2-26,240-s/2+8,24);
+        ctx.strokeStyle="#fbbf24";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(px-s/2-40,210-s/2);ctx.lineTo(px-s/2-6,210-s/2);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(px-s/2-6,210-s/2);ctx.lineTo(px-s/2-16,204-s/2);ctx.moveTo(px-s/2-6,210-s/2);ctx.lineTo(px-s/2-16,216-s/2);ctx.stroke();ctx.lineWidth=1;
+        label(F+" N",px-s/2-30,196-s/2,13,"#fbbf24","center");}
+      meter(30,60,160,"FORCE (N)",fmt(F),"#fbbf24");
+      meter(210,60,160,"MASS (kg)",mystery?"???":fmt(em),mystery?"#a78bfa":"#7dd3fc");
+      meter(390,60,180,"ACCELERATION (m/s²)",pushing>0?(F/em).toFixed(2):(v>0?acc.toFixed(2):"---"),"#34d399");
+      meter(590,60,150,"SPEED (m/s)",v.toFixed(1));
+      meter(760,60,120,"PUSH TIMER",pushing>0?pushing.toFixed(1):"0.0");
+      if(mystery)label("🎁 MYSTERY CRATE — the mass slider is disabled. Use a = F ÷ m backwards!",450,360,14,"#a78bfa","center");
+      else label("Bigger crates are drawn bigger. Ice = no friction, so a = F ÷ m exactly.",450,360,13,"#9fb4cc","center");
+    }};
+  }
+});
+
+/* =========================================================
+   LAB 4 — WAVE WORKBENCH
+========================================================= */
+defLab("waves",{
+  icon:"🌊",title:"Wave Workbench",blurb:"Shape a wave with sliders, then freeze the Mystery Wave and measure wavelength, frequency, and speed.",
+  std:["S8P4","SPS9"],
+  goal:"Play with amplitude & frequency, then press <b>Mystery Wave</b>. Use <b>Freeze</b> + the meter grid to measure wavelength (crest to crest), use the <b>crest counter</b> for frequency, and calculate <b>speed = frequency × wavelength</b>.",
+  build(rng){
+    let A=60,f=1,lam=4,t=0,frozen=false,myst=false,counting=false,ctime=0,crests=0;
+    const mLam=pick(rng,[2,4,5,8]),mF=pick(rng,[0.5,1,2]);
+    const sA=slider("Amplitude",20,90,5,60," px",v=>{if(!myst)A=v;});
+    const sF=slider("Frequency",0.5,3,0.25,1," Hz",v=>{if(!myst)f=v;});
+    const sL=slider("Wavelength",2,8,1,4," m",v=>{if(!myst)lam=v;});
+    cbtn("❄ Freeze","gray",()=>{frozen=!frozen;});
+    const mbn=cbtn("🕵️ Mystery Wave: OFF","gold",()=>{myst=!myst;mbn.textContent=myst?"🕵️ Mystery Wave: ON":"🕵️ Mystery Wave: OFF";frozen=false;crests=0;counting=false;});
+    cbtn("⏱ Count crests (10 s)","green",()=>{if(!counting){counting=true;ctime=0;crests=0;frozen=false;}});
+    const PPM=60; // px per meter
+    const nb=[
+      {type:"num",q:"Turn ON the Mystery Wave and <b>freeze</b> it. Measure crest-to-crest on the grid: what is its <b>wavelength</b>?",a:mLam,tol:0.3,unit:" m",hint:"Each grid square = 1 m. Distance from one crest to the next."},
+      {type:"num",q:"Run the <b>crest counter</b> on the Mystery Wave. What is its <b>frequency</b>? (crests ÷ 10 s)",a:mF,tol:0.15,unit:" Hz",hint:"frequency = crests counted ÷ 10 seconds"},
+      {type:"num",q:"Calculate the Mystery Wave's <b>speed</b>.",a:Math.round(mF*mLam*100)/100,tol:0.2,unit:" m/s",hint:"speed = frequency × wavelength = "+fmt(mF)+" × "+fmt(mLam)}
+    ];
+    const cs=pick(rng,[[2,3],[4,2],[0.5,6],[3,4]]);
+    const cp=[
+      {type:"mc",q:"If you increase a wave's <b>amplitude</b>, you increase its…",opts:["Speed","Energy","Wavelength","Color"],a:1},
+      {type:"num",q:"A wave has frequency "+fmt(cs[0])+" Hz and wavelength "+fmt(cs[1])+" m. Its speed is…",a:cs[0]*cs[1],tol:0.2,unit:" m/s",hint:"v = f × λ"},
+      {type:"mc",q:"The distance from one crest to the next crest is the…",opts:["Amplitude","Frequency","Wavelength","Trough"],a:2}
+    ];
+    return{nb,cp,tick(dt){
+      if(!frozen)t+=dt;
+      if(counting&&!frozen){ctime+=dt;if(ctime>=10){counting=false;}}
+      clearCv();
+      const mid=200,x0=40,x1=860;
+      const useA=myst?55:A,useF=myst?mF:f,useLam=myst?mLam:lam;
+      // grid: 1 square = 1 m
+      ctx.strokeStyle="#1d3350";
+      for(let x=x0;x<=x1;x+=PPM){ctx.beginPath();ctx.moveTo(x,60);ctx.lineTo(x,340);ctx.stroke();label(Math.round((x-x0)/PPM),x,356,10,"#9fb4cc","center");}
+      for(let y=80;y<=320;y+=PPM){ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();}
+      label("meters (1 square = 1 m)",450,375,12,"#9fb4cc","center");
+      ctx.strokeStyle="#33507a";ctx.beginPath();ctx.moveTo(x0,mid);ctx.lineTo(x1,mid);ctx.stroke();
+      // wave
+      ctx.strokeStyle=myst?"#fbbf24":"#38bdf8";ctx.lineWidth=3;ctx.beginPath();
+      for(let x=x0;x<=x1;x++){
+        const xm=(x-x0)/PPM;
+        const y=mid-useA*Math.sin(2*Math.PI*(xm/useLam-useF*t));
+        x===x0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.stroke();ctx.lineWidth=1;
+      // flag + crest counting (count wave cycles passing flag)
+      const flagX=450;
+      ctx.strokeStyle="#f87171";ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(flagX,60);ctx.lineTo(flagX,340);ctx.stroke();ctx.setLineDash([]);
+      label("🚩 counting line",flagX+6,74,12,"#f87171");
+      if(counting)crests=Math.floor(useF*ctime);
+      meter(30,30,140,"CREST COUNT",counting||crests?String(crests):"---","#fbbf24");
+      meter(190,30,140,"TIMER (s)",counting?ctime.toFixed(1):(crests?"10.0":"---"));
+      if(frozen)label("❄ FROZEN — measure with the grid",880,50,13,"#7dd3fc","right");
+      if(myst)label("🕵️ MYSTERY WAVE (sliders off)",880,30,13,"#fbbf24","right");
+      if(counting)label("Counting crests passing the line…",450,50,13,"#34d399","center");
+    }};
+  }
+});
+
+/* =========================================================
+   LAB 5 — CIRCUIT SANDBOX
+========================================================= */
+defLab("circuit",{
+  icon:"💡",title:"Circuit Sandbox",blurb:"Build series & parallel circuits, watch the bulbs glow, and use Ohm's Law to expose the Mystery Resistor.",
+  std:["S8P5","SPS10"],
+  goal:"Add batteries and bulbs, flip between <b>series</b> and <b>parallel</b>, and read the meters. Each battery = 1.5 V, each bulb = 3 Ω. Ohm's Law: <b>V = I × R</b>. Then find the Mystery Resistor!",
+  build(rng){
+    let nBat=2,nBulb=1,para=false,myst=false,glowT=0;
+    const Rx=pick(rng,[2,4,5,6,10]);
+    slider("Batteries",1,3,1,2,"",v=>nBat=v);
+    slider("Bulbs",1,3,1,1,"",v=>nBulb=v);
+    const pb=cbtn("Layout: SERIES","gray",()=>{para=!para;pb.textContent=para?"Layout: PARALLEL":"Layout: SERIES";});
+    const mbn=cbtn("🎁 Mystery Resistor: OFF","gold",()=>{myst=!myst;mbn.textContent=myst?"🎁 Mystery Resistor: ON":"🎁 Mystery Resistor: OFF";});
+    function calc(){
+      const V=nBat*1.5;
+      if(myst)return{V,I:V/Rx,per:0};
+      if(para)return{V,I:nBulb*(V/3),per:V/3};
+      return{V,I:V/(nBulb*3),per:V/(nBulb*3)};
+    }
+    const nb=[
+      {type:"num",q:"Build: <b>2 batteries, 1 bulb</b>. What current does the ammeter read?",a:1,tol:0.08,unit:" A",hint:"I = V ÷ R = 3.0 V ÷ 3 Ω"},
+      {type:"num",q:"Build: <b>2 batteries, 3 bulbs in SERIES</b>. Current now?",a:1/3,tol:0.06,unit:" A",hint:"Resistances add in series: I = 3.0 ÷ 9"},
+      {type:"num",q:"Turn ON the 🎁 Mystery Resistor. Use the meters and Ohm's Law to find its resistance.",a:Rx,tol:0.4,unit:" Ω",hint:"R = V ÷ I — divide the voltmeter reading by the ammeter reading"}
+    ];
+    const ov=pick(rng,[[6,2],[9,3],[12,4],[6,3]]);
+    const cp=[
+      {type:"mc",q:"In a <b>series</b> circuit, one bulb burns out. The other bulbs…",opts:["Get brighter","Stay the same","All go out","Explode… no."],a:2},
+      {type:"mc",q:"In a <b>parallel</b> circuit, you add more bulbs. Each bulb's brightness…",opts:["Stays about the same","Gets much dimmer","Goes out","Doubles"],a:0},
+      {type:"num",q:"A circuit has "+ov[0]+" V across a resistor and "+ov[1]+" A flowing. Resistance?",a:ov[0]/ov[1],tol:0.15,unit:" Ω",hint:"R = V ÷ I"}
+    ];
+    return{nb,cp,tick(dt){
+      glowT+=dt;clearCv();
+      const {V,I,per}=calc();
+      label(myst?"MYSTERY RESISTOR CIRCUIT":"CIRCUIT — "+(para?"PARALLEL":"SERIES"),20,28,15,"#eaf2fb");
+      const L=140,R=760,T=90,B=310;
+      ctx.strokeStyle="#7dd3fc";ctx.lineWidth=3;
+      // battery pack (left side)
+      ctx.beginPath();ctx.moveTo(L,B);ctx.lineTo(L,T);ctx.stroke();
+      for(let i=0;i<nBat;i++){
+        const by=180+i*30;
+        ctx.fillStyle="#0a1420";ctx.fillRect(L-16,by-12,32,24);
+        ctx.strokeStyle="#fbbf24";ctx.strokeRect(L-16,by-12,32,24);
+        ctx.fillStyle="#fbbf24";ctx.fillRect(L-4,by-16,8,4);
+        label("1.5V",L,by+5,10,"#fbbf24","center");
+      }
+      ctx.strokeStyle="#7dd3fc";
+      // top & bottom rails
+      ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(R,T);ctx.moveTo(L,B);ctx.lineTo(R,B);ctx.moveTo(R,T);ctx.lineTo(R,B);ctx.stroke();
+      function bulb(bx,by,pw){
+        const g=Math.min(1,pw/3);
+        ctx.fillStyle="rgba(251,191,36,"+(0.15+0.8*g+0.05*Math.sin(glowT*6))+")";
+        ctx.beginPath();ctx.arc(bx,by,16+8*g,0,7);ctx.fill();
+        ctx.fillStyle="#fff8dc";ctx.beginPath();ctx.arc(bx,by,12,0,7);ctx.fill();
+        ctx.strokeStyle="#33507a";ctx.beginPath();ctx.moveTo(bx-5,by+4);ctx.lineTo(bx-2,by-3);ctx.lineTo(bx+2,by+3);ctx.lineTo(bx+5,by-4);ctx.stroke();
+      }
+      if(myst){
+        // one mystery box mid top rail
+        ctx.fillStyle="#2d2350";rr(ctx,420,T-22,60,44,8);ctx.fill();ctx.strokeStyle="#a78bfa";ctx.strokeRect(420,T-22,60,44);
+        label("R = ?",450,T+5,15,"#a78bfa","center");
+      }else if(!para){
+        // series bulbs along top rail
+        for(let i=0;i<nBulb;i++){const bx=300+i*160;bulb(bx,T,I*I*3);}
+      }else{
+        // parallel branches
+        for(let i=0;i<nBulb;i++){
+          const bx=300+i*160;
+          ctx.strokeStyle="#7dd3fc";ctx.beginPath();ctx.moveTo(bx,T);ctx.lineTo(bx,B);ctx.stroke();
+          bulb(bx,200,per*per*3);
+        }
+      }
+      // electron flow dots
+      const dotN=14,speedPx=I*60;
+      ctx.fillStyle="#34d399";
+      for(let i=0;i<dotN;i++){
+        const p=((glowT*speedPx)/900+i/dotN)%1;
+        let dx,dy;
+        const per1=(R-L),per2=(B-T),tot=2*per1+2*per2,d=p*tot;
+        if(d<per1){dx=L+d;dy=T;}else if(d<per1+per2){dx=R;dy=T+(d-per1);}else if(d<2*per1+per2){dx=R-(d-per1-per2);dy=B;}else{dx=L;dy=B-(d-2*per1-per2);}
+        ctx.beginPath();ctx.arc(dx,dy,3.4,0,7);ctx.fill();
+      }
+      meter(90,330,150,"VOLTMETER (V)",V.toFixed(1),"#fbbf24");
+      meter(260,330,170,"AMMETER (A)",I.toFixed(2),"#34d399");
+      if(!myst)meter(450,330,190,"EACH BULB (Ω)","3.0");
+      label("Green dots = current flow · more current = brighter & faster",880,28,12,"#9fb4cc","right");
+      ctx.lineWidth=1;
+    }};
+  }
+});
+
+/* =========================================================
+   LAB 6 — HEAT & PHASE CHANGE
+========================================================= */
+defLab("heat",{
+  icon:"🔥",title:"Melt & Boil: Phase Change Lab",blurb:"Heat a mystery substance, watch its particles dance, and read its melting & boiling points off the live graph.",
+  std:["S8P1ab","SPS7"],
+  goal:"Turn the burner ON and watch the thermometer, the <b>particle view</b>, and the live heating curve. The temperature <b>pauses</b> (flat spots) at the melting point and boiling point — read them off the graph!",
+  build(rng){
+    const M=pick(rng,[15,25,35]),Bp=pick(rng,[70,85,95]);
+    let T=0,phase="solid",heat=false,time=0,trace=[],meltP=0,boilP=0;
+    const parts=[];const prand=mulberry32(99);
+    for(let i=0;i<36;i++)parts.push({hx:(i%6),hy:Math.floor(i/6),x:0,y:0,vx:(prand()-.5),vy:(prand()-.5)});
+    const hb=cbtn("🔥 Burner: OFF","green",()=>{heat=!heat;hb.textContent=heat?"🔥 Burner: ON":"🔥 Burner: OFF";});
+    cbtn("↺ Restart","gray",()=>{T=0;phase="solid";heat=false;hb.textContent="🔥 Burner: OFF";time=0;trace=[];meltP=0;boilP=0;});
+    ctrlGroup('<label>Flat spots on the graph = phase changes. Energy breaks particle bonds instead of raising temperature.</label>');
+    const nb=[
+      {type:"num",q:"What is this substance's <b>melting point</b>? (read the first flat spot)",a:M,tol:2,unit:" °C",hint:"The temperature where the graph first goes flat"},
+      {type:"num",q:"What is its <b>boiling point</b>? (second flat spot)",a:Bp,tol:2,unit:" °C",hint:"The temperature of the second flat section"},
+      {type:"num",q:"While the substance is melting, the temperature changes by how many degrees?",a:0,tol:0.5,unit:" °C",hint:"Look at the flat spot… flat means it changes by ZERO"}
+    ];
+    const midT=Math.round((M+Bp)/2);
+    const cp=[
+      {type:"mc",q:"During a phase change, the energy you add goes into…",opts:["Raising the temperature","Breaking particle attractions","Making new atoms","Nothing"],a:1},
+      {type:"mc",q:"In the <b>gas</b> phase, the particles…",opts:["Vibrate in fixed spots","Slide past each other","Fly around freely, far apart","Stop moving"],a:2},
+      {type:"mc",q:"At "+midT+" °C, this substance would be a…",opts:["Solid","Liquid","Gas","Plasma"],a:1}
+    ];
+    return{nb,cp,tick(dt){
+      // physics
+      if(heat){
+        time+=dt;
+        if(phase==="solid"){T+=6*dt;if(T>=M){T=M;phase="melting";}}
+        else if(phase==="melting"){meltP+=dt;if(meltP>3.5)phase="liquid";}
+        else if(phase==="liquid"){T+=6*dt;if(T>=Bp){T=Bp;phase="boiling";}}
+        else if(phase==="boiling"){boilP+=dt;if(boilP>4)phase="gas";}
+        else if(phase==="gas"){T+=6*dt;if(T>=Bp+18){T=Bp+18;heat=false;hb.textContent="🔥 Burner: OFF";}}
+        if(time<40)trace.push([time,T]);
+      }
+      clearCv();
+      label("MYSTERY SUBSTANCE X",150,30,15,"#eaf2fb","center");
+      // beaker + particles
+      const bx=60,by=70,bw=190,bh=210;
+      ctx.strokeStyle="#7dd3fc";ctx.lineWidth=2;ctx.strokeRect(bx,by,bw,bh);ctx.lineWidth=1;
+      const eff=phase==="melting"||phase==="liquid"?1:(phase==="boiling"||phase==="gas"?2:0);
+      parts.forEach((p,i)=>{
+        let X,Y;
+        if(eff===0){ // solid lattice, vibrate
+          X=bx+35+p.hx*24+Math.sin(performance.now()/90+i)*2.2*(1+T/40);
+          Y=by+bh-30-p.hy*22+Math.cos(performance.now()/80+i*2)*2.2*(1+T/40);
+        }else if(eff===1){ // liquid: jiggle in bottom half
+          p.x+=(p.vx)*dt*40;p.y+=(p.vy)*dt*40;
+          if(p.x<8||p.x>bw-16)p.vx*=-1;if(p.y<bh/2||p.y>bh-16)p.vy*=-1;
+          p.x=Math.max(8,Math.min(bw-16,p.x||8+((i*37)%160)));p.y=Math.max(bh/2,Math.min(bh-16,p.y||bh/2+((i*23)%90)));
+          X=bx+p.x;Y=by+p.y;
+        }else{ // gas: fly everywhere fast
+          p.x+=(p.vx)*dt*170;p.y+=(p.vy)*dt*170;
+          if(p.x<8||p.x>bw-16)p.vx*=-1;if(p.y<8||p.y>bh-16)p.vy*=-1;
+          p.x=Math.max(8,Math.min(bw-16,p.x||10+((i*41)%170)));p.y=Math.max(8,Math.min(bh-16,p.y||10+((i*29)%190)));
+          X=bx+p.x;Y=by+p.y;
+        }
+        ctx.fillStyle=eff===0?"#7dd3fc":(eff===1?"#38bdf8":"#a78bfa");
+        ctx.beginPath();ctx.arc(X,Y,6,0,7);ctx.fill();
+      });
+      label("Particle view: "+(phase.toUpperCase()),150,300,13,"#fbbf24","center");
+      // burner
+      if(heat){for(let i=0;i<5;i++){const fx=bx+30+i*32;ctx.fillStyle="rgba(251,146,60,"+(0.5+0.4*Math.sin(performance.now()/90+i))+")";ctx.beginPath();ctx.moveTo(fx,by+bh+26);ctx.quadraticCurveTo(fx+7,by+bh+8,fx,by+bh+2);ctx.quadraticCurveTo(fx-7,by+bh+8,fx,by+bh+26);ctx.fill();}}
+      ctx.fillStyle="#33507a";rr(ctx,bx+20,by+bh+26,bw-40,10,4);ctx.fill();
+      meter(300,40,170,"THERMOMETER (°C)",T.toFixed(0),"#f87171");
+      meter(490,40,150,"CLOCK (s)",time.toFixed(0));
+      meter(660,40,170,"PHASE",phase.toUpperCase(),"#fbbf24");
+      // graph
+      const gx=320,gy=360,gw=540,gh=230,tM=40,TM=120;
+      ctx.strokeStyle="#33507a";
+      for(let tt=0;tt<=tM;tt+=5){const X=gx+tt/tM*gw;ctx.beginPath();ctx.moveTo(X,gy);ctx.lineTo(X,gy-gh);ctx.stroke();label(tt,X,gy+14,9,"#9fb4cc","center");}
+      for(let tp=0;tp<=TM;tp+=20){const Y=gy-tp/TM*gh;ctx.beginPath();ctx.moveTo(gx,Y);ctx.lineTo(gx+gw,Y);ctx.stroke();label(tp,gx-8,Y+3,10,"#9fb4cc","right");}
+      label("time (s)",gx+gw/2,gy+30,11,"#9fb4cc","center");
+      label("°C",gx-34,gy-gh-6,12,"#9fb4cc");
+      if(trace.length>1){ctx.strokeStyle="#f87171";ctx.lineWidth=3;ctx.beginPath();trace.forEach((p,i)=>{const X=gx+p[0]/tM*gw,Y=gy-p[1]/TM*gh;i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);});ctx.stroke();ctx.lineWidth=1;}
+      if(!heat&&time===0)label("Turn the burner ON to start! →",590,200,15,"#fbbf24","center");
+    }};
+  }
+});
+
+/* =========================================================
+   LAB 7 — RAMP & ROLL (ENERGY)
+========================================================= */
+defLab("energy",{
+  icon:"🎢",title:"Ramp & Roll: Energy Lab",blurb:"Release a ball down a ramp and watch potential energy transform into kinetic — live energy bars included.",
+  std:["S8P2","SPS7"],
+  goal:"Set a drop height and mass, then <b>Release</b>. Watch the energy bars: <b>PE = m × 10 × h</b> trades into <b>KE</b> as the ball falls, and the total never changes. Then find the Mystery Ball's mass!",
+  build(rng){
+    let h=5,m=2,xb=-1,dir=1,going=false,myst=false;
+    const mx=pick(rng,[1.5,2.5,4,6]); // mystery mass
+    const g=10,PXM=22; // px per meter
+    slider("Drop height",1,10,1,5," m",v=>{h=v;xb=-1;going=false;});
+    const ms=slider("Mass",1,10,1,2," kg",v=>{if(!myst){m=v;xb=-1;going=false;}});
+    cbtn("🎢 Release","green",()=>{going=true;});
+    cbtn("↺ Reset","gray",()=>{going=false;xb=-1;});
+    const mbn=cbtn("🎁 Mystery Ball: OFF","gold",()=>{myst=!myst;mbn.textContent=myst?"🎁 Mystery Ball: ON":"🎁 Mystery Ball: OFF";going=false;xb=-1;});
+    const nb=[
+      {type:"num",q:"Set <b>h = 5 m</b> and <b>m = 2 kg</b>. What is the PE at the top of the ramp?",a:100,tol:2,unit:" J",hint:"PE = m × 10 × h = 2 × 10 × 5"},
+      {type:"num",q:"Release from <b>h = 5 m</b> (any mass). What speed does the ball reach at the very bottom?",a:10,tol:0.5,unit:" m/s",hint:"Read the SPEED meter when the ball passes the bottom"},
+      {type:"num",q:"Turn ON the 🎁 Mystery Ball. Use the PE meter and your height to find its mass.",a:mx,tol:0.25,unit:" kg",hint:"m = PE ÷ (10 × h) — read PE at the top, divide by 10 × height"}
+    ];
+    const pe=pick(rng,[[3,4],[2,6],[5,2],[4,3]]);
+    const cp=[
+      {type:"mc",q:"When the ball is at the <b>bottom</b> of the ramp moving fast, its energy is mostly…",opts:["Potential (PE)","Kinetic (KE)","Chemical","Gone"],a:1},
+      {type:"num",q:"A "+pe[0]+" kg ball sits "+pe[1]+" m up a ramp (g = 10). Its potential energy?",a:pe[0]*10*pe[1],tol:1,unit:" J",hint:"PE = m × 10 × h"},
+      {type:"mc",q:"As the ball rolls down, the total energy (PE + KE)…",opts:["Shrinks to zero","Doubles","Stays the same","Turns into mass"],a:2}
+    ];
+    return{nb,cp,tick(dt){
+      clearCv("#0d2233");
+      const em=myst?mx:m;
+      const bx0=280,bx1=860,bot=330;
+      // valley ramp: y = h*(x^2), x in [-1,1]
+      ctx.strokeStyle="#7dd3fc";ctx.lineWidth=3;ctx.beginPath();
+      for(let i=0;i<=100;i++){const t2=-1+i*0.02,X=bx0+(t2+1)/2*(bx1-bx0),Y=bot-h*t2*t2*PXM;i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);}
+      ctx.stroke();ctx.lineWidth=1;
+      // height ticks (just left of the ramp)
+      for(let mm=0;mm<=10;mm+=2){const Y=bot-mm*PXM;ctx.strokeStyle="#1d3350";ctx.beginPath();ctx.moveTo(246,Y);ctx.lineTo(264,Y);ctx.stroke();label(mm+" m",242,Y+4,10,"#9fb4cc","right");}
+      // physics
+      const yb=h*xb*xb, PE=em*g*yb, TOT=em*g*h, KE=Math.max(0,TOT-PE), v=Math.sqrt(2*KE/em);
+      if(going){
+        xb+=dir*(v+0.4)*dt*0.16;
+        if(xb>=1){xb=1;dir=-1;}if(xb<=-1){xb=-1;dir=1;}
+      }
+      const BX=bx0+(xb+1)/2*(bx1-bx0),BY=bot-yb*PXM-14;
+      const bs=10+em*1.6;
+      ctx.fillStyle=myst?"#a78bfa":"#fbbf24";ctx.beginPath();ctx.arc(BX,BY,bs,0,7);ctx.fill();
+      ctx.strokeStyle="rgba(255,255,255,.5)";ctx.stroke();
+      label(myst?"?":em+" kg",BX,BY+4,11,"#082033","center");
+      // meters (top-center, in the air above the valley)
+      meter(330,26,118,"PE (J)",fmt(Math.round(PE)),"#38bdf8");
+      meter(458,26,118,"KE (J)",fmt(Math.round(KE)),"#fb923c");
+      meter(586,26,118,"SPEED (m/s)",v.toFixed(1),"#34d399");
+      meter(714,26,118,"HEIGHT (m)",yb.toFixed(1));
+      // energy bars
+      const bh=140,by2=360;
+      ctx.fillStyle="#0c1626";rr(ctx,60,by2-bh-26,140,bh+40,10);ctx.fill();
+      label("ENERGY BARS",130,by2-bh-8,11,"#9fb4cc","center");
+      const peH=TOT?PE/TOT*bh:0,keH=TOT?KE/TOT*bh:0;
+      ctx.fillStyle="#38bdf8";ctx.fillRect(82,by2-peH,38,peH);
+      ctx.fillStyle="#fb923c";ctx.fillRect(142,by2-keH,38,keH);
+      label("PE",101,by2+13,11,"#38bdf8","center");label("KE",161,by2+13,11,"#fb923c","center");
+      if(myst)label("🎁 MYSTERY BALL — mass slider disabled. PE meter still works!",450,384,13,"#a78bfa","center");
+    }};
+  }
+});
+
+/* =========================================================
+   LAB 8 — JUNKYARD ELECTROMAGNET
+========================================================= */
+defLab("magnet",{
+  icon:"🧲",title:"Junkyard Electromagnet",blurb:"Wind coils, add batteries, and lift paperclips with your own electromagnet crane. More coils = more power!",
+  std:["S8P5","SPS10"],
+  goal:"An electromagnet gets stronger with more <b>coils</b> and more <b>current</b> (batteries). Power it ON and count the paperclips it lifts. Rule of the junkyard: clips lifted = coils × batteries ÷ 10.",
+  build(rng){
+    let coils=20,bats=1,on=false,liftT=0;
+    const X=pick(rng,[4,6,8]); // mystery clip target
+    slider("Coils",5,50,5,20,"",v=>{coils=v;liftT=0;});
+    slider("Batteries",1,3,1,1,"",v=>{bats=v;liftT=0;});
+    const pbn=cbtn("⚡ Power: OFF","green",()=>{on=!on;pbn.textContent=on?"⚡ Power: ON":"⚡ Power: OFF";liftT=0;});
+    function clips(){return Math.min(15,Math.floor(coils*bats/10));}
+    const nb=[
+      {type:"num",q:"Set <b>20 coils, 1 battery</b>, power ON. How many clips does it lift?",a:2,tol:0.1,unit:" clips",hint:"20 × 1 ÷ 10 = 2"},
+      {type:"num",q:"Keep 20 coils but use <b>2 batteries</b>. Clips now?",a:4,tol:0.1,unit:" clips",hint:"Double the current → double the strength"},
+      {type:"num",q:"CHALLENGE: with <b>2 batteries</b>, what is the <b>fewest coils</b> that lifts at least "+X+" clips?",a:5*X,tol:0.1,unit:" coils",hint:"Try the slider! You need coils × 2 ÷ 10 ≥ "+X}
+    ];
+    const cc=pick(rng,[[30,2],[40,3],[50,2],[30,3]]);
+    const cp=[
+      {type:"mc",q:"You switch the power OFF. The paperclips…",opts:["Stay stuck forever","Fall off — no current, no magnet","Get heavier","Melt"],a:1},
+      {type:"num",q:"An electromagnet has "+cc[0]+" coils and "+cc[1]+" batteries. Clips lifted? (coils × batteries ÷ 10)",a:Math.floor(cc[0]*cc[1]/10),tol:0.1,unit:" clips",hint:"Multiply, then divide by 10"},
+      {type:"mc",q:"Which is the BEST way to make an electromagnet stronger?",opts:["Paint it red","Use fewer coils","Add more coils or more current","Shake it"],a:2}
+    ];
+    return{nb,cp,tick(dt){
+      clearCv();
+      if(on)liftT=Math.min(1,liftT+dt*1.8);else liftT=Math.max(0,liftT-dt*2.5);
+      const n=clips();
+      // crane
+      ctx.strokeStyle="#33507a";ctx.lineWidth=8;
+      ctx.beginPath();ctx.moveTo(120,370);ctx.lineTo(120,60);ctx.lineTo(470,60);ctx.stroke();ctx.lineWidth=1;
+      ctx.strokeStyle="#9fb4cc";ctx.beginPath();ctx.moveTo(450,60);ctx.lineTo(450,120);ctx.stroke();
+      // coil + nail
+      const nx=450,ny=150;
+      ctx.fillStyle="#8b98ab";rr(ctx,nx-10,ny-30,20,80,6);ctx.fill(); // nail
+      const turns=Math.max(3,Math.round(coils/5));
+      ctx.strokeStyle=on?"#fbbf24":"#c2703e";ctx.lineWidth=3;
+      for(let i=0;i<turns;i++){const cy=ny-24+i*(66/turns);ctx.beginPath();ctx.ellipse(nx,cy,17,5,0,0,7);ctx.stroke();}
+      ctx.lineWidth=1;
+      // wires to battery box
+      ctx.strokeStyle=on?"#fbbf24":"#6b7f99";ctx.beginPath();ctx.moveTo(nx-17,ny-24);ctx.lineTo(300,300);ctx.moveTo(nx+17,ny+42);ctx.lineTo(340,300);ctx.stroke();
+      ctx.fillStyle="#0a1420";rr(ctx,270,300,110,58,8);ctx.fill();ctx.strokeStyle="#fbbf24";ctx.strokeRect(270,300,110,58);
+      for(let i=0;i<bats;i++){ctx.fillStyle="#fbbf24";ctx.fillRect(282+i*34,314,26,30);label("1.5",295+i*34,332,9,"#3a2a00","center");}
+      // sparkle if on
+      if(on){label("⚡",nx+30,ny-30+8*Math.sin(performance.now()/150),18);}
+      // clip pile
+      ctx.fillStyle="#152a44";rr(ctx,380,330,220,40,8);ctx.fill();
+      label("paperclip pile",490,356,11,"#9fb4cc","center");
+      const total=15;
+      for(let i=0;i<total;i++){
+        const lifted=on&&i<n;
+        let cxp,cyp;
+        if(lifted){ // stuck under the nail, rows of 5
+          const row=Math.floor(i/5),col=i%5;
+          const hangY=ny+58+row*14;
+          cyp=330-(330-hangY)*liftT+ (1-liftT)*0; cyp=hangY+(330-hangY)*(1-liftT);
+          cxp=nx-28+col*14;
+        }else{cxp=395+(i%8)*25;cyp=336+Math.floor(i/8)*14;}
+        ctx.strokeStyle=lifted?"#7dd3fc":"#6b7f99";ctx.lineWidth=2;
+        ctx.beginPath();ctx.ellipse(cxp,cyp,7,3.5,0.5,0,7);ctx.stroke();ctx.lineWidth=1;
+      }
+      meter(650,40,200,"CLIPS LIFTED",on?String(n):"0",on?"#34d399":"#9fb4cc");
+      meter(650,102,200,"STRENGTH (coils × bats)",String(coils*bats),"#fbbf24");
+      label(on?"Electromagnet is ON — current flows, nail becomes magnetic":"Power is OFF — it's just a nail with wire",450,388,12,"#9fb4cc","center");
+    }};
+  }
+});
+
+/* =========================================================
+   LAB 9 — DECAY DETECTIVE (HALF-LIFE)
+========================================================= */
+defLab("decay",{
+  icon:"☢️",title:"Decay Detective: Half-Life",blurb:"Watch 100 unstable atoms decay step by step, plot the curve, and date a mystery isotope.",
+  std:["HS","SPS3"],
+  goal:"Each press of <b>One half-life</b> lets HALF of the remaining unstable atoms (purple) decay into stable atoms (gray). Watch the counter and the curve — then use the mystery isotope's half-life to answer like a real geologist.",
+  build(rng){
+    const T=pick(rng,[5,10,20,25]); // years per half-life
+    let rem=100,steps=0,flip=0;
+    const atoms=Array.from({length:100},()=>true);
+    const hist=[[0,100]];
+    cbtn("⏭ One half-life (= "+T+" years)","green",()=>{
+      if(rem<=1)return;
+      const target=Math.round(rem/2);let kill=rem-target;
+      // decay random atoms
+      const idx=atoms.map((a,i)=>a?i:-1).filter(i=>i>=0);
+      while(kill>0&&idx.length){const j=Math.floor(Math.random()*idx.length);atoms[idx[j]]=false;idx.splice(j,1);kill--;}
+      rem=target;steps++;hist.push([steps,rem]);flip=1;
+    });
+    cbtn("↺ Reset","gray",()=>{rem=100;steps=0;atoms.fill(true);hist.length=0;hist.push([0,100]);});
+    const nb=[
+      {type:"num",q:"Start fresh (Reset). After <b>2 half-lives</b>, how many unstable atoms remain out of 100?",a:25,tol:1,unit:" atoms",hint:"100 → 50 → 25"},
+      {type:"num",q:"This isotope's half-life is <b>"+T+" years</b>. After 3 presses, how many YEARS have passed?",a:3*T,tol:0.5,unit:" years",hint:"3 half-lives × "+T+" years each"},
+      {type:"num",q:"A rock sample has only <b>12.5%</b> of its unstable atoms left. How many half-lives have passed?",a:3,tol:0.1,unit:" half-lives",hint:"100% → 50% → 25% → 12.5%"}
+    ];
+    const cp=[
+      {type:"mc",q:"A <b>half-life</b> is the time it takes for…",opts:["All atoms to decay","Half of the unstable atoms to decay","Atoms to double","The rock to melt"],a:1},
+      {type:"num",q:"You start with 80 g of an unstable isotope. After 2 half-lives, how many grams remain?",a:20,tol:0.5,unit:" g",hint:"80 → 40 → 20"},
+      {type:"mc",q:"25 unstable atoms remain. After ONE more half-life, about how many remain?",opts:["About 12","Exactly 25","Zero","50"],a:0}
+    ];
+    return{nb,cp,tick(dt){
+      flip=Math.max(0,flip-dt*2);
+      clearCv();
+      label("ATOM SAMPLE — purple = unstable · gray = stable (decayed)",30,30,13,"#eaf2fb");
+      // atom grid 10x10
+      for(let i=0;i<100;i++){
+        const gx2=50+(i%10)*30,gy2=55+Math.floor(i/10)*30;
+        ctx.fillStyle=atoms[i]?"#a78bfa":"#3b4a5e";
+        ctx.beginPath();ctx.arc(gx2,gy2,10+(atoms[i]?flip*2:0),0,7);ctx.fill();
+        if(atoms[i]){ctx.fillStyle="rgba(255,255,255,.25)";ctx.beginPath();ctx.arc(gx2-3,gy2-3,3,0,7);ctx.fill();}
+      }
+      meter(400,50,140,"UNSTABLE LEFT",String(rem),"#a78bfa");
+      meter(400,112,140,"HALF-LIVES",String(steps),"#fbbf24");
+      meter(400,174,140,"YEARS PASSED",String(steps*T),"#34d399");
+      // decay curve
+      const gx=590,gy=340,gw=280,gh=270,SM=6;
+      ctx.strokeStyle="#33507a";
+      for(let s2=0;s2<=SM;s2++){const X=gx+s2/SM*gw;ctx.beginPath();ctx.moveTo(X,gy);ctx.lineTo(X,gy-gh);ctx.stroke();label(s2,X,gy+14,10,"#9fb4cc","center");}
+      for(let p2=0;p2<=100;p2+=25){const Y=gy-p2/100*gh;ctx.beginPath();ctx.moveTo(gx,Y);ctx.lineTo(gx+gw,Y);ctx.stroke();label(p2,gx-8,Y+4,10,"#9fb4cc","right");}
+      label("half-lives",gx+gw/2,gy+30,11,"#9fb4cc","center");
+      label("% left",gx-8,gy-gh-8,11,"#9fb4cc","right");
+      if(hist.length>1){ctx.strokeStyle="#a78bfa";ctx.lineWidth=3;ctx.beginPath();
+        hist.forEach((p,i)=>{const X=gx+Math.min(SM,p[0])/SM*gw,Y=gy-p[1]/100*gh;i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);});ctx.stroke();ctx.lineWidth=1;}
+      hist.forEach(p=>{const X=gx+Math.min(SM,p[0])/SM*gw,Y=gy-p[1]/100*gh;ctx.fillStyle="#fbbf24";ctx.beginPath();ctx.arc(X,Y,4,0,7);ctx.fill();});
+      label("Mystery isotope: half-life = "+T+" years",230,380,13,"#fbbf24","center");
+    }};
+  }
+});
+
+/* ============ boot ============ */
+if(S.name)$("nameInput").value=S.name;
+renderHome();
+</script>
+</body>
+</html>
