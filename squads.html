@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Squad Points</title>
+<style>
+  :root{ --ink:#1d2433; --mut:#5b6579; --bg:#eef1f9; --card:#fff; --brand:#5b5bd6; --brand2:#4747c2;
+         --green:#16a34a; --gold:#f59e0b; --line:#e3e7f2; --danger:#dc2626; }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{font-family:system-ui,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink);margin:0;
+       display:flex;flex-direction:column;min-height:100vh}
+  button{font-family:inherit;cursor:pointer}
+  .muted{color:var(--mut)} .hidden{display:none!important}
+
+  /* header */
+  header{background:var(--card);border-bottom:1px solid var(--line);padding:.6rem 1rem;display:flex;
+         align-items:center;gap:.7rem;flex-wrap:wrap;position:sticky;top:0;z-index:20}
+  header h1{font-size:1.15rem;margin:0;display:flex;align-items:center;gap:.4rem}
+  .qlabel{background:#eef;color:var(--brand2);border-radius:999px;padding:.15rem .7rem;font-weight:600;font-size:.85rem}
+  .spacer{flex:1}
+  .hbtn{background:#f2f4fd;border:1px solid var(--line);border-radius:9px;padding:.45rem .8rem;font-size:.9rem;color:var(--ink)}
+  .hbtn:hover{background:#e8ebfa}
+  .hbtn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+
+  /* period tabs */
+  nav.tabs{display:flex;gap:.4rem;padding:.6rem 1rem 0;overflow-x:auto}
+  nav.tabs button{border:0;background:transparent;padding:.55rem 1rem;border-radius:11px 11px 0 0;font-size:.95rem;
+                  font-weight:600;color:var(--mut);white-space:nowrap}
+  nav.tabs button.on{background:var(--card);color:var(--brand2);box-shadow:0 -2px 6px rgba(20,30,60,.05)}
+
+  /* main grid */
+  main{flex:1;padding:1rem;max-width:1180px;width:100%;margin:0 auto}
+  .banner{background:linear-gradient(90deg,#fff7e0,#fff);border:1px solid #f3e2ac;border-radius:12px;
+          padding:.55rem .9rem;margin-bottom:.8rem;font-size:.95rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+  .goalwrap{margin:-.2rem 0 .9rem}
+  .goalbar{height:12px;background:#dfe4f2;border-radius:999px;overflow:hidden}
+  .goalbar>div{height:100%;background:linear-gradient(90deg,#34d399,#16a34a);border-radius:999px;transition:width .6s}
+  .goaltext{font-size:.8rem;color:var(--mut);margin-top:.25rem}
+  .gridtools{display:flex;align-items:center;gap:.6rem;margin-bottom:.7rem;flex-wrap:wrap}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem}
+  .sq{background:var(--card);border-radius:16px;padding:1rem .9rem .9rem;position:relative;text-align:center;
+      border:1px solid var(--line);box-shadow:0 2px 8px rgba(20,30,60,.06);cursor:pointer;transition:transform .12s}
+  .sq:hover{transform:translateY(-3px)}
+  .sq .pts{position:absolute;top:-11px;right:-8px;background:var(--green);color:#fff;border-radius:999px;
+           min-width:44px;padding:.32rem .5rem;font-weight:800;font-size:1rem;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+  .sq .pts.bump{animation:bump .5s}
+  @keyframes bump{30%{transform:scale(1.35)}}
+  .sq .avatar{width:86px;height:86px;margin:0 auto .4rem;border-radius:14px;overflow:hidden;background:#f5f6fc;
+              display:flex;align-items:center;justify-content:center}
+  .sq .avatar img,.sq .avatar svg{width:100%;height:100%;object-fit:contain}
+  .sq .nm{font-weight:700;font-size:1rem;line-height:1.25;overflow:hidden;display:-webkit-box;
+          -webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:2.5em}
+  .sq .meta{margin-top:.35rem;font-size:.8rem;color:var(--mut);display:flex;justify-content:center;gap:.55rem;flex-wrap:wrap}
+  .sq .medal{position:absolute;top:-11px;left:-8px;font-size:1.4rem;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}
+  .sq .flame{position:absolute;top:32px;right:6px;font-size:.95rem;background:#fff3;border-radius:999px}
+  .sq .bdg{margin-top:.3rem;font-size:.95rem;letter-spacing:.1em;min-height:1.2em}
+  .sq.add{border:2px dashed #c9cfe4;background:transparent;box-shadow:none;display:flex;align-items:center;
+          justify-content:center;color:var(--mut);font-weight:600;min-height:190px}
+  .empty{max-width:520px;margin:3rem auto;text-align:center;background:var(--card);border-radius:16px;
+         padding:2rem;border:1px solid var(--line)}
+
+  /* toolbar */
+  .toolbar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;
+           justify-content:center;gap:.5rem;padding:.55rem .6rem;flex-wrap:wrap;z-index:20}
+  .toolbar button{background:#f2f4fd;border:1px solid var(--line);border-radius:999px;padding:.55rem 1rem;font-size:.92rem}
+  .toolbar button:hover{background:#e8ebfa}
+
+  /* overlays & modals */
+  .ovl{position:fixed;inset:0;background:rgba(18,24,44,.55);z-index:50;display:flex;align-items:center;
+       justify-content:center;padding:1rem;overflow:auto}
+  .panel{background:var(--card);border-radius:18px;max-width:760px;width:100%;max-height:92vh;overflow:auto;
+         padding:1.3rem;position:relative}
+  .panel h2{margin:.1rem 0 .8rem;font-size:1.25rem}
+  .panel h3{margin:1.2rem 0 .45rem;font-size:1rem;border-top:1px solid var(--line);padding-top:1rem}
+  .panel h3:first-of-type{border-top:0;padding-top:0}
+  .x{position:absolute;top:.7rem;right:.8rem;border:0;background:#eef0f8;border-radius:999px;width:34px;height:34px;font-size:1rem}
+  .row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.3rem 0}
+  .btn{background:var(--brand);color:#fff;border:0;border-radius:9px;padding:.55rem 1rem;font-size:.95rem}
+  .btn.gray{background:#eef0f8;color:var(--ink)} .btn.red{background:var(--danger)}
+  .btn:disabled{opacity:.45;cursor:default}
+  input[type=text],input[type=number],textarea,select{font-family:inherit;font-size:.95rem;border:1px solid #c9cfe4;
+       border-radius:8px;padding:.5rem .6rem;background:#fff;color:var(--ink)}
+  textarea{width:100%;min-height:110px}
+  .chip{display:inline-flex;align-items:center;gap:.3rem;background:#eef0f8;border-radius:999px;
+        padding:.25rem .7rem;font-size:.85rem;margin:.15rem}
+  .chip button{border:0;background:transparent;font-size:.8rem;color:var(--mut)}
+  .chip.off{opacity:.45;text-decoration:line-through}
+
+  /* award modal */
+  .award .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin:.9rem 0}
+  .award .nums button{font-size:2rem;font-weight:800;padding:1.05rem 0;border-radius:14px;border:0;
+        background:linear-gradient(180deg,#6d6de2,#5b5bd6);color:#fff;box-shadow:0 3px 0 #3f3fae}
+  .award .nums button:active{transform:translateY(2px);box-shadow:0 1px 0 #3f3fae}
+  .award .nums button.custom{background:linear-gradient(180deg,#f6b73c,#f59e0b);box-shadow:0 3px 0 #b45309}
+
+  /* randomizer */
+  .rand{ text-align:center }
+  .rand .big{font-size:clamp(2rem,7vw,3.6rem);font-weight:900;min-height:1.4em;margin:1.4rem 0;color:var(--brand2)}
+  .rand .big.landed{animation:pop .45s}
+  @keyframes pop{40%{transform:scale(1.18)}}
+
+  /* standings */
+  .stTabs{display:flex;gap:.4rem;margin-bottom:.9rem;flex-wrap:wrap}
+  .stTabs button{border:1px solid var(--line);background:#f2f4fd;border-radius:999px;padding:.4rem .95rem;font-size:.9rem}
+  .stTabs button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  table.lb{width:100%;border-collapse:collapse;font-size:.95rem}
+  table.lb td,table.lb th{padding:.5rem .5rem;text-align:left;border-bottom:1px solid var(--line)}
+  table.lb td.r{text-align:right;font-weight:700}
+  .rec{background:#fff8e6;border:1px solid #f3e2ac;border-radius:10px;padding:.6rem .8rem;margin-bottom:.8rem;font-size:.95rem}
+
+  /* undo pill */
+  #undoPill{position:fixed;left:50%;transform:translateX(-50%);bottom:78px;background:#1d2433;color:#fff;
+    border-radius:999px;padding:.55rem .6rem .55rem 1.1rem;display:flex;gap:.7rem;align-items:center;z-index:60;
+    box-shadow:0 4px 14px rgba(0,0,0,.3);font-size:.92rem}
+  #undoPill button{background:#fff;color:#1d2433;border:0;border-radius:999px;padding:.35rem .9rem;font-weight:700}
+
+  /* projector */
+  .proj{position:fixed;inset:0;background:#141a2e;color:#fff;z-index:80;padding:2.2rem;overflow:auto}
+  .proj h1{font-size:2rem;margin:0 0 1.4rem;display:flex;gap:1rem;align-items:baseline}
+  .proj .grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+  .proj .sq{background:#1f2742;border-color:#2c3555;color:#fff;cursor:default}
+  .proj .sq:hover{transform:none}
+  .proj .sq .nm{color:#fff} .proj .sq .meta{color:#9aa6c8}
+  .proj .first{outline:3px solid var(--gold);box-shadow:0 0 22px #f59e0b66}
+  .proj .exit{position:fixed;top:1rem;right:1rem;background:#ffffff22;color:#fff;border:0;border-radius:9px;padding:.5rem .9rem}
+
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:100}
+  footer{padding:.7rem;text-align:center}
+  footer a{color:var(--brand2);font-size:.85rem;text-decoration:none;background:#fff;border:1px solid var(--line);
+           border-radius:999px;padding:.4rem .9rem;display:inline-block}
+  @media (max-width:640px){ .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))} main{padding: .7rem} }
+</style>
+</head>
+<body>
+<header>
+  <h1>🏆 Squad Points</h1>
+  <span class="qlabel" id="qLabel">Q1</span>
+  <span class="spacer"></span>
+  <button class="hbtn" id="btnStandings2">🏆 Standings</button>
+  <button class="hbtn" id="btnSetup2">⚙️ Setup</button>
+</header>
+<nav class="tabs" id="tabs"></nav>
+<main id="main"></main>
+<div class="toolbar" id="toolbar">
+  <button data-act="random">🎲 Random Student</button>
+  <button data-act="randomsquad">🎲 Random Squad</button>
+  <button data-act="standings">🏆 Standings</button>
+  <button data-act="share">📤 Share</button>
+  <button data-act="projector">📽️ Projector</button>
+  <button data-act="timer">⏱️ Timer</button>
+  <button data-act="setup">⚙️ Setup</button>
+</div>
+<footer><a href="https://tobinscience.com" target="_blank" rel="noopener">Find more great resources at TobinScience.com →</a></footer>
+<div id="overlays"></div>
+<div id="undoHost"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+/*==CORE-START==*/
+"use strict";
+const SP = (() => {
+
+  // ---------- ids / storage ----------
+  let _uidc = 0;
+  const uid = (p) => p + (++_uidc).toString(36) + Math.random().toString(36).slice(2, 8);
+  const STORE_KEY = "squadPoints.v1";
+  const save = (state) => { if (typeof localStorage !== "undefined") localStorage.setItem(STORE_KEY, JSON.stringify(state)); };
+  const load = () => {
+    if (typeof localStorage === "undefined") return null;
+    try { const raw = localStorage.getItem(STORE_KEY); return raw ? JSON.parse(raw) : null; }
+    catch { return null; }
+  };
+
+  // ---------- state ----------
+  const AV_COUNT = 20; // built-in avatar pack size (art ships in a later chunk)
+  function newState(now) {
+    return {
+      settings: { soundOn: true, confettiOn: true, schoolYearLabel: "", lastBackupAt: null },
+      periods: [], students: [],
+      quarters: [{ id: uid("q"), label: "Q1", startedAt: now, endedAt: null }],
+      squads: [], awards: [],
+      pickerState: {}, goals: {}
+    };
+  }
+  const currentQuarter = (st) => st.quarters.find(q => q.endedAt === null);
+
+  // ---------- periods / roster ----------
+  function addPeriod(st, name) {
+    const p = { id: uid("p"), name: String(name).trim(), order: st.periods.length, emoji: "" };
+    st.periods.push(p); return p;
+  }
+  function renamePeriod(st, periodId, name) {
+    const p = st.periods.find(x => x.id === periodId); if (p) p.name = String(name).trim();
+  }
+  function parseRoster(text) {
+    const out = [], seen = new Set();
+    for (const rawLine of String(text).split(/\r?\n/)) {
+      const cells = rawLine.includes("\t") ? rawLine.split("\t") : [rawLine];
+      for (let cell of cells) {
+        cell = cell.replace(/^\s*\d+\s*[.)\-:]?\s*/, "").trim();   // strip "1." / "2)" numbering
+        if (!cell) continue;
+        const m = cell.match(/^([^,]+),\s*([^,]+)$/);              // "Last, First" -> "First Last"
+        if (m) cell = m[2].trim() + " " + m[1].trim();
+        cell = cell.replace(/\s+/g, " ");
+        const key = cell.toLowerCase();
+        if (!/[a-z]/i.test(cell)) continue;                        // must contain a letter
+        if (!seen.has(key)) { seen.add(key); out.push(cell); }
+      }
+    }
+    return out;
+  }
+  function addStudents(st, periodId, names) {
+    const existing = new Set(st.students.filter(s => s.periodId === periodId && s.active).map(s => s.name.toLowerCase()));
+    const added = [], skipped = [];
+    for (const n of names) {
+      if (existing.has(n.toLowerCase())) { skipped.push(n); continue; }
+      existing.add(n.toLowerCase());
+      const s = { id: uid("s"), periodId, name: n, active: true };
+      st.students.push(s); added.push(s);
+    }
+    return { added, skipped };
+  }
+
+  // ---------- quarters / squads ----------
+  function startQuarter(st, label, now) {
+    const open = currentQuarter(st);
+    if (open) open.endedAt = now;
+    const q = { id: uid("q"), label: String(label).trim(), startedAt: now, endedAt: null };
+    st.quarters.push(q); return q;
+  }
+  function addSquad(st, periodId, name) {
+    const q = currentQuarter(st);
+    const sq = { id: uid("g"), periodId, quarterId: q.id, name: String(name).trim(),
+                 imageKey: null, builtinAvatar: 0, memberIds: [] };
+    st.squads.push(sq); return sq;
+  }
+  function renameSquad(st, squadId, name) {
+    const sq = st.squads.find(x => x.id === squadId); if (sq) sq.name = String(name).trim();
+  }
+  function setSquadAvatar(st, squadId, avatarIndex) {
+    const sq = st.squads.find(x => x.id === squadId);
+    if (sq) sq.builtinAvatar = Math.max(0, Math.min(AV_COUNT - 1, avatarIndex | 0));
+  }
+  function assignStudent(st, squadId, studentId) {
+    const sq = st.squads.find(x => x.id === squadId); if (!sq) return;
+    // a student belongs to at most one squad per quarter
+    for (const other of st.squads) {
+      if (other.quarterId === sq.quarterId) other.memberIds = other.memberIds.filter(id => id !== studentId);
+    }
+    sq.memberIds.push(studentId);
+  }
+  function unassignStudent(st, squadId, studentId) {
+    const sq = st.squads.find(x => x.id === squadId);
+    if (sq) sq.memberIds = sq.memberIds.filter(id => id !== studentId);
+  }
+  const currentSquads = (st, periodId) => {
+    const q = currentQuarter(st);
+    return st.squads.filter(g => g.quarterId === q.id && (periodId == null || g.periodId === periodId));
+  };
+
+  // ---------- awards ledger (append-only; undo deletes a row) ----------
+  function award(st, squadId, points, now, note) {
+    const p = Number(points);
+    if (!Number.isInteger(p) || p < 1) throw new Error("Points must be a whole number of 1 or more.");
+    if (!st.squads.some(g => g.id === squadId)) throw new Error("Unknown squad.");
+    const a = { id: uid("a"), squadId, points: p, ts: now, note: note || null };
+    st.awards.push(a); return a;
+  }
+  function undoAward(st, awardId) {
+    const i = st.awards.findIndex(a => a.id === awardId);
+    if (i >= 0) st.awards.splice(i, 1);
+    return i >= 0;
+  }
+
+  // ---------- time helpers (device-local) ----------
+  function dayKey(ts) {
+    const d = new Date(ts);
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function weekStart(ts) { // Monday 00:00 local
+    const d = new Date(ts);
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    return d.getTime();
+  }
+
+  // ---------- derived stats (everything computes from the ledger) ----------
+  const _awardsOf = (st, squadId) => st.awards.filter(a => a.squadId === squadId);
+  const squadTotal  = (st, id) => _awardsOf(st, id).reduce((t, a) => t + a.points, 0);
+  const squadDaily  = (st, id, now) => _awardsOf(st, id).filter(a => dayKey(a.ts) === dayKey(now)).reduce((t, a) => t + a.points, 0);
+  const squadWeekly = (st, id, now) => {
+    const ws = weekStart(now), we = ws + 7 * 864e5;
+    return _awardsOf(st, id).filter(a => a.ts >= ws && a.ts < we).reduce((t, a) => t + a.points, 0);
+  };
+
+  function streak(st, squadId, now) {
+    // consecutive CLASS days (days when any squad in this period earned points) where this squad also earned
+    const sq = st.squads.find(g => g.id === squadId); if (!sq) return 0;
+    const mates = st.squads.filter(g => g.periodId === sq.periodId && g.quarterId === sq.quarterId).map(g => g.id);
+    const upTo = st.awards.filter(a => a.ts <= now); // "as of now" — later awards can't rewrite history
+    const classDays = [...new Set(upTo.filter(a => mates.includes(a.squadId)).map(a => dayKey(a.ts)))].sort();
+    const mine = new Set(upTo.filter(a => a.squadId === squadId).map(a => dayKey(a.ts)));
+    let n = 0;
+    for (let i = classDays.length - 1; i >= 0; i--) { if (mine.has(classDays[i])) n++; else break; }
+    return n;
+  }
+
+  function _rank(rows, key) { // ties share a rank: rank = 1 + count strictly greater
+    for (const r of rows) r.rank = 1 + rows.filter(x => x[key] > r[key]).length;
+    return rows;
+  }
+
+  function periodStandings(st, periodId, now) {
+    const rows = currentSquads(st, periodId).map(sq => ({
+      squad: sq, name: sq.name, total: squadTotal(st, sq.id),
+      daily: squadDaily(st, sq.id, now), weekly: squadWeekly(st, sq.id, now),
+      streak: streak(st, sq.id, now), badges: badges(st, sq.id, now)
+    }));
+    rows.sort((a, b) => b.total - a.total || a.name.localeCompare(b.name));
+    return _rank(rows, "total");
+  }
+
+  function quarterChampion(st, now) {
+    let best = null;
+    for (const p of st.periods) for (const r of periodStandings(st, p.id, now)) {
+      if (r.total > 0 && (!best || r.total > best.total)) best = { name: r.name, period: p.name, total: r.total };
+    }
+    return best;
+  }
+
+  function allTimeTop10(st) {
+    const rows = st.squads.map(sq => {
+      const q = st.quarters.find(x => x.id === sq.quarterId);
+      const p = st.periods.find(x => x.id === sq.periodId);
+      return { name: sq.name, period: p ? p.name : "?", quarter: q ? q.label : "?", total: squadTotal(st, sq.id) };
+    }).filter(r => r.total > 0);
+    rows.sort((a, b) => b.total - a.total || a.name.localeCompare(b.name));
+    return rows.slice(0, 10);
+  }
+
+  function weeklyRace(st, now) {
+    const rows = [];
+    for (const p of st.periods) for (const sq of currentSquads(st, p.id)) {
+      const w = squadWeekly(st, sq.id, now);
+      if (w > 0) rows.push({ name: sq.name, period: p.name, weekly: w });
+    }
+    rows.sort((a, b) => b.weekly - a.weekly || a.name.localeCompare(b.name));
+    return rows;
+  }
+
+  function squadOfWeek(st, periodId, now) { // last week's top weekly squad in this period
+    const ws = weekStart(now), prev = ws - 7 * 864e5;
+    let best = null;
+    for (const sq of currentSquads(st, periodId)) {
+      const pts = _awardsOf(st, sq.id).filter(a => a.ts >= prev && a.ts < ws).reduce((t, a) => t + a.points, 0);
+      if (pts > 0 && (!best || pts > best.points)) best = { name: sq.name, points: pts };
+    }
+    return best;
+  }
+
+  // ---------- badges ----------
+  const BADGES = {
+    first_points:  { icon: "🌟", label: "First Points",   desc: "Earned the squad's first points" },
+    club100:       { icon: "💯", label: "Century Club",   desc: "Reached 100 points in a quarter" },
+    club250:       { icon: "🚀", label: "250 Club",       desc: "Reached 250 points in a quarter" },
+    club500:       { icon: "👑", label: "500 Club",       desc: "Reached 500 points in a quarter" },
+    hot_streak:    { icon: "🔥", label: "Hot Streak",     desc: "Earned points 5 class days in a row" },
+    daily_double:  { icon: "⚡", label: "Daily Double",   desc: "Top daily squad twice in one week" },
+    comeback:      { icon: "📈", label: "Comeback",       desc: "From last place to top 3 in one week" },
+    record_breaker:{ icon: "🏅", label: "Record Breakers",desc: "Set a new all-time record" }
+  };
+
+  function badges(st, squadId, now) {
+    const out = [];
+    const total = squadTotal(st, squadId);
+    if (total >= 1) out.push("first_points");
+    if (total >= 100) out.push("club100");
+    if (total >= 250) out.push("club250");
+    if (total >= 500) out.push("club500");
+    if (streak(st, squadId, now) >= 5) out.push("hot_streak");
+
+    const sq = st.squads.find(g => g.id === squadId);
+    const mates = st.squads.filter(g => g.periodId === sq.periodId && g.quarterId === sq.quarterId);
+
+    // daily double: strictly-top daily scorer in its period on 2+ days of the same Mon–Sun week (any week)
+    const byWeekWins = {};
+    const days = [...new Set(st.awards.filter(a => mates.some(m => m.id === a.squadId)).map(a => dayKey(a.ts)))];
+    for (const day of days) {
+      const scores = mates.map(m => ({ id: m.id, pts: st.awards.filter(a => a.squadId === m.id && dayKey(a.ts) === day).reduce((t, a) => t + a.points, 0) }));
+      const top = Math.max(...scores.map(s => s.pts));
+      const winners = scores.filter(s => s.pts === top && top > 0);
+      if (winners.length === 1 && winners[0].id === squadId) {
+        const wk = weekStart(st.awards.find(a => dayKey(a.ts) === day && mates.some(m => m.id === a.squadId)).ts);
+        byWeekWins[wk] = (byWeekWins[wk] || 0) + 1;
+      }
+    }
+    if (Object.values(byWeekWins).some(n => n >= 2)) out.push("daily_double");
+
+    // comeback: strictly last at start of this week (4+ squads, had a real deficit) and top 3 now
+    if (mates.length >= 4) {
+      const ws = weekStart(now);
+      const prevTotals = mates.map(m => ({ id: m.id, pts: st.awards.filter(a => a.squadId === m.id && a.ts < ws).reduce((t, a) => t + a.points, 0) }));
+      const minPts = Math.min(...prevTotals.map(x => x.pts)), maxPts = Math.max(...prevTotals.map(x => x.pts));
+      const lastOnes = prevTotals.filter(x => x.pts === minPts);
+      if (maxPts > minPts && lastOnes.length === 1 && lastOnes[0].id === squadId) {
+        const nowRows = mates.map(m => ({ id: m.id, pts: squadTotal(st, m.id) })).sort((a, b) => b.pts - a.pts);
+        const rank = 1 + nowRows.filter(x => x.pts > squadTotal(st, squadId)).length;
+        if (rank <= 3) out.push("comeback");
+      }
+    }
+
+    // record breaker: beat the best total ever posted by any OTHER (squad, quarter) pair
+    const otherBest = Math.max(0, ...st.squads.filter(g => g.id !== squadId).map(g => squadTotal(st, g.id)));
+    if (otherBest > 0 && total > otherBest) out.push("record_breaker");
+
+    return out;
+  }
+
+  // ---------- random picker ----------
+  function pickRandom(st, periodId, opts) {
+    const o = opts || {};
+    const rng = o.rng || Math.random;
+    const pool0 = st.students.filter(s => s.periodId === periodId && s.active && !(o.excludeIds || []).includes(s.id));
+    if (!pool0.length) return null;
+    let ps = st.pickerState[periodId];
+    if (!ps) ps = st.pickerState[periodId] = { remainingIds: [], noRepeat: false };
+    if (o.noRepeat != null) ps.noRepeat = !!o.noRepeat;
+    let pool = pool0;
+    if (ps.noRepeat) {
+      ps.remainingIds = ps.remainingIds.filter(id => pool0.some(s => s.id === id));
+      if (!ps.remainingIds.length) ps.remainingIds = pool0.map(s => s.id); // everyone had a turn -> reset
+      pool = pool0.filter(s => ps.remainingIds.includes(s.id));
+    }
+    const chosen = pool[Math.floor(rng() * pool.length)];
+    if (ps.noRepeat) ps.remainingIds = ps.remainingIds.filter(id => id !== chosen.id);
+    return chosen;
+  }
+  function resetPicker(st, periodId) { if (st.pickerState[periodId]) st.pickerState[periodId].remainingIds = []; }
+
+  // ---------- goals ----------
+  function setGoal(st, periodId, target) { st.goals[periodId] = target == null ? null : Math.max(1, target | 0); }
+
+  // ---------- student-link snapshot (short keys; NO student names / notes / images) ----------
+  function buildSnapshot(st, now) {
+    const q = currentQuarter(st);
+    const snap = {
+      v: 1, y: st.settings.schoolYearLabel || "", q: q.label, at: Math.floor(now / 60000),
+      p: st.periods.map(p => {
+        const sow = squadOfWeek(st, p.id, now);
+        return {
+          n: p.name,
+          s: periodStandings(st, p.id, now).map(r => ({
+            n: r.name, av: r.squad.builtinAvatar, t: r.total, d: r.daily, w: r.weekly,
+            st: r.streak, b: r.badges
+          })),
+          sow: sow ? sow.name : null,
+          g: st.goals[p.id] ? { t: st.goals[p.id], c: periodStandings(st, p.id, now).reduce((t, r) => t + r.total, 0) } : null
+        };
+      }),
+      champ: {
+        cur: quarterChampion(st, now),
+        top10: allTimeTop10(st).map(r => ({ n: r.name, p: r.period, q: r.quarter, t: r.total })),
+        week: weeklyRace(st, now).slice(0, 10).map(r => ({ n: r.name, p: r.period, w: r.weekly }))
+      }
+    };
+    return snap;
+  }
+
+  // ---------- compression + base64url (native streams; no libraries) ----------
+  async function _pipe(bytes, stream) {
+    const w = stream.writable.getWriter();
+    w.write(bytes); w.close();
+    return new Uint8Array(await new Response(stream.readable).arrayBuffer());
+  }
+  const _b64url = (bytes) => {
+    let s = ""; for (const b of bytes) s += String.fromCharCode(b);
+    return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  };
+  const _unb64url = (str) => {
+    const s = atob(str.replace(/-/g, "+").replace(/_/g, "/"));
+    return Uint8Array.from(s, c => c.charCodeAt(0));
+  };
+  async function packJSON(obj) {
+    const bytes = new TextEncoder().encode(JSON.stringify(obj));
+    return _b64url(await _pipe(bytes, new CompressionStream("deflate-raw")));
+  }
+  async function unpackJSON(str) {
+    const bytes = await _pipe(_unb64url(str), new DecompressionStream("deflate-raw"));
+    return JSON.parse(new TextDecoder().decode(bytes));
+  }
+  const encodeSnapshot = (snap) => packJSON(snap);
+  async function decodeSnapshot(str) {
+    const snap = await unpackJSON(str);
+    if (snap.v !== 1) throw new Error("This link was made by a newer version of Squad Points.");
+    return snap;
+  }
+
+  // ---------- transfer code (all data except custom images) ----------
+  const TRANSFER_PREFIX = "SQT1.";
+  async function encodeTransfer(st) {
+    const clean = JSON.parse(JSON.stringify(st));
+    for (const sq of clean.squads) sq.imageKey = null; // images live in IndexedDB; use file backup for those
+    return TRANSFER_PREFIX + await packJSON(clean);
+  }
+  async function decodeTransfer(code) {
+    const c = String(code).trim();
+    if (!c.startsWith(TRANSFER_PREFIX)) {
+      if (/^[A-Za-z0-9_-]{40,}$/.test(c)) throw new Error("That looks like a student share link, not a Transfer Code. In Squad Points go to Setup → Move to another device.");
+      throw new Error("That doesn't look like a Squad Points Transfer Code.");
+    }
+    const st = await unpackJSON(c.slice(TRANSFER_PREFIX.length));
+    if (!st.periods || !st.awards || !st.quarters) throw new Error("Transfer Code is incomplete — copy the WHOLE code and try again.");
+    return st;
+  }
+
+  return {
+    AV_COUNT, BADGES, STORE_KEY,
+    uid, save, load, newState, currentQuarter,
+    addPeriod, renamePeriod, parseRoster, addStudents,
+    startQuarter, addSquad, renameSquad, setSquadAvatar, assignStudent, unassignStudent, currentSquads,
+    award, undoAward, dayKey, weekStart,
+    squadTotal, squadDaily, squadWeekly, streak, periodStandings,
+    quarterChampion, allTimeTop10, weeklyRace, squadOfWeek, badges,
+    pickRandom, resetPicker, setGoal,
+    buildSnapshot, encodeSnapshot, decodeSnapshot, encodeTransfer, decodeTransfer
+  };
+})();
+if (typeof globalThis !== "undefined") globalThis.SP = SP;
+/*==CORE-END==*/
+</script>
+
+<script>
+/*==TEST-START==*/
+async function runCoreTests(SP) {
+  const log = []; let passed = 0, failed = 0;
+  const ok = (cond, name) => { cond ? passed++ : failed++; log.push((cond ? "PASS  " : "FAIL  ") + name); };
+  const eq = (a, b, name) => ok(JSON.stringify(a) === JSON.stringify(b), name + "  [" + JSON.stringify(a) + " == " + JSON.stringify(b) + "]");
+  const T = (y, mo, d, h, mi) => new Date(y, mo - 1, d, h || 12, mi || 0).getTime(); // local time
+
+  // --- roster parser ---
+  const names = SP.parseRoster("1. Smith, Ava\n2) Jones, Ben\nCara Diaz\n\n  cara diaz \nDan\tElla Fox\n3 - Grey, Hank");
+  eq(names, ["Ava Smith", "Ben Jones", "Cara Diaz", "Dan", "Ella Fox", "Hank Grey"], "roster: numbering, Last-First swap, tabs, dedupe, blanks");
+  eq(SP.parseRoster("12345\n---"), [], "roster: junk lines dropped");
+
+  // --- state scenario: Q1, one period, 4 squads ---
+  const MON = T(2026, 9, 14), TUE = T(2026, 9, 15), WED = T(2026, 9, 16), THU = T(2026, 9, 17), FRI = T(2026, 9, 18);
+  const st = SP.newState(T(2026, 8, 3));
+  st.settings.schoolYearLabel = "2026-27";
+  const p3 = SP.addPeriod(st, "3rd Period");
+  const p4 = SP.addPeriod(st, "4th Period");
+  const r = SP.addStudents(st, p3.id, SP.parseRoster("Ava Smith\nBen Jones\nCara Diaz\nDan Lee\nElla Fox\nHank Grey\nIvy Moss\nJon Park"));
+  eq(r.added.length, 8, "addStudents: 8 added");
+  eq(SP.addStudents(st, p3.id, ["ava smith"]).skipped.length, 1, "addStudents: case-insensitive dedupe");
+
+  const A = SP.addSquad(st, p3.id, "Da Niches"), B = SP.addSquad(st, p3.id, "Allergy Alphas"),
+        C = SP.addSquad(st, p3.id, "Men of Culture"), D = SP.addSquad(st, p3.id, "Bucketeers");
+  const X = SP.addSquad(st, p4.id, "Lord Farquads");
+  const ids = st.students.filter(s => s.periodId === p3.id).map(s => s.id);
+  SP.assignStudent(st, A.id, ids[0]); SP.assignStudent(st, A.id, ids[1]);
+  SP.assignStudent(st, B.id, ids[0]); // steals Ava from A
+  eq(A.memberIds.length, 1, "assign: student moved out of old squad");
+  eq(B.memberIds.length, 1, "assign: student landed in new squad");
+
+  // --- award validation ---
+  let threw = 0;
+  for (const bad of [0, -3, 2.5, "x"]) { try { SP.award(st, A.id, bad, MON); } catch { threw++; } }
+  eq(threw, 4, "award: rejects 0, negative, fraction, non-number");
+
+  // --- ledger + daily/weekly/total math ---
+  SP.award(st, A.id, 5, MON); SP.award(st, A.id, 3, MON);
+  SP.award(st, B.id, 4, MON);
+  SP.award(st, A.id, 2, TUE);
+  SP.award(st, B.id, 5, WED); SP.award(st, C.id, 1, WED);
+  SP.award(st, X.id, 5, WED);
+  const SUN_LATE = T(2026, 9, 20, 23, 59), NEXT_MON = T(2026, 9, 21, 0, 1);
+  SP.award(st, C.id, 4, SUN_LATE);   // still last week
+  SP.award(st, C.id, 5, NEXT_MON);   // new week
+
+  eq(SP.squadTotal(st, A.id), 10, "total: A = 10");
+  eq(SP.squadDaily(st, A.id, MON), 8, "daily: A on Monday = 8");
+  eq(SP.squadDaily(st, A.id, TUE), 2, "daily: A on Tuesday = 2");
+  eq(SP.squadWeekly(st, A.id, FRI), 10, "weekly: A week-1 = 10");
+  eq(SP.squadWeekly(st, C.id, FRI), 5, "weekly: C week-1 = 5 (incl. Sunday 23:59)");
+  eq(SP.squadWeekly(st, C.id, NEXT_MON), 5, "weekly: resets Monday (C week-2 = 5)");
+  eq(SP.squadTotal(st, C.id), 10, "quarter total persists across weeks (C = 10)");
+
+  // --- standings + ranks (ties) ---
+  const rows = SP.periodStandings(st, p3.id, NEXT_MON);
+  eq(rows.map(r => r.name), ["Allergy Alphas", "Bucketeers", "Da Niches", "Men of Culture"].sort((a, b) => {
+    const t = { "Da Niches": 10, "Allergy Alphas": 9, "Men of Culture": 10, "Bucketeers": 0 };
+    return t[b] - t[a] || a.localeCompare(b);
+  }), "standings: sorted by total, ties alphabetical");
+  eq(rows[0].rank, 1, "rank: co-leaders rank 1");
+  eq(rows[1].rank, 1, "rank: tie shares rank 1");
+  eq(rows[2].rank, 3, "rank: next rank skips (3)");
+
+  // --- streak: MON,TUE class days for A... A earned MON+TUE, missed WED (class day), so streak from WED back = 0 chain broken ---
+  eq(SP.streak(st, A.id, WED), 0, "streak: broken on missed class day");
+  eq(SP.streak(st, B.id, WED), 1, "streak: B earned on latest class day only after gap (TUE missed)");
+  // build a clean 3-day streak for D
+  SP.award(st, D.id, 1, WED); SP.award(st, D.id, 1, T(2026, 9, 20, 23, 58)); SP.award(st, D.id, 1, NEXT_MON);
+  eq(SP.streak(st, D.id, NEXT_MON), 3, "streak: 3 consecutive class days");
+
+  // --- champion / weekly race / squad of week ---
+  const champ = SP.quarterChampion(st, NEXT_MON);
+  ok(champ && champ.total === 10, "champion: total 10 from 3rd Period");
+  const race = SP.weeklyRace(st, FRI);
+  eq(race[0].weekly, 10, "weekly race: leader = 10");
+  ok(race.some(r => r.period === "4th Period"), "weekly race: includes other periods");
+  const sow = SP.squadOfWeek(st, p3.id, NEXT_MON);
+  ok(sow && sow.points >= 5, "squad of week: previous week's top squad found");
+
+  // --- picker: no-repeat exhausts everyone before repeating ---
+  let seed = 42; const rng = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+  const seen = new Set(); const p3count = st.students.filter(s => s.periodId === p3.id && s.active).length;
+  for (let i = 0; i < p3count; i++) seen.add(SP.pickRandom(st, p3.id, { noRepeat: true, rng }).id);
+  eq(seen.size, p3count, "picker: all " + p3count + " students picked once before any repeat");
+  ok(SP.pickRandom(st, p3.id, { noRepeat: true, rng }) !== null, "picker: auto-resets after everyone had a turn");
+
+  // --- undo ---
+  const big = SP.award(st, D.id, 50, NEXT_MON);
+  eq(SP.squadTotal(st, D.id), 53, "custom award: +50 accepted");
+  SP.undoAward(st, big.id);
+  eq(SP.squadTotal(st, D.id), 3, "undo: award fully reversed");
+
+  // --- badges ---
+  for (let i = 0; i < 25; i++) SP.award(st, A.id, 5, NEXT_MON); // A -> 135
+  const ab = SP.badges(st, A.id, NEXT_MON);
+  ok(ab.includes("club100"), "badge: Century Club at 100+");
+  ok(ab.includes("record_breaker"), "badge: record breaker when beating best other total");
+  ok(!SP.badges(st, D.id, NEXT_MON).includes("club100"), "badge: not given below threshold");
+
+  // --- new quarter: archive + fresh start + all-time records ---
+  SP.startQuarter(st, "Q2 2026-27", T(2026, 10, 26));
+  eq(SP.currentSquads(st, p3.id).length, 0, "new quarter: no squads yet");
+  eq(st.students.filter(s => s.periodId === p3.id && s.active).length, 8, "new quarter: roster kept");
+  const top = SP.allTimeTop10(st);
+  eq(top[0].total, 135, "all-time: Q1 record preserved");
+  eq(top[0].quarter, "Q1", "all-time: labeled with quarter");
+  const E = SP.addSquad(st, p3.id, "New Kids");
+  SP.award(st, E.id, 5, T(2026, 10, 27));
+  eq(SP.periodStandings(st, p3.id, T(2026, 10, 27)).length, 1, "new quarter: standings only show new squads");
+  ok(SP.allTimeTop10(st).some(r => r.name === "New Kids"), "all-time: current-quarter squads compete live");
+
+  // --- snapshot: shape + privacy ---
+  const snap = SP.buildSnapshot(st, T(2026, 10, 27));
+  eq(snap.v, 1, "snapshot: versioned");
+  eq(snap.p.length, 2, "snapshot: all periods included");
+  const js = JSON.stringify(snap);
+  ok(!js.includes("Ava") && !js.includes("Smith"), "snapshot: NO student names leak");
+  ok(js.includes("Da Niches"), "snapshot: squad names present (records)");
+  ok(snap.champ.top10[0].t === 135, "snapshot: all-time record rides along");
+
+  // --- encode/decode round-trips (needs CompressionStream) ---
+  if (typeof CompressionStream !== "undefined") {
+    const enc = await SP.encodeSnapshot(snap);
+    ok(/^[A-Za-z0-9_-]+$/.test(enc), "encode: URL-safe base64");
+    ok(enc.length < 8192, "encode: snapshot fits link budget (" + enc.length + " chars)");
+    const back = await SP.decodeSnapshot(enc);
+    eq(back.champ.top10[0].t, 135, "decode: snapshot round-trip intact");
+
+    const code = await SP.encodeTransfer(st);
+    ok(code.startsWith("SQT1."), "transfer: prefixed");
+    const st2 = await SP.decodeTransfer(code);
+    eq(st2.awards.length, st.awards.length, "transfer: full ledger survives (" + st.awards.length + " awards)");
+    eq(SP.squadTotal(st2, A.id), 135, "transfer: totals recompute identically on new device");
+    let msg = "";
+    try { await SP.decodeTransfer(enc); } catch (e) { msg = e.message; }
+    ok(msg.includes("share link"), "transfer: pasting a share link explains the difference");
+  } else {
+    log.push("SKIP  CompressionStream not available in this runtime — verify encode/decode in browser");
+  }
+
+  return { passed, failed, log };
+}
+if (typeof globalThis !== "undefined") globalThis.runCoreTests = runCoreTests;
+/*==TEST-END==*/
+
+</script>
+
+<script>
+/*==QR-START==*/
+// Self-contained QR encoder (byte mode, EC level L, versions 1-40). Verified offline in
+// qr_gen.mjs (ECC tables vs geometry, encode/decode round-trip v1-40, format + version-info
+// bits vs published ISO/IEC 18004 values). No external library, no network.
+window.QR = (() => {
+  "use strict";
+  const EXP = new Uint8Array(512), LOG = new Uint8Array(256);
+  (() => { let x = 1; for (let i = 0; i < 255; i++) { EXP[i] = x; LOG[x] = i; x <<= 1; if (x & 0x100) x ^= 0x11d; } for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255]; })();
+  const gmul = (a, b) => (a === 0 || b === 0) ? 0 : EXP[LOG[a] + LOG[b]];
+  function rsGen(deg) { let p = [1]; for (let i = 0; i < deg; i++) { const np = new Array(p.length + 1).fill(0); for (let j = 0; j < p.length; j++) { np[j] ^= gmul(p[j], EXP[i]); np[j + 1] ^= p[j]; } p = np; } return p; }
+  function rsEC(data, deg) { const gen = rsGen(deg); const res = new Array(deg).fill(0); for (const d of data) { const f = d ^ res[0]; res.shift(); res.push(0); for (let j = 0; j < deg; j++) res[j] ^= gmul(gen[j], f); } return res; }
+  const ECL = {
+    1:[7,[[1,19]]],2:[10,[[1,34]]],3:[15,[[1,55]]],4:[20,[[1,80]]],5:[26,[[1,108]]],
+    6:[18,[[2,68]]],7:[20,[[2,78]]],8:[24,[[2,97]]],9:[30,[[2,116]]],10:[18,[[2,68],[2,69]]],
+    11:[20,[[4,81]]],12:[24,[[2,92],[2,93]]],13:[26,[[4,107]]],14:[30,[[3,115],[1,116]]],15:[22,[[5,87],[1,88]]],
+    16:[24,[[5,98],[1,99]]],17:[28,[[1,107],[5,108]]],18:[30,[[5,120],[1,121]]],19:[28,[[3,113],[4,114]]],20:[28,[[3,107],[5,108]]],
+    21:[28,[[4,116],[4,117]]],22:[28,[[2,111],[7,112]]],23:[30,[[4,121],[5,122]]],24:[30,[[6,117],[4,118]]],25:[26,[[8,106],[4,107]]],
+    26:[28,[[10,114],[2,115]]],27:[30,[[8,122],[4,123]]],28:[30,[[3,117],[10,118]]],29:[30,[[7,116],[7,117]]],30:[30,[[5,115],[10,116]]],
+    31:[30,[[13,115],[3,116]]],32:[30,[[17,115]]],33:[30,[[17,115],[1,116]]],34:[30,[[13,115],[6,116]]],35:[30,[[12,121],[7,122]]],
+    36:[30,[[6,121],[14,122]]],37:[30,[[17,122],[4,123]]],38:[30,[[4,122],[18,123]]],39:[30,[[20,117],[4,118]]],40:[30,[[19,118],[6,119]]]
+  };
+  const ALIGN = {1:[],2:[6,18],3:[6,22],4:[6,26],5:[6,30],6:[6,34],7:[6,22,38],8:[6,24,42],9:[6,26,46],10:[6,28,50],
+    11:[6,30,54],12:[6,32,58],13:[6,34,62],14:[6,26,46,66],15:[6,26,48,70],16:[6,26,50,74],17:[6,30,54,78],18:[6,30,56,82],
+    19:[6,30,58,86],20:[6,34,62,90],21:[6,28,50,72,94],22:[6,26,50,74,98],23:[6,30,54,78,102],24:[6,28,54,80,106],25:[6,32,58,84,110],
+    26:[6,30,58,86,114],27:[6,34,62,90,118],28:[6,26,50,74,98,122],29:[6,30,54,78,102,126],30:[6,26,52,78,104,130],
+    31:[6,30,56,82,108,134],32:[6,34,60,86,112,138],33:[6,30,58,86,114,142],34:[6,34,62,90,118,146],35:[6,30,54,78,102,126,150],
+    36:[6,24,50,76,102,128,154],37:[6,28,54,80,106,132,158],38:[6,32,58,84,110,136,162],39:[6,26,54,82,110,138,166],40:[6,30,58,86,114,142,170]};
+  const VERINFO = {7:0x07C94,8:0x085BC,9:0x09A99,10:0x0A4D3,11:0x0BBF6,12:0x0C762,13:0x0D847,14:0x0E60D,15:0x0F928,
+    16:0x10B78,17:0x1145D,18:0x12A17,19:0x13532,20:0x149A6,21:0x15683,22:0x168C9,23:0x177EC,24:0x18EC4,25:0x191E1,
+    26:0x1AFAB,27:0x1B08E,28:0x1CC1A,29:0x1D33F,30:0x1ED75,31:0x1F250,32:0x209D5,33:0x216F0,34:0x228BA,35:0x2379F,
+    36:0x24B0B,37:0x2542E,38:0x26A64,39:0x27541,40:0x28C69};
+  const size = v => 17 + 4 * v;
+  function alignCenters(v){ const ac=ALIGN[v]; if(!ac.length) return []; const mx=ac[ac.length-1]; const out=[]; for(const r of ac) for(const c of ac){ if((r===6&&c===6)||(r===6&&c===mx)||(r===mx&&c===6)) continue; out.push([r,c]); } return out; }
+  function totalDataCodewords(v){ const [,g]=ECL[v]; let d=0; for(const [cnt,per] of g) d+=cnt*per; return d; }
+  function pickVersion(len){ for(let v=1;v<=40;v++){ const cap=totalDataCodewords(v); const ccBits=v<10?8:16; const need=Math.ceil((4+ccBits+len*8)/8); if(need<=cap) return v; } throw new Error("too large"); }
+  function makeCodewords(bytes,v){ const [ecPer,groups]=ECL[v]; const capD=totalDataCodewords(v); const ccBits=v<10?8:16;
+    const bits=[]; const push=(val,n)=>{ for(let i=n-1;i>=0;i--) bits.push((val>>i)&1); };
+    push(0b0100,4); push(bytes.length,ccBits); for(const b of bytes) push(b,8);
+    const totalBits=capD*8; for(let i=0;i<4&&bits.length<totalBits;i++) bits.push(0); while(bits.length%8) bits.push(0);
+    const dcw=[]; for(let i=0;i<bits.length;i+=8){ let b=0; for(let j=0;j<8;j++) b=(b<<1)|bits[i+j]; dcw.push(b); }
+    const pads=[0xEC,0x11]; let pi=0; while(dcw.length<capD) dcw.push(pads[pi++%2]);
+    const dataBlocks=[],ecBlocks=[]; let idx=0;
+    for(const [cnt,per] of groups) for(let b=0;b<cnt;b++){ const blk=dcw.slice(idx,idx+per); idx+=per; dataBlocks.push(blk); ecBlocks.push(rsEC(blk,ecPer)); }
+    const out=[]; const maxD=Math.max(...dataBlocks.map(b=>b.length));
+    for(let i=0;i<maxD;i++) for(const blk of dataBlocks) if(i<blk.length) out.push(blk[i]);
+    const maxE=Math.max(...ecBlocks.map(b=>b.length));
+    for(let i=0;i<maxE;i++) for(const blk of ecBlocks) if(i<blk.length) out.push(blk[i]);
+    return out;
+  }
+  function buildMatrix(bytes,v){ const n=size(v);
+    const M=Array.from({length:n},()=>new Int8Array(n).fill(-1)); const isFn=Array.from({length:n},()=>new Uint8Array(n));
+    const put=(r,c,val)=>{M[r][c]=val;isFn[r][c]=1;};
+    const drawFinder=(br,bc)=>{ for(let r=-1;r<=7;r++) for(let c=-1;c<=7;c++){ const rr=br+r,cc=bc+c; if(rr<0||cc<0||rr>=n||cc>=n) continue; const ring=(r>=0&&r<=6&&(c===0||c===6))||(c>=0&&c<=6&&(r===0||r===6)); const core=(r>=2&&r<=4&&c>=2&&c<=4); put(rr,cc,(ring||core)?1:0); } };
+    drawFinder(0,0); drawFinder(0,n-7); drawFinder(n-7,0);
+    for(let i=8;i<n-8;i++){ const val=(i%2===0)?1:0; if(!isFn[6][i])put(6,i,val); if(!isFn[i][6])put(i,6,val); }
+    for(const [r,c] of alignCenters(v)){ for(let dr=-2;dr<=2;dr++) for(let dc=-2;dc<=2;dc++){ const ring=Math.max(Math.abs(dr),Math.abs(dc)); put(r+dr,c+dc,(ring===2||ring===0)?1:0); } }
+    put(n-8,8,1);
+    for(let i=0;i<=8;i++){ if(!isFn[8][i])put(8,i,0); if(!isFn[i][8])put(i,8,0); }
+    for(let i=0;i<8;i++){ if(!isFn[8][n-1-i])put(8,n-1-i,0); if(!isFn[n-1-i][8])put(n-1-i,8,0); }
+    if(v>=7){ for(let i=0;i<6;i++) for(let j=0;j<3;j++){ put(i,n-11+j,0); put(n-11+j,i,0); } }
+    const cw=makeCodewords(bytes,v); const bitAt=k=>(cw[k>>3]>>(7-(k&7)))&1;
+    let bit=0,dirUp=true;
+    for(let col=n-1;col>0;col-=2){ if(col===6) col--; for(let i=0;i<n;i++){ const row=dirUp?(n-1-i):i; for(let c=0;c<2;c++){ const cc=col-c; if(isFn[row][cc]) continue; M[row][cc]= bit<cw.length*8 ? bitAt(bit):0; bit++; } } dirUp=!dirUp; }
+    const maskFn=[ (r,c)=>(r+c)%2===0,(r,c)=>r%2===0,(r,c)=>c%3===0,(r,c)=>(r+c)%3===0,
+      (r,c)=>(Math.floor(r/2)+Math.floor(c/3))%2===0,(r,c)=>((r*c)%2+(r*c)%3)===0,
+      (r,c)=>(((r*c)%2+(r*c)%3)%2)===0,(r,c)=>(((r+c)%2+(r*c)%3)%2)===0 ];
+    const applyMask=mi=>{ const o=M.map(r=>Int8Array.from(r)); for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(!isFn[r][c]&&maskFn[mi](r,c)) o[r][c]^=1; return o; };
+    const fmtBits=mask=>{ const data=(0b01<<3)|mask; let d=data<<10; const g=0b10100110111; for(let i=14;i>=10;i--) if((d>>i)&1) d^=g<<(i-10); return ((data<<10)|d)^0b101010000010010; };
+    const placeFormat=(mat,mask)=>{ const b=fmtBits(mask); for(let i=0;i<=5;i++){ mat[8][i]=(b>>i)&1; mat[i][8]=(b>>(14-i))&1; } mat[8][7]=(b>>6)&1; mat[8][8]=(b>>7)&1; mat[7][8]=(b>>8)&1; for(let i=9;i<15;i++) mat[14-i][8]=(b>>i)&1; for(let i=0;i<8;i++) mat[8][n-1-i]=(b>>i)&1; for(let i=8;i<15;i++) mat[n-15+i][8]=(b>>i)&1; mat[n-8][8]=1; };
+    const placeVersion=mat=>{ if(v<7) return; const vi=VERINFO[v]; for(let i=0;i<18;i++){ const b=(vi>>i)&1; const r=Math.floor(i/3),c=i%3; mat[r][n-11+c]=b; mat[n-11+c][r]=b; } };
+    function penalty(mat){ let p=0;
+      for(let r=0;r<n;r++){ let run=1; for(let c=1;c<n;c++){ if(mat[r][c]===mat[r][c-1]){run++; if(run===5)p+=3; else if(run>5)p++;} else run=1; } }
+      for(let c=0;c<n;c++){ let run=1; for(let r=1;r<n;r++){ if(mat[r][c]===mat[r-1][c]){run++; if(run===5)p+=3; else if(run>5)p++;} else run=1; } }
+      for(let r=0;r<n-1;r++) for(let c=0;c<n-1;c++){ const x=mat[r][c]; if(x===mat[r][c+1]&&x===mat[r+1][c]&&x===mat[r+1][c+1]) p+=3; }
+      const pat=[1,0,1,1,1,0,1]; const has=(arr,i)=>{ for(let k=0;k<7;k++) if(arr[i+k]!==pat[k]) return false; return true; };
+      for(let r=0;r<n;r++){ const row=[...mat[r]]; for(let c=0;c<=n-7;c++){ if(has(row,c)){ const before=c>=4&&row.slice(c-4,c).every(x=>x===0); const after=c+11<=n&&row.slice(c+7,c+11).every(x=>x===0); if(before||after) p+=40; } } }
+      for(let c=0;c<n;c++){ const col=[]; for(let r=0;r<n;r++) col.push(mat[r][c]); for(let r=0;r<=n-7;r++){ if(has(col,r)){ const before=r>=4&&col.slice(r-4,r).every(x=>x===0); const after=r+11<=n&&col.slice(r+7,r+11).every(x=>x===0); if(before||after) p+=40; } } }
+      let dark=0; for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(mat[r][c])dark++; p+=Math.floor(Math.abs(dark*100/(n*n)-50)/5)*10; return p; }
+    let best=null;
+    for(let mi=0;mi<8;mi++){ const mm=applyMask(mi); placeFormat(mm,mi); placeVersion(mm); const pen=penalty(mm); if(best===null||pen<best.pen) best={mat:mm,pen}; }
+    return { matrix: best.mat, n };
+  }
+  function matrix(text){ const bytes=[...new TextEncoder().encode(text)]; const v=pickVersion(bytes.length); return buildMatrix(bytes,v); }
+  function svg(text, sizePx){
+    const { matrix: M, n } = matrix(text);
+    const quiet=4, dim=n+quiet*2, ns="http://www.w3.org/2000/svg";
+    const el=document.createElementNS(ns,"svg");
+    el.setAttribute("viewBox",`0 0 ${dim} ${dim}`); el.setAttribute("width",sizePx); el.setAttribute("height",sizePx);
+    el.setAttribute("shape-rendering","crispEdges");
+    const bg=document.createElementNS(ns,"rect"); bg.setAttribute("width",dim); bg.setAttribute("height",dim); bg.setAttribute("fill","#fff"); el.appendChild(bg);
+    let d=""; for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(M[r][c]===1) d+=`M${c+quiet} ${r+quiet}h1v1h-1z`;
+    const path=document.createElementNS(ns,"path"); path.setAttribute("d",d); path.setAttribute("fill","#000"); el.appendChild(path);
+    return el;
+  }
+  return { svg, matrix };
+})();
+/*==QR-END==*/
+
+/*==AVATAR-START==*/
+// 20 original code-drawn "creature" avatars. Deterministic per index. No external art.
+const AV_COUNT_UI = SP.AV_COUNT;
+function avatarSVG(i) {
+  i = ((i % AV_COUNT_UI) + AV_COUNT_UI) % AV_COUNT_UI;
+  const h = Math.round((i * 360) / AV_COUNT_UI);
+  const main = `hsl(${h} 68% 55%)`, dark = `hsl(${h} 65% 34%)`, pale = `hsl(${h} 70% 93%)`, belly = `hsl(${h} 70% 82%)`;
+  const shape = i % 4, feat = i % 5, eyes = (i % 3) + 1, mouth = i % 3;
+  let s = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Squad avatar">`;
+  s += `<rect x="2" y="2" width="96" height="96" rx="20" fill="${pale}"/>`;
+  // top features (drawn behind body)
+  if (feat === 1) s += `<path d="M32 30 L38 12 L46 30 Z" fill="${dark}"/><path d="M68 30 L62 12 L54 30 Z" fill="${dark}"/>`; // horns
+  if (feat === 2) s += `<ellipse cx="30" cy="30" rx="12" ry="16" fill="${dark}"/><ellipse cx="70" cy="30" rx="12" ry="16" fill="${dark}"/>`; // ears
+  if (feat === 3) s += `<line x1="40" y1="26" x2="34" y2="10" stroke="${dark}" stroke-width="3"/><circle cx="33" cy="8" r="4" fill="${dark}"/><line x1="60" y1="26" x2="66" y2="10" stroke="${dark}" stroke-width="3"/><circle cx="67" cy="8" r="4" fill="${dark}"/>`; // antennae
+  if (feat === 4) s += `<path d="M30 28 L36 14 L42 28 Z" fill="${dark}"/><path d="M44 26 L50 10 L56 26 Z" fill="${dark}"/><path d="M58 28 L64 14 L70 28 Z" fill="${dark}"/>`; // spikes
+  // body
+  if (shape === 0) s += `<rect x="24" y="26" width="52" height="54" rx="20" fill="${main}"/>`;
+  else if (shape === 1) s += `<circle cx="50" cy="54" r="28" fill="${main}"/>`;
+  else if (shape === 2) s += `<rect x="30" y="22" width="40" height="60" rx="18" fill="${main}"/>`;
+  else s += `<rect x="20" y="32" width="60" height="46" rx="20" fill="${main}"/>`;
+  s += `<ellipse cx="50" cy="64" rx="18" ry="14" fill="${belly}" opacity=".85"/>`;
+  // eyes
+  const ex = eyes === 1 ? [50] : eyes === 2 ? [40, 60] : [37, 50, 63];
+  const ey = eyes === 3 ? 46 : 48;
+  for (const x of ex) { s += `<circle cx="${x}" cy="${ey}" r="8" fill="#fff"/><circle cx="${x}" cy="${ey + 1}" r="3.6" fill="#1d2433"/><circle cx="${x + 1.5}" cy="${ey - 1.5}" r="1.3" fill="#fff"/>`; }
+  // mouth
+  if (mouth === 0) s += `<path d="M40 68 Q50 78 60 68" fill="none" stroke="${dark}" stroke-width="3" stroke-linecap="round"/>`;
+  else if (mouth === 1) s += `<ellipse cx="50" cy="70" rx="8" ry="6" fill="${dark}"/><ellipse cx="50" cy="71" rx="4" ry="3" fill="#ffb4b4"/>`;
+  else s += `<rect x="42" y="66" width="16" height="8" rx="2" fill="#fff" stroke="${dark}" stroke-width="2"/><line x1="50" y1="66" x2="50" y2="74" stroke="${dark}" stroke-width="1.5"/>`;
+  s += `</svg>`;
+  return s;
+}
+/*==AVATAR-END==*/
+
+/*==IMG-START==*/
+// Custom squad images/GIFs live in IndexedDB (too big for localStorage; never leave the device).
+const IMGDB = {
+  _db: null,
+  open() {
+    if (this._db) return Promise.resolve(this._db);
+    return new Promise((res, rej) => {
+      const r = indexedDB.open("squadPointsImages", 1);
+      r.onupgradeneeded = () => r.result.createObjectStore("img");
+      r.onsuccess = () => { this._db = r.result; res(r.result); };
+      r.onerror = () => rej(r.error);
+    });
+  },
+  async put(key, blob) { const db = await this.open(); return new Promise((res, rej) => { const t = db.transaction("img", "readwrite"); t.objectStore("img").put(blob, key); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); },
+  async get(key) { const db = await this.open(); return new Promise((res, rej) => { const t = db.transaction("img", "readonly"); const q = t.objectStore("img").get(key); q.onsuccess = () => res(q.result || null); q.onerror = () => rej(q.error); }); },
+  async del(key) { const db = await this.open(); return new Promise((res, rej) => { const t = db.transaction("img", "readwrite"); t.objectStore("img").delete(key); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); },
+  async all() { const db = await this.open(); return new Promise((res, rej) => { const t = db.transaction("img", "readonly"); const store = t.objectStore("img"); const out = {}; const cur = store.openCursor(); cur.onsuccess = e => { const c = e.target.result; if (c) { out[c.key] = c.value; c.continue(); } else res(out); }; cur.onerror = () => rej(cur.error); }); }
+};
+/*==IMG-END==*/
+
+/*==APP-START==*/
+(() => {
+  "use strict";
+  const $ = sel => document.querySelector(sel);
+  const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const now = () => Date.now();
+
+  let st = SP.load() || SP.newState(now());
+  let activePeriodId = st.periods[0] ? st.periods[0].id : null;
+  let sortByPoints = false;
+  let sessionExclude = {};         // {periodId: Set(studentId)} absent-today, cleared on reload
+  const urlCache = {};             // imageKey -> object URL
+
+  const persist = () => SP.save(st);
+  const curPeriod = () => st.periods.find(p => p.id === activePeriodId) || null;
+
+  // ---------- image url cache ----------
+  async function imgURL(key) {
+    if (!key) return null;
+    if (urlCache[key]) return urlCache[key];
+    const blob = await IMGDB.get(key);
+    if (!blob) return null;
+    return (urlCache[key] = URL.createObjectURL(blob));
+  }
+  function dropURL(key) { if (urlCache[key]) { URL.revokeObjectURL(urlCache[key]); delete urlCache[key]; } }
+
+  // ---------- overlays ----------
+  function modal(innerHTML, cls) {
+    const o = el("div", "ovl");
+    o.innerHTML = `<div class="panel ${cls || ""}"><button class="x" data-close>✕</button>${innerHTML}</div>`;
+    o.addEventListener("mousedown", e => { if (e.target === o) close(o); });
+    o.querySelector("[data-close]").addEventListener("click", () => close(o));
+    $("#overlays").appendChild(o);
+    return o;
+  }
+  function close(o) { if (o && o.parentNode) o.parentNode.removeChild(o); }
+  function fullscreen(innerHTML, cls) { const o = el("div", cls); o.innerHTML = innerHTML; $("#overlays").appendChild(o); return o; }
+
+  // ---------- toast/confetti/sound ----------
+  const confettiCanvas = $("#confetti"), cctx = confettiCanvas.getContext("2d");
+  let cparts = [], craf = 0;
+  function sizeCanvas() { confettiCanvas.width = innerWidth; confettiCanvas.height = innerHeight; }
+  addEventListener("resize", sizeCanvas); sizeCanvas();
+  function confetti(n) {
+    if (!st.settings.confettiOn) return;
+    const cols = ["#5b5bd6", "#16a34a", "#f59e0b", "#e0447f", "#22c1c3", "#f6d743"];
+    for (let i = 0; i < n; i++) cparts.push({ x: innerWidth / 2 + (Math.random() - .5) * 120, y: innerHeight / 3, vx: (Math.random() - .5) * 9, vy: -Math.random() * 12 - 4, g: .4 + Math.random() * .2, c: cols[i % cols.length], s: 5 + Math.random() * 6, r: Math.random() * 6, vr: (Math.random() - .5) * .5, life: 90 });
+    if (!craf) craf = requestAnimationFrame(stepConfetti);
+  }
+  function stepConfetti() {
+    cctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    cparts = cparts.filter(p => p.life-- > 0 && p.y < innerHeight + 20);
+    for (const p of cparts) { p.vy += p.g; p.x += p.vx; p.y += p.vy; p.r += p.vr; cctx.save(); cctx.translate(p.x, p.y); cctx.rotate(p.r); cctx.fillStyle = p.c; cctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s); cctx.restore(); }
+    if (cparts.length) craf = requestAnimationFrame(stepConfetti); else { craf = 0; cctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height); }
+  }
+  let actx = null;
+  function blip(points) {
+    if (!st.settings.soundOn) return;
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
+      o.type = "triangle"; o.frequency.setValueAtTime(440, t); o.frequency.exponentialRampToValueAtTime(880 + Math.min(points, 10) * 40, t + .12);
+      g.gain.setValueAtTime(.001, t); g.gain.exponentialRampToValueAtTime(.25, t + .02); g.gain.exponentialRampToValueAtTime(.001, t + .25);
+      o.connect(g).connect(actx.destination); o.start(t); o.stop(t + .26);
+    } catch (e) {}
+  }
+
+  // ================= HEADER / TABS / DASHBOARD =================
+  function renderHeader() {
+    const q = SP.currentQuarter(st);
+    $("#qLabel").textContent = q ? q.label : "—";
+  }
+  function renderTabs() {
+    const nav = $("#tabs"); nav.innerHTML = "";
+    for (const p of st.periods) {
+      const b = el("button", p.id === activePeriodId ? "on" : "", esc(p.name));
+      b.onclick = () => { activePeriodId = p.id; render(); };
+      nav.appendChild(b);
+    }
+    const add = el("button", "", "＋ Class");
+    add.style.color = "var(--brand)";
+    add.onclick = addPeriodFlow;
+    nav.appendChild(add);
+  }
+
+  async function renderDashboard() {
+    const main = $("#main"); main.innerHTML = "";
+    if (!st.periods.length) {
+      main.appendChild(el("div", "empty", `<h2>Welcome to Squad Points 🏆</h2>
+        <p class="muted">Set up your first class period and paste in your roster to get started. Everything stays on this device — no accounts, no sign-in.</p>
+        <button class="btn" id="startBtn">Add your first class period</button>`));
+      $("#startBtn").onclick = addPeriodFlow;
+      return;
+    }
+    if (!activePeriodId || !curPeriod()) activePeriodId = st.periods[0].id;
+
+    // squad-of-the-week banner
+    const sow = SP.squadOfWeek(st, activePeriodId, now());
+    if (sow) main.appendChild(el("div", "banner", `👑 <b>Squad of the Week:</b>&nbsp;${esc(sow.name)} <span class="muted">(${sow.points} pts last week)</span>`));
+
+    // record-to-beat banner
+    const top = SP.allTimeTop10(st)[0];
+    if (top) main.appendChild(el("div", "banner", `🏅 <b>All-time record to beat:</b>&nbsp;${top.total} pts — ${esc(top.name)} <span class="muted">(${esc(top.period)} ${esc(top.quarter)})</span>`));
+
+    // goal bar
+    const goal = st.goals[activePeriodId];
+    if (goal) {
+      const combined = SP.periodStandings(st, activePeriodId, now()).reduce((t, r) => t + r.total, 0);
+      const pct = Math.min(100, Math.round(combined / goal * 100));
+      const g = el("div", "goalwrap", `<div class="goalbar"><div style="width:${pct}%"></div></div><div class="goaltext">Class goal: ${combined} / ${goal} pts (${pct}%)</div>`);
+      main.appendChild(g);
+    }
+
+    // grid tools
+    const gt = el("div", "gridtools");
+    const sortBtn = el("button", "hbtn", sortByPoints ? "↕ Sorted by points" : "↕ Sort by points");
+    sortBtn.onclick = () => { sortByPoints = !sortByPoints; render(); };
+    gt.appendChild(sortBtn);
+    const rows0 = SP.periodStandings(st, activePeriodId, now());
+    gt.appendChild(el("span", "muted", `&nbsp; ${rows0.length} squad${rows0.length === 1 ? "" : "s"}`));
+    main.appendChild(gt);
+
+    // squad grid
+    const grid = el("div", "grid");
+    let rows = rows0.slice();
+    if (!sortByPoints) rows.sort((a, b) => a.name.localeCompare(b.name)); // stable "by name/number" default
+    for (const r of rows) {
+      const card = el("div", "sq");
+      card.dataset.squad = r.squad.id;
+      const medal = r.rank === 1 ? "🥇" : r.rank === 2 ? "🥈" : r.rank === 3 ? "🥉" : "";
+      const badgeIcons = r.badges.map(b => SP.BADGES[b] ? SP.BADGES[b].icon : "").join("");
+      card.innerHTML = `${medal ? `<div class="medal">${medal}</div>` : ""}
+        <div class="pts" data-pts>${r.total}</div>
+        ${r.streak >= 3 ? `<div class="flame" title="${r.streak}-day streak">🔥${r.streak}</div>` : ""}
+        <div class="avatar" data-av></div>
+        <div class="nm" title="${esc(r.name)}">${esc(r.name)}</div>
+        <div class="meta"><span>Today ${r.daily}</span><span>Week ${r.weekly}</span></div>
+        <div class="bdg" title="badges">${badgeIcons}</div>`;
+      card.onclick = () => openAward(r.squad.id);
+      grid.appendChild(card);
+      // avatar (async image or svg)
+      const av = card.querySelector("[data-av]");
+      if (r.squad.imageKey) { imgURL(r.squad.imageKey).then(u => { av.innerHTML = u ? `<img src="${u}" alt="">` : avatarSVG(r.squad.builtinAvatar); }); }
+      else av.innerHTML = avatarSVG(r.squad.builtinAvatar);
+    }
+    // add-squad card
+    const addC = el("div", "sq add", "＋ Add / edit squads");
+    addC.onclick = openSquadBuilder;
+    grid.appendChild(addC);
+    main.appendChild(grid);
+  }
+
+  // ================= AWARD =================
+  function openAward(squadId) {
+    const sq = st.squads.find(s => s.id === squadId); if (!sq) return;
+    const total = SP.squadTotal(st, squadId);
+    const o = modal(`<div class="award">
+      <h2>${esc(sq.name)}</h2>
+      <p class="muted" style="margin-top:-.4rem">Current total: <b>${total}</b> · give points:</p>
+      <div class="nums">
+        ${[1,2,3,4,5].map(n => `<button data-pts="${n}">${n}</button>`).join("")}
+        <button class="custom" data-custom>⭐<br><span style="font-size:1rem">Custom</span></button>
+      </div>
+      <div class="row"><input type="text" id="awNote" placeholder="Optional note (why?) — you can skip this" style="flex:1"></div>
+    </div>`, "award");
+    o.querySelectorAll("[data-pts]").forEach(b => b.onclick = () => { doAward(squadId, +b.dataset.pts, $("#awNote").value.trim()); close(o); });
+    o.querySelector("[data-custom]").onclick = () => { close(o); openCustom(squadId); };
+  }
+  function openCustom(squadId) {
+    const sq = st.squads.find(s => s.id === squadId);
+    const o = modal(`<h2>Custom points — ${esc(sq.name)}</h2>
+      <div class="row"><input type="number" id="cAmt" min="1" step="1" value="10" style="font-size:1.5rem;width:120px;text-align:center"></div>
+      <div class="row">${[10,15,20,25,50].map(n => `<button class="btn gray" data-q="${n}">${n}</button>`).join("")}</div>
+      <div class="row"><input type="text" id="cNote" placeholder="Optional note" style="flex:1"></div>
+      <div class="row"><button class="btn" id="cGo">Give points</button></div>
+      <p class="muted" id="cErr"></p>`);
+    o.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { $("#cAmt").value = b.dataset.q; });
+    o.querySelector("#cGo").onclick = () => {
+      const v = Math.floor(+$("#cAmt").value);
+      if (!Number.isInteger(v) || v < 1) { $("#cErr").textContent = "Enter a whole number of 1 or more."; return; }
+      doAward(squadId, v, $("#cNote").value.trim()); close(o);
+    };
+  }
+  function doAward(squadId, points, note) {
+    let a;
+    try { a = SP.award(st, squadId, points, now(), note); } catch (e) { alert(e.message); return; }
+    persist();
+    confetti(points >= 5 ? 60 : 28); blip(points);
+    render();
+    // bump animation on the card
+    const card = document.querySelector(`.sq[data-squad="${squadId}"] [data-pts]`);
+    if (card) { card.classList.remove("bump"); void card.offsetWidth; card.classList.add("bump"); }
+    showUndo(a);
+  }
+  let undoTimer = 0;
+  function showUndo(a) {
+    const host = $("#undoHost"); host.innerHTML = "";
+    const sq = st.squads.find(s => s.id === a.squadId);
+    const pill = el("div"); pill.id = "undoPill";
+    pill.innerHTML = `<span>+${a.points} to ${esc(sq ? sq.name : "squad")}</span><button>Undo</button>`;
+    pill.querySelector("button").onclick = () => { SP.undoAward(st, a.id); persist(); host.innerHTML = ""; render(); };
+    host.appendChild(pill);
+    clearTimeout(undoTimer); undoTimer = setTimeout(() => { host.innerHTML = ""; }, 8000);
+  }
+
+  // ================= PERIODS / ROSTER =================
+  function addPeriodFlow() {
+    const name = prompt("Name this class period (e.g. 3rd Period):", `${st.periods.length + 1}${["st","nd","rd"][st.periods.length] || "th"} Period`);
+    if (!name || !name.trim()) return;
+    const p = SP.addPeriod(st, name.trim()); persist();
+    activePeriodId = p.id; render();
+    openRoster(p.id);
+  }
+  function openRoster(periodId) {
+    const p = st.periods.find(x => x.id === periodId);
+    const existing = st.students.filter(s => s.periodId === periodId && s.active);
+    const o = modal(`<h2>Roster — ${esc(p.name)}</h2>
+      <p class="muted">Paste your student list below (one name per line — "First Last" or "Last, First" both work; numbering and tabs are fine).</p>
+      <textarea id="rIn" placeholder="Ava Smith&#10;Jones, Ben&#10;1. Cara Diaz"></textarea>
+      <div class="row"><button class="btn" id="rPrev">Preview names</button>
+        <span class="muted">${existing.length} student${existing.length === 1 ? "" : "s"} currently in this class</span></div>
+      <div id="rPreview"></div>`);
+    $("#rPrev").onclick = () => {
+      const names = SP.parseRoster($("#rIn").value);
+      const box = $("#rPreview"); box.innerHTML = "";
+      if (!names.length) { box.innerHTML = `<p class="muted">No names found yet — paste your list above.</p>`; return; }
+      box.appendChild(el("h3", null, `Found ${names.length} name${names.length === 1 ? "" : "s"}`));
+      box.appendChild(el("div", null, names.map(n => `<span class="chip">${esc(n)}</span>`).join("")));
+      const go = el("button", "btn", `Add ${names.length} to ${esc(p.name)}`);
+      go.onclick = () => { const r = SP.addStudents(st, periodId, names); persist(); close(o); render(); toast(`Added ${r.added.length} student${r.added.length === 1 ? "" : "s"}${r.skipped.length ? ` (${r.skipped.length} already there)` : ""}.`); };
+      box.appendChild(el("div", "row", "")).appendChild(go);
+    };
+  }
+  function toast(msg) {
+    const host = $("#undoHost"); host.innerHTML = "";
+    const pill = el("div"); pill.id = "undoPill"; pill.innerHTML = `<span>${esc(msg)}</span>`;
+    host.appendChild(pill); setTimeout(() => { if (host.firstChild === pill) host.innerHTML = ""; }, 3500);
+  }
+
+  // ================= SQUAD BUILDER =================
+  let builderSel = null;
+  function openSquadBuilder() {
+    if (!activePeriodId) { addPeriodFlow(); return; }
+    builderSel = builderSel && st.squads.some(s => s.id === builderSel) ? builderSel : null;
+    const o = modal(`<h2>Squads — ${esc(curPeriod().name)}</h2>
+      <p class="muted">${esc(SP.currentQuarter(st).label)} · Students name their own squads; type each name here. Tap a squad to select it, then tap an unassigned student to add them.</p>
+      <div id="sbBody"></div>`, "");
+    renderBuilder($("#sbBody"), o);
+  }
+  function renderBuilder(body) {
+    const periodId = activePeriodId;
+    const squads = SP.currentSquads(st, periodId);
+    const roster = st.students.filter(s => s.periodId === periodId && s.active);
+    const assigned = new Set(squads.flatMap(s => s.memberIds));
+    const unassigned = roster.filter(s => !assigned.has(s.id));
+    body.innerHTML = "";
+
+    const addRow = el("div", "row");
+    const addBtn = el("button", "btn", "＋ New squad");
+    addBtn.onclick = () => { const nm = prompt("Squad name:", `Squad ${squads.length + 1}`); if (nm && nm.trim()) { const sq = SP.addSquad(st, periodId, nm.trim()); persist(); builderSel = sq.id; renderBuilder(body); render(); } };
+    addRow.appendChild(addBtn);
+    if (!roster.length) addRow.appendChild(el("span", "muted", "Add a roster first (Setup → this class)."));
+    body.appendChild(addRow);
+
+    for (const sq of squads) {
+      const wrap = el("div", "row");
+      wrap.style.cssText = "border:2px solid " + (sq.id === builderSel ? "var(--brand)" : "var(--line)") + ";border-radius:12px;padding:.6rem;display:block;margin:.5rem 0";
+      const warn = sq.memberIds.length < 2 ? " ⚠ under 2" : sq.memberIds.length > 4 ? " ⚠ over 4" : "";
+      const head = el("div", "row");
+      head.style.cssText = "justify-content:space-between";
+      const av = el("div"); av.style.cssText = "width:36px;height:36px"; av.innerHTML = avatarSVG(sq.builtinAvatar);
+      const title = el("div", "", `<b>${esc(sq.name)}</b> <span class="muted">${sq.memberIds.length} member${sq.memberIds.length === 1 ? "" : "s"}${warn}</span>`);
+      title.style.cssText = "flex:1;cursor:pointer"; title.onclick = () => { builderSel = sq.id; renderBuilder(body); };
+      const left = el("div", "row"); left.appendChild(av); left.appendChild(title);
+      const btns = el("div", "row");
+      const bAv = el("button", "btn gray", "🎨"); bAv.title = "Choose avatar"; bAv.onclick = () => pickAvatar(sq.id, body);
+      const bImg = el("button", "btn gray", "🖼"); bImg.title = "Upload image/GIF"; bImg.onclick = () => uploadImage(sq.id, body);
+      const bRen = el("button", "btn gray", "✏️"); bRen.onclick = () => { const nm = prompt("Rename squad:", sq.name); if (nm && nm.trim()) { SP.renameSquad(st, sq.id, nm.trim()); persist(); renderBuilder(body); render(); } };
+      const bDel = el("button", "btn red", "🗑"); bDel.onclick = () => deleteSquad(sq.id, body);
+      btns.append(bAv, bImg, bRen, bDel);
+      head.append(left, btns); wrap.appendChild(head);
+      const mem = el("div"); mem.style.marginTop = ".4rem";
+      mem.innerHTML = sq.memberIds.map(id => { const s = roster.find(x => x.id === id); return s ? `<span class="chip">${esc(s.name)} <button data-un="${id}" data-sq="${sq.id}">✕</button></span>` : ""; }).join("") || `<span class="muted">No members yet — tap students below.</span>`;
+      mem.querySelectorAll("[data-un]").forEach(b => b.onclick = () => { SP.unassignStudent(st, b.dataset.sq, b.dataset.un); persist(); renderBuilder(body); render(); });
+      wrap.appendChild(mem);
+      body.appendChild(wrap);
+    }
+
+    body.appendChild(el("h3", null, `Unassigned students (${unassigned.length})`));
+    const pool = el("div");
+    if (!unassigned.length) pool.innerHTML = `<span class="muted">${roster.length ? "Everyone is on a squad. 🎉" : "No students yet."}</span>`;
+    else pool.innerHTML = unassigned.map(s => `<span class="chip" data-add="${s.id}" style="cursor:pointer">${esc(s.name)} ＋</span>`).join("");
+    pool.querySelectorAll("[data-add]").forEach(c => c.onclick = () => {
+      if (!builderSel) { toast("Tap a squad above to select it first."); return; }
+      SP.assignStudent(st, builderSel, c.dataset.add); persist(); renderBuilder(body); render();
+    });
+    body.appendChild(pool);
+  }
+  function deleteSquad(squadId, body) {
+    const hasAwards = st.awards.some(a => a.squadId === squadId);
+    if (hasAwards) { if (!confirm("This squad has points recorded. Deleting it removes those points from this quarter's totals and records. Delete anyway?")) return; st.awards = st.awards.filter(a => a.squadId !== squadId); }
+    const sq = st.squads.find(s => s.id === squadId);
+    if (sq && sq.imageKey) { IMGDB.del(sq.imageKey); dropURL(sq.imageKey); }
+    st.squads = st.squads.filter(s => s.id !== squadId);
+    if (builderSel === squadId) builderSel = null;
+    persist(); renderBuilder(body); render();
+  }
+  function pickAvatar(squadId, body) {
+    const o = modal(`<h2>Choose an avatar</h2><div class="grid" id="avGrid" style="grid-template-columns:repeat(auto-fill,minmax(72px,1fr))"></div>`);
+    const g = $("#avGrid");
+    for (let i = 0; i < AV_COUNT_UI; i++) { const c = el("div", "sq"); c.style.cssText = "padding:.4rem;min-height:0"; c.innerHTML = `<div class="avatar" style="width:56px;height:56px">${avatarSVG(i)}</div>`; c.onclick = () => { SP.setSquadAvatar(st, squadId, i); const sq = st.squads.find(s => s.id === squadId); if (sq && sq.imageKey) { IMGDB.del(sq.imageKey); dropURL(sq.imageKey); sq.imageKey = null; } persist(); close(o); renderBuilder(body); render(); }; g.appendChild(c); }
+  }
+  function uploadImage(squadId, body) {
+    const inp = el("input"); inp.type = "file"; inp.accept = "image/png,image/jpeg,image/gif,image/webp";
+    inp.onchange = async () => {
+      const f = inp.files[0]; if (!f) return;
+      if (f.size > 4 * 1024 * 1024) { alert("That image is over 4 MB. Please pick a smaller file (or a shorter GIF)."); return; }
+      const sq = st.squads.find(s => s.id === squadId);
+      const key = sq.imageKey || SP.uid("img");
+      await IMGDB.put(key, f); dropURL(key); sq.imageKey = key; persist();
+      renderBuilder(body); render();
+      toast(`Image set. For student links this squad shows its avatar — pick one with 🎨 as a backup.`);
+    };
+    inp.click();
+  }
+
+  // ================= RANDOM =================
+  function openRandom(mode) {
+    if (!activePeriodId) return;
+    const period = curPeriod();
+    if (mode === "squad") {
+      const squads = SP.currentSquads(st, activePeriodId);
+      if (!squads.length) { toast("No squads in this class yet."); return; }
+      return spin(squads.map(s => s.name), "Random Squad", null);
+    }
+    const roster = st.students.filter(s => s.periodId === activePeriodId && s.active);
+    if (!roster.length) { toast("No students in this class yet."); return; }
+    const ps = st.pickerState[activePeriodId] || { noRepeat: false, remainingIds: [] };
+    const exSet = sessionExclude[activePeriodId] || (sessionExclude[activePeriodId] = new Set());
+    const o = fullscreen(`<div class="ovl"><div class="panel rand">
+      <button class="x" data-close>✕</button>
+      <h2>🎲 Random Student — ${esc(period.name)}</h2>
+      <div class="big" id="rBig">—</div>
+      <div class="row" style="justify-content:center">
+        <button class="btn" id="rGo">Pick a student</button>
+        <button class="btn gray" id="rAgain" style="display:none">Pick again</button>
+      </div>
+      <div class="row" style="justify-content:center">
+        <label class="muted"><input type="checkbox" id="rNo" ${ps.noRepeat ? "checked" : ""}> No repeats until everyone's had a turn</label>
+      </div>
+      <div class="row" style="justify-content:center"><span class="muted" id="rCount"></span> <button class="hbtn" id="rReset" style="display:none">Reset</button></div>
+      <h3 style="text-align:left">Absent today? Tap to skip (clears when you reload):</h3>
+      <div id="rExcl" style="text-align:left"></div>
+    </div></div>`, "");
+    const root = o.firstChild;
+    root.addEventListener("mousedown", e => { if (e.target === root) close(o); });
+    o.querySelector("[data-close]").onclick = () => close(o);
+    const big = $("#rBig");
+    const drawExcl = () => { $("#rExcl").innerHTML = roster.map(s => `<span class="chip ${exSet.has(s.id) ? "off" : ""}" data-ex="${s.id}" style="cursor:pointer">${esc(s.name)}</span>`).join(""); $("#rExcl").querySelectorAll("[data-ex]").forEach(c => c.onclick = () => { const id = c.dataset.ex; exSet.has(id) ? exSet.delete(id) : exSet.add(id); drawExcl(); updateCount(); }); };
+    const updateCount = () => {
+      const noRep = $("#rNo").checked;
+      $("#rReset").style.display = noRep ? "" : "none";
+      if (noRep) { const p = st.pickerState[activePeriodId]; const left = p ? p.remainingIds.length : 0; $("#rCount").textContent = left ? `${left} left this round` : "fresh round"; }
+      else $("#rCount").textContent = "";
+    };
+    drawExcl(); updateCount();
+    $("#rNo").onchange = updateCount;
+    $("#rReset").onclick = () => { SP.resetPicker(st, activePeriodId); persist(); updateCount(); toast("Everyone is back in the pool."); };
+    const run = () => {
+      const chosen = SP.pickRandom(st, activePeriodId, { noRepeat: $("#rNo").checked, excludeIds: [...exSet] });
+      persist(); updateCount();
+      if (!chosen) { big.textContent = "Nobody left!"; return; }
+      const pool = roster.filter(s => !exSet.has(s.id));
+      spinInto(big, pool.map(s => s.name), chosen.name, () => { blip(3); confetti(20); });
+      $("#rGo").style.display = "none"; $("#rAgain").style.display = "";
+    };
+    $("#rGo").onclick = run; $("#rAgain").onclick = run;
+  }
+  function spin(names, title, ignored) {
+    const o = fullscreen(`<div class="ovl"><div class="panel rand"><button class="x" data-close>✕</button>
+      <h2>🎲 ${esc(title)}</h2><div class="big" id="sBig">—</div>
+      <div class="row" style="justify-content:center"><button class="btn" id="sGo">Pick</button></div></div></div>`, "");
+    const root = o.firstChild; root.addEventListener("mousedown", e => { if (e.target === root) close(o); });
+    o.querySelector("[data-close]").onclick = () => close(o);
+    const go = () => spinInto($("#sBig"), names, names[Math.floor(Math.random() * names.length)], () => { blip(3); confetti(20); });
+    $("#sGo").onclick = go;
+  }
+  function spinInto(elm, pool, finalName, done) {
+    let ticks = 0; const total = 22 + Math.floor(Math.random() * 8);
+    elm.classList.remove("landed");
+    const iv = setInterval(() => {
+      elm.textContent = pool[Math.floor(Math.random() * pool.length)] || finalName;
+      if (++ticks >= total) { clearInterval(iv); elm.textContent = finalName; elm.classList.add("landed"); done && done(); }
+    }, Math.min(30 + ticks * 6, 140));
+    // accelerate-decelerate via variable interval: emulate by clearing and re-scheduling
+  }
+
+  // ================= STANDINGS =================
+  function openStandings(defaultTab) {
+    const o = modal(`<h2>🏆 Standings</h2>
+      <div class="stTabs" id="stTabs"></div>
+      <div id="stBody"></div>`, "");
+    const tabs = [["class","This Class"],["daily","Today"],["weekly","This Week"],["champ","Champions"],["all","All-Time"],["race","Weekly Race"]];
+    let tab = defaultTab || "class";
+    const tb = $("#stTabs");
+    const draw = () => {
+      tb.innerHTML = tabs.map(([k, l]) => `<button class="${k === tab ? "on" : ""}" data-t="${k}">${l}</button>`).join("");
+      tb.querySelectorAll("[data-t]").forEach(b => b.onclick = () => { tab = b.dataset.t; draw(); });
+      const body = $("#stBody");
+      const rowsTable = (rows, cols) => `<table class="lb"><tr>${cols.map(c => `<th${c[2] ? ' style="text-align:right"' : ""}>${c[1]}</th>`).join("")}</tr>${rows}</table>`;
+      if (tab === "class" || tab === "daily" || tab === "weekly") {
+        if (!activePeriodId) { body.innerHTML = `<p class="muted">No class selected.</p>`; return; }
+        const key = tab === "class" ? "total" : tab === "daily" ? "daily" : "weekly";
+        let rows = SP.periodStandings(st, activePeriodId, now()).slice().sort((a, b) => b[key] - a[key] || a.name.localeCompare(b.name));
+        const body2 = rows.map((r, i) => `<tr><td>${["🥇","🥈","🥉"][i] || (i + 1)}</td><td>${esc(r.name)}</td><td class="r">${r[key]}</td></tr>`).join("");
+        body.innerHTML = `<p class="muted">${esc(curPeriod().name)} · ${tab === "class" ? "quarter totals" : tab === "daily" ? "points today" : "points this week"}</p>` + rowsTable(body2, [["","",0],["Squad","Squad",0],["","Pts",1]]);
+      } else if (tab === "champ") {
+        const c = SP.quarterChampion(st, now());
+        body.innerHTML = c ? `<div class="rec">👑 <b>Quarter Champion:</b> ${esc(c.name)} — ${esc(c.period)} — ${c.total} pts</div>` : `<p class="muted">No points yet this quarter.</p>`;
+        body.innerHTML += `<h3>Top squad in each class (this quarter)</h3>`;
+        const perClass = st.periods.map(p => { const r = SP.periodStandings(st, p.id, now())[0]; return r && r.total > 0 ? `<tr><td>${esc(p.name)}</td><td>${esc(r.name)}</td><td class="r">${r.total}</td></tr>` : `<tr><td>${esc(p.name)}</td><td class="muted">—</td><td class="r">0</td></tr>`; }).join("");
+        body.innerHTML += rowsTable(perClass, [["","Class",0],["","Squad",0],["","Pts",1]]);
+      } else if (tab === "all") {
+        const rows = SP.allTimeTop10(st);
+        body.innerHTML = `<p class="muted">Highest single-quarter squad totals ever — the records to beat.</p>` + (rows.length ? rowsTable(rows.map((r, i) => `<tr><td>${["🥇","🥈","🥉"][i] || (i + 1)}</td><td>${esc(r.name)}</td><td class="muted">${esc(r.period)} · ${esc(r.quarter)}</td><td class="r">${r.total}</td></tr>`).join(""), [["","",0],["","Squad",0],["","When",0],["","Pts",1]]) : `<p class="muted">No records yet — start awarding points!</p>`);
+      } else if (tab === "race") {
+        const rows = SP.weeklyRace(st, now());
+        body.innerHTML = `<p class="muted">Points earned this week across every class — anyone can win a week!</p>` + (rows.length ? rowsTable(rows.map((r, i) => `<tr><td>${["🥇","🥈","🥉"][i] || (i + 1)}</td><td>${esc(r.name)}</td><td class="muted">${esc(r.period)}</td><td class="r">${r.weekly}</td></tr>`).join(""), [["","",0],["","Squad",0],["","Class",0],["","Pts",1]]) : `<p class="muted">No points yet this week.</p>`);
+      }
+    };
+    draw();
+  }
+
+  // ================= PROJECTOR =================
+  function openProjector() {
+    if (!activePeriodId) return;
+    const rows = SP.periodStandings(st, activePeriodId, now());
+    const cards = rows.map(r => {
+      const medal = r.rank === 1 ? "🥇" : r.rank === 2 ? "🥈" : r.rank === 3 ? "🥉" : "";
+      return `<div class="sq ${r.rank === 1 ? "first" : ""}"><div class="pts">${r.total}</div>${medal ? `<div class="medal">${medal}</div>` : ""}<div class="avatar" data-avp="${r.squad.builtinAvatar}" data-key="${r.squad.imageKey || ""}"></div><div class="nm">${esc(r.name)}</div><div class="meta"><span>Today ${r.daily}</span><span>Week ${r.weekly}</span></div></div>`;
+    }).join("");
+    const o = fullscreen(`<div class="proj"><button class="exit" data-close>✕ Exit</button><h1>🏆 ${esc(curPeriod().name)} <span class="muted" style="font-size:1rem;color:#9aa6c8">${esc(SP.currentQuarter(st).label)}</span></h1><div class="grid">${cards}</div></div>`, "");
+    o.querySelector("[data-close]").onclick = () => close(o);
+    o.querySelectorAll("[data-avp]").forEach(av => { const key = av.dataset.key; if (key) imgURL(key).then(u => av.innerHTML = u ? `<img src="${u}" alt="">` : avatarSVG(+av.dataset.avp)); else av.innerHTML = avatarSVG(+av.dataset.avp); });
+    const esckey = e => { if (e.key === "Escape") { close(o); removeEventListener("keydown", esckey); } };
+    addEventListener("keydown", esckey);
+  }
+
+  // ================= TIMER =================
+  function openTimer() {
+    const o = modal(`<h2>⏱️ Timer</h2>
+      <div class="row" style="justify-content:center"><div id="tDisp" style="font-size:3rem;font-weight:900">0:00</div></div>
+      <div class="row" style="justify-content:center">${[1,2,3,5,10].map(m => `<button class="btn gray" data-m="${m}">${m} min</button>`).join("")}</div>
+      <div class="row" style="justify-content:center"><button class="btn" id="tStart">Start</button><button class="btn gray" id="tStop">Stop</button></div>`);
+    let remain = 0, iv = 0;
+    const disp = $("#tDisp");
+    const show = () => disp.textContent = Math.floor(remain / 60) + ":" + String(remain % 60).padStart(2, "0");
+    o.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { remain = +b.dataset.m * 60; show(); });
+    $("#tStart").onclick = () => { clearInterval(iv); iv = setInterval(() => { if (remain > 0) { remain--; show(); if (remain === 0) { clearInterval(iv); blip(8); confetti(40); disp.textContent = "Time!"; } } }, 1000); };
+    $("#tStop").onclick = () => clearInterval(iv);
+    o.addEventListener("click", e => { if (e.target.matches("[data-close]")) clearInterval(iv); });
+  }
+
+  // ================= SHARE =================
+  async function openShare() {
+    const o = modal(`<h2>📤 Share standings with students</h2>
+      <p class="muted">This makes a link (and QR code) students open on their own devices. It's a snapshot of right now — re-share whenever you want them to see fresh numbers.</p>
+      <div id="shBody"><p class="muted">Building link…</p></div>`);
+    const body = $("#shBody");
+    try {
+      const snap = SP.buildSnapshot(st, now());
+      const enc = await SP.encodeSnapshot(snap);
+      const base = location.href.replace(/squads\.html.*$/, "").replace(/[^/]*$/, "");
+      const url = base + "squads-view.html#s=" + enc;
+      const customSquads = st.squads.filter(s => s.imageKey && SP.currentSquads(st).some(c => c.id === s.id)).map(s => s.name);
+      body.innerHTML = `
+        <div class="row"><input type="text" id="shUrl" readonly value="${esc(url)}" style="flex:1"><button class="btn" id="shCopy">Copy</button></div>
+        <div class="row" style="justify-content:center"><div id="qr" style="background:#fff;padding:10px;border-radius:10px"></div></div>
+        <p class="muted">Standings as of ${new Date().toLocaleString()}.</p>
+        ${customSquads.length ? `<p class="muted">Note: ${customSquads.map(esc).join(", ")} will show their built-in avatar on the student view (uploaded images don't travel in links).</p>` : ""}
+        <p class="muted" style="font-size:.8rem">Link length: ${url.length} characters.</p>`;
+      $("#shCopy").onclick = () => { $("#shUrl").select(); document.execCommand && document.execCommand("copy"); navigator.clipboard && navigator.clipboard.writeText(url); toast("Link copied!"); };
+      if (window.QR) { try { $("#qr").appendChild(window.QR.svg(url, 220)); } catch (e) { $("#qr").innerHTML = `<span class="muted" style="color:#333">This much data is too big for a QR code — use the Copy button and post the link in Canvas or Google Classroom.</span>`; } }
+      else $("#qr").innerHTML = `<span class="muted" style="color:#333">📋 Use the <b>Copy</b> button and paste the link in Canvas or Google Classroom for students. (Scannable QR codes are coming soon.)</span>`;
+    } catch (e) { body.innerHTML = `<p class="muted">Couldn't build the link: ${esc(e.message)}</p>`; }
+  }
+
+  // ================= SETUP =================
+  function openSetup() {
+    const q = SP.currentQuarter(st);
+    const o = modal(`<h2>⚙️ Setup</h2>
+      <h3>Class periods</h3><div id="suPeriods"></div>
+      <div class="row"><button class="btn" id="suAddP">＋ Add class period</button></div>
+      <h3>Squads &amp; rosters</h3>
+      <p class="muted">Pick a class, then manage its roster and squads.</p>
+      <div class="row" id="suClassBtns"></div>
+      <h3>Quarter</h3>
+      <p class="muted">Current: <b>${esc(q.label)}</b>. Starting a new quarter keeps your classes and rosters, archives this quarter's squads &amp; points into the records, and gives you fresh squads to build.</p>
+      <div class="row"><button class="btn" id="suNewQ">Start new quarter</button></div>
+      <h3>Move to another device</h3>
+      <p class="muted">Copy this code, then paste it into Squad Points on the other device (Setup → Paste transfer code). Carries everything except uploaded images.</p>
+      <div class="row"><button class="btn gray" id="suGetCode">Get transfer code</button><button class="btn gray" id="suPaste">Paste transfer code</button></div>
+      <h3>Backup file (full, includes images)</h3>
+      <div class="row"><button class="btn gray" id="suExport">Export backup file</button><button class="btn gray" id="suImport">Import backup file</button></div>
+      <p class="muted" id="suBackupNote"></p>
+      <h3>Options</h3>
+      <div class="row"><label><input type="checkbox" id="suSound" ${st.settings.soundOn ? "checked" : ""}> Sound effects</label>
+        <label><input type="checkbox" id="suConf" ${st.settings.confettiOn ? "checked" : ""}> Confetti</label></div>
+      <div class="row"><label>School year: <input type="text" id="suYear" value="${esc(st.settings.schoolYearLabel)}" placeholder="2026-27" style="width:110px"></label></div>
+      <div class="row"><label>Class goal (combined pts, blank = off): <input type="number" id="suGoal" min="0" value="${activePeriodId && st.goals[activePeriodId] ? st.goals[activePeriodId] : ""}" style="width:100px"></label></div>`);
+
+    const drawPeriods = () => {
+      const box = $("#suPeriods"); box.innerHTML = "";
+      st.periods.forEach((p, idx) => {
+        const r = el("div", "row");
+        r.innerHTML = `<b style="flex:1">${esc(p.name)}</b> <span class="muted">${st.students.filter(s => s.periodId === p.id && s.active).length} students</span>`;
+        const up = el("button", "btn gray", "↑"); up.onclick = () => { if (idx > 0) { [st.periods[idx - 1], st.periods[idx]] = [st.periods[idx], st.periods[idx - 1]]; persist(); drawPeriods(); render(); } };
+        const ren = el("button", "btn gray", "✏️"); ren.onclick = () => { const nm = prompt("Rename class:", p.name); if (nm && nm.trim()) { SP.renamePeriod(st, p.id, nm.trim()); persist(); drawPeriods(); drawClassBtns(); render(); } };
+        const del = el("button", "btn red", "🗑"); del.onclick = () => { if (confirm(`Remove ${p.name}? Its students and squads are archived (points stay in all-time records).`)) { st.periods = st.periods.filter(x => x.id !== p.id); st.students.forEach(s => { if (s.periodId === p.id) s.active = false; }); if (activePeriodId === p.id) activePeriodId = st.periods[0] ? st.periods[0].id : null; persist(); drawPeriods(); drawClassBtns(); render(); } };
+        r.append(up, ren, del); box.appendChild(r);
+      });
+      if (!st.periods.length) box.innerHTML = `<p class="muted">No classes yet.</p>`;
+    };
+    const drawClassBtns = () => {
+      const box = $("#suClassBtns"); box.innerHTML = "";
+      st.periods.forEach(p => { const b = el("button", "btn gray", esc(p.name)); b.onclick = () => { activePeriodId = p.id; close(o); render(); openClassManage(p.id); }; box.appendChild(b); });
+      if (!st.periods.length) box.innerHTML = `<span class="muted">Add a class first.</span>`;
+    };
+    drawPeriods(); drawClassBtns();
+    if (st.settings.lastBackupAt) { const days = Math.floor((now() - st.settings.lastBackupAt) / 864e5); $("#suBackupNote").textContent = `Last backup: ${days === 0 ? "today" : days + " day" + (days === 1 ? "" : "s") + " ago"}.`; }
+
+    $("#suAddP").onclick = () => { close(o); addPeriodFlow(); };
+    $("#suNewQ").onclick = () => startNewQuarter(o);
+    $("#suGetCode").onclick = () => showTransferCode();
+    $("#suPaste").onclick = () => pasteTransferCode(o);
+    $("#suExport").onclick = () => exportBackup();
+    $("#suImport").onclick = () => importBackup(o);
+    $("#suSound").onchange = e => { st.settings.soundOn = e.target.checked; persist(); if (e.target.checked) blip(3); };
+    $("#suConf").onchange = e => { st.settings.confettiOn = e.target.checked; persist(); if (e.target.checked) confetti(20); };
+    $("#suYear").onchange = e => { st.settings.schoolYearLabel = e.target.value.trim(); persist(); };
+    $("#suGoal").onchange = e => { if (activePeriodId) { SP.setGoal(st, activePeriodId, e.target.value ? +e.target.value : null); persist(); render(); } };
+  }
+  function openClassManage(periodId) {
+    activePeriodId = periodId;
+    const o = modal(`<h2>${esc(st.periods.find(p => p.id === periodId).name)}</h2>
+      <div class="row"><button class="btn" id="cmRoster">📋 Roster</button><button class="btn" id="cmSquads">👥 Squads</button></div>`);
+    $("#cmRoster").onclick = () => { close(o); openRoster(periodId); };
+    $("#cmSquads").onclick = () => { close(o); openSquadBuilder(); };
+  }
+  function startNewQuarter(setupOverlay) {
+    const suggested = "Q" + (st.quarters.length + 1) + (st.settings.schoolYearLabel ? " " + st.settings.schoolYearLabel : "");
+    const label = prompt(`Name the new quarter. This archives ${SP.currentQuarter(st).label}'s squads and points into the all-time records, keeps all your rosters, and starts you with fresh squads.\n\nType the new quarter name to confirm:`, suggested);
+    if (!label || !label.trim()) return;
+    SP.startQuarter(st, label.trim(), now()); persist();
+    close(setupOverlay); render(); toast(`Started ${label.trim()}. Build your new squads!`);
+  }
+  async function showTransferCode() {
+    const code = await SP.encodeTransfer(st);
+    const o = modal(`<h2>Transfer code</h2>
+      <p class="muted">Copy this whole code and paste it into Squad Points on the other device.</p>
+      <textarea id="tcOut" readonly style="min-height:140px;font-family:monospace;font-size:.75rem">${esc(code)}</textarea>
+      <div class="row"><button class="btn" id="tcCopy">Copy code</button></div>`);
+    $("#tcCopy").onclick = () => { $("#tcOut").select(); document.execCommand && document.execCommand("copy"); navigator.clipboard && navigator.clipboard.writeText(code); toast("Code copied!"); };
+  }
+  function pasteTransferCode(setupOverlay) {
+    const o = modal(`<h2>Paste transfer code</h2>
+      <p class="muted">Paste the code from your other device. This replaces the data on THIS device.</p>
+      <textarea id="tcIn" style="min-height:140px;font-family:monospace;font-size:.75rem"></textarea>
+      <div class="row"><button class="btn" id="tcGo">Import</button></div><p class="muted" id="tcErr"></p>`);
+    $("#tcGo").onclick = async () => {
+      try {
+        const incoming = await SP.decodeTransfer($("#tcIn").value);
+        if (!confirm(`Import ${incoming.periods.length} classes, ${incoming.students.filter(s => s.active).length} students, ${incoming.awards.length} awards? This replaces what's on this device.`)) return;
+        st = incoming; activePeriodId = st.periods[0] ? st.periods[0].id : null; persist();
+        close(o); close(setupOverlay); render(); toast("Imported!");
+      } catch (e) { $("#tcErr").textContent = e.message; }
+    };
+  }
+  async function exportBackup() {
+    const images = {};
+    const all = await IMGDB.all();
+    for (const [k, blob] of Object.entries(all)) images[k] = await blobToDataURL(blob);
+    const payload = { format: "squadPoints-backup", v: 1, at: now(), state: st, images };
+    const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+    const a = el("a"); a.href = URL.createObjectURL(blob); a.download = "squad-points-backup.json"; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    st.settings.lastBackupAt = now(); persist();
+    toast("Backup downloaded.");
+  }
+  function importBackup(setupOverlay) {
+    const inp = el("input"); inp.type = "file"; inp.accept = "application/json,.json";
+    inp.onchange = async () => {
+      const f = inp.files[0]; if (!f) return;
+      try {
+        const data = JSON.parse(await f.text());
+        if (data.format !== "squadPoints-backup" || !data.state) throw new Error("Not a Squad Points backup file.");
+        if (!confirm("Restore this backup? It replaces the data on this device.")) return;
+        st = data.state; activePeriodId = st.periods[0] ? st.periods[0].id : null;
+        if (data.images) for (const [k, durl] of Object.entries(data.images)) { dropURL(k); await IMGDB.put(k, await dataURLToBlob(durl)); }
+        persist(); close(setupOverlay); render(); toast("Backup restored.");
+      } catch (e) { alert("Couldn't import: " + e.message); }
+    };
+    inp.click();
+  }
+  const blobToDataURL = blob => new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(blob); });
+  const dataURLToBlob = async durl => (await fetch(durl)).blob();
+
+  // ================= WIRING =================
+  function render() { renderHeader(); renderTabs(); renderDashboard(); }
+  $("#toolbar").addEventListener("click", e => {
+    const b = e.target.closest("button[data-act]"); if (!b) return;
+    const act = b.dataset.act;
+    if (act === "random") openRandom("student");
+    else if (act === "randomsquad") openRandom("squad");
+    else if (act === "standings") openStandings();
+    else if (act === "share") openShare();
+    else if (act === "projector") openProjector();
+    else if (act === "timer") openTimer();
+    else if (act === "setup") openSetup();
+  });
+  $("#btnStandings2").onclick = () => openStandings();
+  $("#btnSetup2").onclick = () => openSetup();
+
+  render();
+  window._SPapp = { get st() { return st; }, render, openSetup, openShare, avatarSVG };
+})();
+/*==APP-END==*/
+</script>
+</body>
+</html>

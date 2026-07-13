@@ -76,8 +76,8 @@
   .soon{margin-top:14px;padding:10px 14px;border-radius:10px;font-weight:700;font-size:14px;text-align:center;color:var(--faint);background:var(--bg);border:1px dashed var(--line)}
 
   /* ---------- TpT + videos band ---------- */
-  .duo{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-  @media(max-width:980px){.duo{grid-template-columns:1fr 1fr}}
+  .duo{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  @media(max-width:1080px){.duo{grid-template-columns:1fr 1fr}}
   @media(max-width:680px){.duo{grid-template-columns:1fr}}
   .tpt-bar{display:flex;flex-direction:column;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;box-shadow:var(--shadow);transition:transform .15s ease,box-shadow .15s ease}
   .tpt-bar:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift)}
@@ -238,6 +238,10 @@
   </section>
 
   <section id="tpt">
+    <div class="sec-head">
+      <h2>Other Great Classroom Resources</h2>
+      <p>Free tools for your classroom — everything runs right in the browser and your data stays on your device.</p>
+    </div>
     <div class="duo">
       <div class="tpt-bar">
         <img src="virtual-lab-cover.jpg" alt="Virtual Lab Bench cover art">
@@ -262,6 +266,14 @@
           <p>Free behavior tracking for your classroom — paste in your roster, set your expectations and point values, and get consequence alerts plus a printable daily report. All data stays on your device.</p>
         </div>
         <a class="btn ghost" href="/classroom.html">Open Class Manager →</a>
+      </div>
+      <div class="tpt-bar">
+        <img src="squad-points-cover.jpg" alt="Squad Points cover art">
+        <div class="tpt-txt">
+          <h3>Squad Points</h3>
+          <p>Free team points tracker — organize students into squads, award points with one tap, and run live leaderboards with daily, weekly, and all-time records. Share standings with students by link. No accounts; all data stays on your device.</p>
+        </div>
+        <a class="btn ghost" href="/squads.html">Open Squad Points →</a>
       </div>
     </div>
   </section>
@@ -301,6 +313,7 @@
         <h4>More</h4>
         <a href="/virtual-lab-bench.html">Virtual Lab Bench</a>
         <a href="/classroom.html">Class Manager</a>
+        <a href="/squads.html">Squad Points</a>
         <a href="/simple-science.html">Simple Science Videos</a>
         <a href="https://www.teacherspayteachers.com/store/derek-tobin" target="_blank" rel="noopener">TpT Store</a>
         <a href="/district.html">Cherokee County, GA access</a>
