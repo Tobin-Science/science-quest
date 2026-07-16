@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Squad Points — Free Team Points Tracker for Teachers</title>
 <meta name="description" content="Free classroom team points tracker. Organize students into squads, award points in three taps, run live leaderboards with daily, weekly, and all-time records — no accounts, all data stays on your device.">
+<meta property="og:title" content="Squad Points — Free Team Points Tracker for Teachers">
+<meta property="og:description" content="Organize students into squads, award points in three taps, and run leaderboards with daily, weekly, and all-time records. Free, no accounts.">
+<meta property="og:image" content="https://tobinscience.com/squad-points-og.jpg">
+<meta property="og:url" content="https://tobinscience.com/squads.html">
+<meta property="og:type" content="website">
 <link rel="icon" type="image/png" href="/favicon.png">
 <style>
   :root{ --ink:#182135; --mut:#5f6b83; --bg:#f2f4fb; --card:#fff; --brand:#5b5bd6; --brand2:#4640c9;
@@ -88,9 +93,10 @@
   .sq.add{border:2px dashed #c2c9e6;background:rgba(255,255,255,.5);box-shadow:none;display:flex;align-items:center;
           justify-content:center;color:var(--brand2);font-weight:700;min-height:196px}
   .sq.add:hover{background:#fff;transform:none}
-  .empty{max-width:520px;margin:3rem auto;text-align:center;background:var(--card);border-radius:20px;
-         padding:2.4rem 2rem;border:1px solid var(--line);box-shadow:var(--shadow)}
-  .empty h2{margin-top:0}
+  .empty{max-width:560px;margin:2.2rem auto;text-align:center;background:var(--card);border-radius:20px;
+         padding:1.6rem 2rem 2.2rem;border:1px solid var(--line);box-shadow:var(--shadow)}
+  .empty h2{margin-top:.4rem}
+  .empty .hero{width:100%;max-width:400px;height:auto;border-radius:14px}
 
   /* floating toolbar */
   .toolbar{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;background:rgba(255,255,255,.94);
@@ -1019,7 +1025,8 @@ const IMGDB = {
   async function renderDashboard() {
     const main = $("#main"); main.innerHTML = "";
     if (!st.periods.length) {
-      main.appendChild(el("div", "empty", `<h2>Welcome to Squad Points</h2>
+      main.appendChild(el("div", "empty", `<img class="hero" src="squad-welcome.jpg" alt="Students celebrating around a leaderboard podium">
+        <h2>Welcome to Squad Points</h2>
         <p class="muted">Set up your first class period and paste in your roster to get started. Everything stays on this device — no accounts, no sign-in.</p>
         <button class="btn" id="startBtn">Add your first class period</button>`));
       $("#startBtn").onclick = addPeriodFlow;
@@ -1420,7 +1427,10 @@ const IMGDB = {
   // ================= SHARE =================
   async function openShare() {
     const o = modal(`<h2>${ic("share", 20)} Share standings with students</h2>
-      <p class="muted">This makes a link (and QR code) students open on their own devices. It's a snapshot of right now — re-share whenever you want them to see fresh numbers.</p>
+      <div class="row" style="align-items:flex-start;flex-wrap:nowrap">
+        <p class="muted" style="flex:1;margin:0">This makes a link (and QR code) students open on their own devices. It's a snapshot of right now — re-share whenever you want them to see fresh numbers.</p>
+        <img src="squad-scan.jpg" alt="" style="width:92px;height:92px;border-radius:12px;flex:none">
+      </div>
       <div id="shBody"><p class="muted">Building link…</p></div>`);
     const body = $("#shBody");
     try {

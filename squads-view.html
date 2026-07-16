@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Squad Points — Standings</title>
 <meta name="description" content="Live squad standings for your class — daily, weekly, and all-time records.">
+<meta property="og:title" content="Squad Points — Class Standings">
+<meta property="og:description" content="See your class's squad standings — daily, weekly, and all-time records.">
+<meta property="og:image" content="https://tobinscience.com/squad-points-og.jpg">
+<meta property="og:type" content="website">
 <link rel="icon" type="image/png" href="/favicon.png">
 <style>
   :root{ --ink:#182135; --mut:#5f6b83; --bg:#f2f4fb; --card:#fff; --brand:#5b5bd6; --brand2:#4640c9;
@@ -73,6 +77,7 @@
   h3{margin:1.3rem 0 .6rem;letter-spacing:-.2px}
   .err{max-width:460px;margin:3rem auto;text-align:center;background:var(--card);border-radius:20px;
        padding:2.2rem 1.8rem;border:1px solid var(--line);box-shadow:var(--shadow)}
+  .artempty{display:block;width:min(260px,64%);margin:1.1rem auto .5rem;border-radius:14px}
   footer{padding:1rem;text-align:center}
   footer a{color:var(--brand2);font-size:.85rem;text-decoration:none;background:#fff;border:1px solid var(--line);
            border-radius:999px;padding:.38rem .95rem .38rem .5rem;display:inline-flex;align-items:center;gap:.5rem;box-shadow:var(--shadow)}
@@ -214,7 +219,7 @@ function renderChamp(body){
   html += `<h3>${ic("medal",18)} All-Time Records (highest quarter totals ever)</h3>`;
   html += (c.top10&&c.top10.length) ? `<table class="lb"><tr><th></th><th>Squad</th><th>When</th><th style="text-align:right">Pts</th></tr>` +
     c.top10.map((r,i)=>`<tr><td>${rk(i+1)}</td><td>${esc(r.n)}</td><td class="muted">${esc(r.p)} · ${esc(r.q)}</td><td class="r">${r.t}</td></tr>`).join("") + `</table>`
-    : `<p class="muted">No records yet.</p>`;
+    : `<img class="artempty" src="squad-podium.jpg" alt="Empty podium waiting for a winner"><p class="muted" style="text-align:center">No records yet.</p>`;
   body.innerHTML = html;
 }
 function renderWeek(body){
@@ -222,7 +227,7 @@ function renderWeek(body){
   let html = `<h3>${ic("flame",18)} This Week's Race (all classes)</h3><p class="muted" style="margin-top:-.3rem">Anyone can win a week!</p>`;
   html += w.length ? `<table class="lb"><tr><th></th><th>Squad</th><th>Class</th><th style="text-align:right">Pts</th></tr>` +
     w.map((r,i)=>`<tr><td>${rk(i+1)}</td><td>${esc(r.n)}</td><td class="muted">${esc(r.p)}</td><td class="r">${r.w}</td></tr>`).join("") + `</table>`
-    : `<p class="muted">No points yet this week.</p>`;
+    : `<img class="artempty" src="squad-podium.jpg" alt="Empty podium waiting for a winner"><p class="muted" style="text-align:center">No points yet this week — the race starts with the first award.</p>`;
   body.innerHTML = html;
 }
 addEventListener("hashchange", boot);
