@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teacher Planner — Free from TobinScience.com</title>
+<meta name="description" content="Free teacher year planner: plan your whole school year from yearly overview down to minute-by-minute lessons. No login, no server — everything stays on your device.">
+<style>
+:root{
+  --ink:#1e293b; --ink2:#475569; --mut:#94a3b8; --bg:#f1f5f9; --card:#ffffff;
+  --brand:#0f766e; --brand-dk:#115e59; --brand-lt:#ccfbf1;
+  --amber:#d97706; --amber-bg:#fef3c7; --red:#dc2626; --red-bg:#fee2e2;
+  --green:#16a34a; --green-bg:#dcfce7; --line:#e2e8f0; --line2:#cbd5e1;
+  --r:10px; --shadow:0 1px 3px rgba(15,23,42,.08),0 4px 14px rgba(15,23,42,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:var(--ink)}
+h1{font-size:20px}h2{font-size:17px;margin-bottom:8px}h3{font-size:15px}
+a{color:var(--brand)}
+.muted{color:var(--ink2)}.small{font-size:13px}.tiny{font-size:12px}
+.hidden{display:none!important}
+
+/* ---------- layout ---------- */
+.topbar{position:sticky;top:0;z-index:40;background:var(--brand);color:#fff;box-shadow:var(--shadow)}
+.topbar-in{max-width:1160px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.logo .yr{font-weight:400;font-size:13px;opacity:.85}
+.tabs{display:flex;gap:2px;flex-wrap:wrap}
+.tab{background:transparent;border:0;color:#e6fffb;padding:7px 13px;border-radius:8px;font-weight:600;font-size:14px}
+.tab:hover{background:rgba(255,255,255,.12)}
+.tab.on{background:#fff;color:var(--brand-dk)}
+.topbar .spacer{flex:1}
+.brandbtn{display:inline-block;background:var(--amber);color:#fff;border:0;border-radius:8px;padding:8px 14px;font-weight:700;font-size:13px;text-decoration:none;text-align:center}
+.brandbtn:hover{filter:brightness(1.06)}
+.compactbtn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:7px 12px;font-weight:600;font-size:13px}
+.compactbtn:hover{background:rgba(255,255,255,.25)}
+.wrap{max-width:1160px;margin:0 auto;padding:18px 16px 60px}
+.footer{max-width:1160px;margin:0 auto;padding:22px 16px 40px;text-align:center;color:var(--ink2);font-size:13px}
+.footer .brandbtn{margin-bottom:10px}
+
+/* ---------- cards & controls ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+.card.tight{padding:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row.between{justify-content:space-between}
+.btn{background:#fff;border:1px solid var(--line2);border-radius:8px;padding:7px 13px;font-weight:600;font-size:14px;color:var(--ink)}
+.btn:hover{background:#f8fafc;border-color:var(--mut)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:var(--brand-dk)}
+.btn.danger{color:var(--red);border-color:#fca5a5}
+.btn.danger:hover{background:var(--red-bg)}
+.btn.sm{padding:3px 9px;font-size:13px}
+.btn.icon{padding:3px 8px;font-size:13px;line-height:1.2}
+.btn:disabled{opacity:.45;cursor:default}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-weight:600;font-size:13px;color:var(--ink2)}
+input[type=text],input[type=date],input[type=time],input[type=number],input[type=datetime-local],select,textarea{
+  border:1px solid var(--line2);border-radius:8px;padding:7px 10px;background:#fff;max-width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--brand-lt);border-color:var(--brand)}
+textarea{resize:vertical}
+.checkline{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
+.checkline input{width:16px;height:16px;accent-color:var(--brand)}
+.chip{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:600;background:var(--line);color:var(--ink2);white-space:nowrap}
+.chip.brand{background:var(--brand-lt);color:var(--brand-dk)}
+.chip.amber{background:var(--amber-bg);color:#92400e}
+.chip.red{background:var(--red-bg);color:#991b1b}
+.chip.green{background:var(--green-bg);color:#166534}
+.badge-dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.warnbox{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;font-size:14px;margin:10px 0}
+.errbox{background:var(--red-bg);border:1px solid #fca5a5;border-radius:8px;padding:10px 12px;font-size:14px;margin:10px 0}
+.okbox{background:var(--green-bg);border:1px solid #86efac;border-radius:8px;padding:10px 12px;font-size:14px;margin:10px 0}
+.seg{display:inline-flex;background:#e2e8f0;border-radius:9px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;border-radius:7px;padding:5px 13px;font-weight:600;font-size:13px;color:var(--ink2)}
+.seg button.on{background:#fff;color:var(--brand-dk);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+table.plain{border-collapse:collapse;width:100%}
+table.plain th{ text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--ink2);padding:6px 8px;border-bottom:2px solid var(--line)}
+table.plain td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+
+/* ---------- wizard ---------- */
+.wiz{max-width:680px;margin:26px auto}
+.wiz-steps{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.wiz-step{flex:1;min-width:60px;height:6px;border-radius:3px;background:var(--line2)}
+.wiz-step.done{background:var(--brand)}
+.wiz h1{margin-bottom:4px}
+.wiz .sub{color:var(--ink2);margin-bottom:18px}
+.wiz-nav{display:flex;justify-content:space-between;margin-top:20px}
+.daypick{display:flex;gap:6px;flex-wrap:wrap}
+.daypick label{border:1px solid var(--line2);border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:600;font-size:14px;background:#fff}
+.daypick label.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.daypick input{display:none}
+.list-edit{display:flex;flex-direction:column;gap:6px}
+.list-edit .li{display:flex;gap:8px;align-items:center;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:6px 10px;flex-wrap:wrap}
+.list-edit .li .grow{flex:1;min-width:120px}
+
+/* ---------- budget ---------- */
+.budgetbar{display:flex;height:26px;border-radius:8px;overflow:hidden;border:1px solid var(--line2);margin:8px 0}
+.budgetbar .segpart{min-width:2px;position:relative}
+.budgetbar .free{background:repeating-linear-gradient(45deg,#f1f5f9,#f1f5f9 6px,#e2e8f0 6px,#e2e8f0 12px)}
+.budgetnums{display:flex;gap:18px;flex-wrap:wrap;font-size:14px}
+.budgetnums b{font-size:17px}
+
+/* ---------- year view ---------- */
+.months-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:12px}
+.mini-cal{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:10px;cursor:pointer}
+.mini-cal:hover{border-color:var(--brand);box-shadow:var(--shadow)}
+.mini-cal h4{font-size:13px;margin-bottom:6px;color:var(--brand-dk)}
+.mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mini-grid .dh{font-size:9px;text-align:center;color:var(--mut);font-weight:700}
+.mini-d{aspect-ratio:1;border-radius:4px;font-size:10px;display:flex;align-items:center;justify-content:center;background:#fff;color:var(--ink2);position:relative}
+.mini-d.off{background:#f1f5f9;color:#cbd5e1}
+.mini-d.brk{background:repeating-linear-gradient(45deg,#e2e8f0,#e2e8f0 3px,#f8fafc 3px,#f8fafc 6px);color:#94a3b8}
+.mini-d.today{outline:2px solid var(--amber);outline-offset:-2px;font-weight:700}
+.mini-d.term::after{content:"";position:absolute;right:1px;top:1px;width:6px;height:6px;border-radius:50%;background:var(--red)}
+.unit-rows .urow{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.unit-rows .urow:last-child{border-bottom:0}
+.ucolor{width:14px;height:14px;border-radius:4px;flex:0 0 auto}
+
+/* ---------- month view ---------- */
+.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.mg-head{font-size:12px;font-weight:700;color:var(--ink2);text-align:center;padding:4px 0}
+.mg-cell{background:#fff;border:1px solid var(--line);border-radius:8px;min-height:86px;padding:5px 6px;font-size:12px;cursor:pointer;position:relative;overflow:hidden}
+.mg-cell:hover{border-color:var(--brand)}
+.mg-cell.off{background:#f8fafc;color:var(--mut);cursor:default}
+.mg-cell.blank{background:transparent;border:0;cursor:default}
+.mg-cell .dnum{font-weight:700;font-size:13px}
+.mg-cell.today .dnum{background:var(--amber);color:#fff;border-radius:6px;padding:0 5px;display:inline-block}
+.mg-cell .ulabel{display:block;border-radius:4px;padding:0 4px;font-size:10.5px;font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mg-cell .peek{color:var(--ink2);font-size:10.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mg-cell .offlbl{font-size:10.5px;color:var(--mut);margin-top:2px}
+
+/* ---------- day view ---------- */
+.period-card{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;cursor:pointer}
+.period-card:hover{border-color:var(--brand);box-shadow:var(--shadow)}
+.period-card.prep{background:#f8fafc;cursor:default}
+.pc-time{flex:0 0 108px;font-weight:700;color:var(--brand-dk);font-size:14px;line-height:1.35}
+.pc-time .dur{display:block;font-weight:400;color:var(--mut);font-size:12px}
+.pc-main{flex:1;min-width:0}
+.pc-main .cname{font-weight:700}
+.pc-blocks{color:var(--ink2);font-size:13px;margin-top:3px}
+/* hourly axis */
+.axis{position:relative;background:#fff;border:1px solid var(--line);border-radius:var(--r);margin-top:8px}
+.axis .hline{position:absolute;left:0;right:0;border-top:1px dashed var(--line);font-size:10px;color:var(--mut);padding-left:6px}
+.axis .ap{position:absolute;left:70px;right:12px;border-radius:8px;border:1px solid var(--line2);background:#f8fafc;overflow:hidden;cursor:pointer;box-shadow:var(--shadow)}
+.axis .ap:hover{border-color:var(--brand)}
+.axis .ap .aphead{font-size:12px;font-weight:700;padding:2px 8px}
+.axis .ap .ablock{position:absolute;left:0;right:0;border-top:1px solid rgba(255,255,255,.7);font-size:10.5px;padding:0 8px;overflow:hidden;white-space:nowrap}
+
+/* ---------- minute editor ---------- */
+.blocks-table td input[type=text]{width:100%}
+.blocks-table td input[type=number]{width:70px}
+.blocks-table .tm{white-space:nowrap;font-weight:600;color:var(--brand-dk);font-size:13px}
+.blocks-table tr.over td{background:var(--red-bg)}
+.totline{font-weight:600;margin-top:8px}
+.totline.bad{color:var(--red)}
+
+/* ---------- to do ---------- */
+.todo-item{display:flex;gap:10px;align-items:flex-start;padding:10px 6px;border-bottom:1px solid var(--line)}
+.todo-item:last-child{border-bottom:0}
+.todo-item.done .ttext{text-decoration:line-through;color:var(--mut)}
+.todo-item .ttext{flex:1;min-width:0;overflow-wrap:anywhere}
+.todo-item input[type=checkbox]{width:17px;height:17px;margin-top:3px;accent-color:var(--brand)}
+
+/* ---------- modal ---------- */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:80;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.3);max-width:560px;width:100%;max-height:88vh;overflow:auto;padding:20px}
+.modal h2{margin-bottom:10px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:var(--ink);color:#fff;border-radius:10px;padding:11px 18px;z-index:120;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.35);max-width:90vw}
+.toast.alert{background:var(--amber);font-weight:700}
+
+/* ---------- compact (PiP / popup / panel) ---------- */
+.cp-body{font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#0f766e;color:#fff;height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none}
+.cp-top{display:flex;align-items:center;gap:6px;padding:6px 8px 2px}
+.cp-top select{flex:1;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:#fff;border-radius:7px;padding:3px 6px;font-size:13px;font-weight:700}
+.cp-top select option{color:#1e293b}
+.cp-btns{display:flex;gap:6px;padding:6px 8px;flex:1;align-items:stretch}
+.cp-btns button{flex:1;border:0;border-radius:9px;background:rgba(255,255,255,.14);color:#fff;font-weight:700;font-size:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.cp-btns button:hover{background:rgba(255,255,255,.26)}
+.cp-btns .ico{font-size:19px}
+.cp-name{padding:2px 8px 7px;text-align:center;font-size:13px;min-height:22px}
+.cp-name b{font-size:16px}
+.cp-form{display:flex;flex-direction:column;gap:6px;padding:8px;flex:1;overflow:auto}
+.cp-form textarea,.cp-form input{border:0;border-radius:7px;padding:6px 8px;font-size:13px;width:100%}
+.cp-form .cl{display:flex;align-items:center;gap:6px;font-size:12.5px}
+.cp-row{display:flex;gap:6px}
+.cp-row button{flex:1;border:0;border-radius:8px;padding:7px;font-weight:700;background:rgba(255,255,255,.16);color:#fff;font-size:13px}
+.cp-row button.pri{background:#f59e0b}
+.cp-timer{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6px}
+.cp-clock{font-size:52px;font-weight:800;letter-spacing:2px;font-variant-numeric:tabular-nums;line-height:1}
+.cp-clock.flash{animation:cpflash .5s steps(2) infinite}
+@keyframes cpflash{to{color:#f59e0b}}
+.cp-presets{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.cp-presets button{border:0;border-radius:7px;padding:4px 10px;font-weight:700;background:rgba(255,255,255,.16);color:#fff;font-size:12.5px}
+/* big in-page timer overlay (fallback + projector mode) */
+.timer-big .cp-clock{font-size:min(28vw,240px)}
+
+/* ---------- print ---------- */
+#printArea{display:none}
+@media print{
+  body{background:#fff}
+  #app,.topbar,.footer{display:none!important}
+  #printArea{display:block;font-size:12px;color:#000}
+  #printArea .ph{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #000;padding-bottom:4px;margin-bottom:10px}
+  #printArea .ph h1{font-size:16px}
+  #printArea .pf{margin-top:14px;border-top:1px solid #000;padding-top:4px;font-size:11px;text-align:center}
+  #printArea table{border-collapse:collapse;width:100%}
+  #printArea th,#printArea td{border:1px solid #000;padding:3px 5px;vertical-align:top;text-align:left}
+  #printArea th{background:#eee}
+  #printArea .pgbrk{page-break-before:always}
+  #printArea .mini-grid{gap:1px}
+  #printArea .mini-d{border:1px solid #ccc;border-radius:0}
+  .noprint{display:none!important}
+}
+@media (max-width:640px){
+  .pc-time{flex-basis:84px}
+  .months-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .mg-cell{min-height:64px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="printArea"></div>
+<script>
+"use strict";
+/* =====================================================================
+   Teacher Planner — TobinScience.com
+   One data model of base facts; every view is computed. No backend.
+   ===================================================================== */
+
+/* ---------- storage (swappable: localStorage on the live site, in-memory fallback) ---------- */
+const Store=(()=>{
+  const KEY='tp_state_v1';
+  try{
+    const t='__tp_probe';localStorage.setItem(t,'1');localStorage.removeItem(t);
+    return{
+      get(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } },
+      set(s){ try{ localStorage.setItem(KEY,JSON.stringify(s)); }catch(e){} },
+      kind:'local'
+    };
+  }catch(e){
+    let mem=null;
+    return{ get(){return mem;}, set(s){mem=JSON.parse(JSON.stringify(s));}, kind:'memory' };
+  }
+})();
+
+/* ---------- date utils (plain Y-M-D strings; no timestamps, no DST traps) ---------- */
+const DOWS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const D={
+  parse(s){ const[y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d,12); },
+  fmt(dt){ return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); },
+  today(){ return D.fmt(new Date()); },
+  addDays(s,n){ const dt=D.parse(s); dt.setDate(dt.getDate()+n); return D.fmt(dt); },
+  dow(s){ return D.parse(s).getDay(); },
+  human(s,withYear){ const dt=D.parse(s); return MONTHS[dt.getMonth()].slice(0,3)+' '+dt.getDate()+(withYear?', '+dt.getFullYear():''); },
+  long(s){ const dt=D.parse(s); return DOWS[dt.getDay()]+', '+MONTHS[dt.getMonth()]+' '+dt.getDate()+', '+dt.getFullYear(); },
+  monthKey(s){ return s.slice(0,7); },
+  daysInMonth(y,m){ return new Date(y,m,0,12).getDate(); },
+  valid(s){ return /^\d{4}-\d{2}-\d{2}$/.test(s||''); }
+};
+function t2m(t){ if(!t)return 0; const[h,m]=t.split(':').map(Number); return h*60+m; }
+function m2t(min){ return String(Math.floor(min/60)).padStart(2,'0')+':'+String(min%60).padStart(2,'0'); }
+function fmt12(min){ min=((min%1440)+1440)%1440; let h=Math.floor(min/60),m=min%60; const ap=h>=12?'PM':'AM'; h=((h+11)%12)+1; return h+':'+String(m).padStart(2,'0')+' '+ap; }
+function nowMin(){ const n=new Date(); return n.getHours()*60+n.getMinutes(); }
+
+/* ---------- misc utils ---------- */
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function plural(n,w){ return n+' '+w+(n===1?'':'s'); }
+const UNIT_COLORS=['#99f6e4','#bfdbfe','#fde68a','#fecaca','#ddd6fe','#bbf7d0','#fbcfe8','#fed7aa','#a5f3fc','#e9d5ff','#d9f99d','#fde2e4'];
+
+/* ---------- state ---------- */
+let S=null;   // persistent state
+let UI={ tab:'plan', zoom:'year', date:D.today(), month:null, periodId:null,
+         dayMode:'list', wizard:null, modal:null, compactPeriod:null, compactMode:'home' };
+
+function defaultState(){
+  return { version:1, activeYearId:null, years:{}, courses:{}, blockTemplates:[], todos:[],
+           draws:{}, settings:{ pureRandom:false, timerSound:false, alertsExplained:false } };
+}
+function persist(){ Store.set(S); }
+function activeYear(){ return S.activeYearId? S.years[S.activeYearId] : null; }
+function newYearDraft(){
+  return { id:'y'+uid(), label:'', firstDay:'', lastDay:'',
+    weekDays:[false,true,true,true,true,true,false],   // Sun..Sat
+    daysOff:{}, breaks:[], terms:[], targetDate:'',
+    units:[], periods:[], rosters:{}, lessons:{}, archived:false, copyFrom:null };
+}
+function courseName(cid){ return cid && S.courses[cid] ? S.courses[cid].name : ''; }
+function findOrCreateCourse(name){
+  name=(name||'').trim(); if(!name) return null;
+  for(const id in S.courses) if(S.courses[id].name.toLowerCase()===name.toLowerCase()) return id;
+  const id='c'+uid(); S.courses[id]={id,name}; return id;
+}
+
+/* ---------- derived: school-day calendar (computed, never stored) ---------- */
+function isSchoolDay(y,date){
+  if(date<y.firstDay||date>y.lastDay) return false;
+  if(!y.weekDays[D.dow(date)]) return false;
+  if(y.daysOff[date]!==undefined) return false;
+  for(const b of y.breaks) if(date>=b.start&&date<=b.end) return false;
+  return true;
+}
+function offReason(y,date){
+  if(y.daysOff[date]!==undefined) return y.daysOff[date]||'No school';
+  for(const b of y.breaks) if(date>=b.start&&date<=b.end) return b.name||'Break';
+  if(!y.weekDays[D.dow(date)]) return '';
+  return '';
+}
+function schoolDays(y,from,to){
+  const out=[]; if(!D.valid(from)||!D.valid(to)) return out;
+  for(let d=from;d<=to;d=D.addDays(d,1)) if(isSchoolDay(y,d)) out.push(d);
+  return out;
+}
+/* Units laid end-to-end across the school-day pool up to the target date. */
+function unitLayout(y){
+  const end=(y.targetDate&&y.targetDate>=y.firstDay)?y.targetDate:y.lastDay;
+  const pool=schoolDays(y,y.firstDay,end);
+  const spans=[]; let i=0;
+  for(const u of y.units){
+    const days=pool.slice(i,i+u.days);
+    spans.push({unit:u,days,start:days[0]||null,end:days[days.length-1]||null,shortfall:Math.max(0,u.days-days.length)});
+    i+=u.days;
+  }
+  const assigned=y.units.reduce((a,u)=>a+u.days,0);
+  return { spans, available:pool.length, assigned, unassigned:pool.length-assigned, endDate:end };
+}
+function unitForDate(y,date){
+  const L=unitLayout(y);
+  for(const s of L.spans){ const k=s.days.indexOf(date); if(k>=0) return {span:s,idx:k}; }
+  return null;
+}
+/* Breaks / marked days off that fall inside a unit's calendar span. */
+function midUnitAlerts(y){
+  const L=unitLayout(y); const out=[];
+  for(const s of L.spans){
+    if(!s.start||!s.end) continue;
+    for(const b of y.breaks){
+      if(b.start>s.start&&b.start<=s.end)
+        out.push({unit:s.unit,what:(b.name||'Break')+' ('+D.human(b.start)+(b.end!==b.start?' – '+D.human(b.end):'')+')'});
+    }
+    const offs=[];
+    for(const d in y.daysOff) if(d>s.start&&d<s.end) offs.push(d);
+    if(offs.length) out.push({unit:s.unit,what:offs.length===1?((y.daysOff[offs[0]]||'No-school day')+' ('+D.human(offs[0])+')'):plural(offs.length,'no-school day')+' inside this unit'});
+  }
+  return out;
+}
+function unitProgress(y,u){
+  const L=unitLayout(y); const s=L.spans.find(x=>x.unit.id===u.id); if(!s||!s.start) return null;
+  const today=D.today(); let used=0;
+  for(const d of s.days){ if(d<=today) used++; }
+  return {used,total:u.days,remaining:u.days-used,span:s};
+}
+
+/* ---------- lessons (sparse: only touched days are stored) ---------- */
+function lessonFor(y,date,pid,create){
+  if(!y.lessons[date]){ if(!create) return null; y.lessons[date]={periods:{},note:'',links:[]}; }
+  const day=y.lessons[date];
+  if(!day.periods[pid]){ if(!create) return null; day.periods[pid]={blocks:[],links:[]}; }
+  return day.periods[pid];
+}
+function dayRec(y,date,create){
+  if(!y.lessons[date]&&create) y.lessons[date]={periods:{},note:'',links:[]};
+  return y.lessons[date]||null;
+}
+function cleanDay(y,date){ // drop empty day records so storage stays sparse
+  const r=y.lessons[date]; if(!r) return;
+  for(const pid in r.periods){ const p=r.periods[pid]; if(!p.blocks.length&&!p.links.length) delete r.periods[pid]; }
+  if(!Object.keys(r.periods).length&&!r.note&&!(r.links&&r.links.length)) delete y.lessons[date];
+}
+function blockTimes(period,blocks){ // stack durations onto the period's real start time
+  let t=t2m(period.start); return blocks.map(b=>{ const s=t; t+=Number(b.duration)||0; return {start:s,end:t,label:b.label,duration:b.duration}; });
+}
+
+/* =====================================================================
+   UI CORE — one render root, event delegation via data-act / data-ch
+   ===================================================================== */
+const ACT={}, CH={};
+function wireDoc(doc){
+  doc.addEventListener('click',e=>{
+    const t=e.target.closest('[data-act]'); if(!t) return;
+    const fn=ACT[t.dataset.act]; if(fn){ e.preventDefault(); fn(t,e); }
+  });
+  doc.addEventListener('change',e=>{
+    const t=e.target.closest('[data-ch]'); if(!t) return;
+    const fn=CH[t.dataset.ch]; if(fn) fn(t,e);
+  });
+}
+function render(){
+  document.getElementById('app').innerHTML=App();
+  renderCompactIfOpen();
+}
+let toastTimer=null;
+function showToast(msg,cls){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const d=document.createElement('div'); d.className='toast'+(cls?' '+cls:''); d.textContent=msg;
+  document.body.appendChild(d); clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>d.remove(), cls==='alert'?8000:2600);
+}
+function brandBtn(){ return '<a class="brandbtn" href="https://www.tobinscience.com" target="_blank" rel="noopener">Find more great resources at TobinScience.com</a>'; }
+
+/* ---------- root ---------- */
+function App(){
+  if(UI.wizard) return Wizard();
+  const y=activeYear();
+  if(!y) return Wizard(); // safety
+  return TopBar(y)+'<div class="wrap">'+MainBody(y)+'</div>'+Footer()+(UI.modal?Modal():'');
+}
+function TopBar(y){
+  const tabs=[['plan','📅 Plan'],['units','📦 Units'],['todo','✅ To Do'],['rosters','🧑‍🏫 Rosters'],['share','🔗 Share & Settings']];
+  return '<div class="topbar"><div class="topbar-in">'
+    +'<div class="logo">🗓️ Teacher Planner <span class="yr">'+esc(y.label)+(y.archived?' · ARCHIVED':'')+'</span></div>'
+    +'<div class="tabs">'+tabs.map(t=>'<button class="tab'+(UI.tab===t[0]?' on':'')+'" data-act="tab" data-a="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'
+    +'<span class="spacer"></span>'
+    +'<button class="compactbtn" data-act="openCompact" title="Shrink to a small floating window">🗕 Compact mode</button>'
+    +brandBtn()
+    +'</div></div>';
+}
+function Footer(){
+  return '<div class="footer">'+brandBtn()
+    +'<div class="tiny" style="margin-top:8px">Free forever · All of your data stays on this device — nothing is uploaded anywhere.'
+    +(Store.kind==='memory'?' <b>(Preview mode: this environment can’t save between visits — use Export before leaving.)</b>':'')
+    +'</div></div>';
+}
+ACT.tab=t=>{ UI.tab=t.dataset.a; render(); };
+
+function MainBody(y){
+  switch(UI.tab){
+    case 'plan': return PlanView(y);
+    case 'units': return UnitsTab(y);
+    case 'todo': return TodoTab();
+    case 'rosters': return RostersTab(y);
+    case 'share': return ShareTab(y);
+  }
+  return '';
+}
+
+/* =====================================================================
+   SETUP WIZARD — writes the base facts
+   ===================================================================== */
+const WIZ_STEPS=['Welcome','School year dates','School week','No-school days & breaks','Units & target date','Periods & courses'];
+function startWizard(opts){
+  opts=opts||{};
+  let draft;
+  if(opts.editYearId){ draft=clone(S.years[opts.editYearId]);
+    draft.periods=draft.periods.map(p=>({...p,courseName:courseName(p.courseId)})); }
+  else draft=newYearDraft();
+  if(opts.copyFrom){
+    const src=S.years[opts.copyFrom];
+    draft.copyFrom=opts.copyFrom;
+    draft.weekDays=clone(src.weekDays);
+    draft.units=clone(src.units).map(u=>({...u}));
+    draft.targetDate='';
+    draft.periods=clone(src.periods).map(p=>({...p,id:'p'+uid(),courseName:courseName(p.courseId)}));
+  }
+  if(!draft.periods.length) draft.periods=[];
+  UI.wizard={step:opts.skipWelcome?1:0,y:draft,edit:!!opts.editYearId,editYearId:opts.editYearId||null};
+  render();
+}
+function Wizard(){
+  const w=UI.wizard||{step:0,y:newYearDraft()};
+  if(!UI.wizard) UI.wizard=w;
+  const canCancel=!!activeYear();
+  let body='';
+  switch(w.step){
+    case 0: body=wzWelcome(); break;
+    case 1: body=wzDates(w.y); break;
+    case 2: body=wzWeek(w.y); break;
+    case 3: body=wzDaysOff(w.y); break;
+    case 4: body=wzUnits(w.y); break;
+    case 5: body=wzPeriods(w.y); break;
+  }
+  const bar=WIZ_STEPS.map((s,i)=>'<div class="wiz-step'+(i<=w.step?' done':'')+'" title="'+esc(s)+'"></div>').join('');
+  return '<div class="wrap"><div class="wiz">'
+    +'<div class="row between" style="margin-bottom:6px"><div class="logo" style="color:var(--brand-dk)">🗓️ Teacher Planner</div>'+brandBtn()+'</div>'
+    +'<div class="wiz-steps">'+bar+'</div>'
+    +'<div class="card">'+body
+    +'<div class="wiz-nav">'
+    +(w.step>0?'<button class="btn" data-act="wzBack">← Back</button>':(canCancel?'<button class="btn" data-act="wzCancel">Cancel</button>':'<span></span>'))
+    +(w.step===0?'<button class="btn primary" data-act="wzNext">Set up my year →</button>'
+      : w.step<WIZ_STEPS.length-1?'<button class="btn primary" data-act="wzNext">Next →</button>'
+      :'<button class="btn primary" data-act="wzFinish">'+(w.edit?'Save changes':'Finish setup ✓')+'</button>')
+    +'</div></div>'
+    +(w.step>0&&canCancel?'<div style="text-align:center"><button class="btn sm" data-act="wzCancel">Cancel and go back to my planner</button></div>':'')
+    +'</div></div>';
+}
+function wzWelcome(){
+  return '<h1>Welcome! Let’s plan your year.</h1>'
+    +'<p class="sub">A free planning tool for any teacher. Plan the whole year, zoom from a yearly overview all the way down to minute-by-minute lessons, and adjust as you go. Everything stays on your device — no login, no account.</p>'
+    +'<p class="small muted" style="margin-bottom:14px">Setup takes about 5 minutes: school-year dates → your school week → holidays & breaks → your units → your class periods.</p>'
+    +'<div class="card tight" style="background:#f8fafc"><b>Already have a plan from a colleague or another device?</b>'
+    +'<div class="row" style="margin-top:8px"><button class="btn" data-act="importCodeDlg">Paste a transfer code</button>'
+    +'<button class="btn" data-act="importFile">Import a .plan file</button></div></div>';
+}
+function wzDates(y){
+  return '<h1>'+(UI.wizard.edit?'School year dates':'When does your school year run?')+'</h1>'
+    +'<p class="sub">Enter the <b>first day of school</b> and the <b>last day of school</b>. The planner builds your whole calendar from these two dates.</p>'
+    +'<div class="field"><label>First day of school</label><input type="date" value="'+esc(y.firstDay)+'" data-ch="wz" data-f="firstDay"></div>'
+    +'<div class="field"><label>Last day of school</label><input type="date" value="'+esc(y.lastDay)+'" data-ch="wz" data-f="lastDay"></div>'
+    +'<div class="field"><label>Name of this school year</label><input type="text" value="'+esc(y.label)+'" placeholder="e.g. 2026–2027" data-ch="wz" data-f="label"></div>'
+    +(y.copyFrom?'<div class="okbox">📋 Copying from <b>'+esc(S.years[y.copyFrom].label)+'</b> — your units, periods, courses, and lessons will carry over onto this new calendar. You’ll enter the new year’s holidays and breaks fresh (they change every year). Rosters do not copy — new students!</div>':'');
+}
+function wzWeek(y){
+  return '<h1>Which days is school normally in session?</h1>'
+    +'<p class="sub">Most schools run Monday–Friday, but some districts differ — pick whatever matches yours.</p>'
+    +'<div class="daypick">'+DOWS.map((d,i)=>'<label class="'+(y.weekDays[i]?'on':'')+'"><input type="checkbox" '+(y.weekDays[i]?'checked':'')+' data-ch="wzDay" data-a="'+i+'">'+d+'</label>').join('')+'</div>';
+}
+function wzDaysOff(y){
+  const offs=Object.keys(y.daysOff).sort();
+  return '<h1>No-school days & breaks</h1>'
+    +'<p class="sub">Add single days off (like MLK Day or a teacher workday) and multi-day breaks (like Thanksgiving break). You can always add more later.</p>'
+    +'<h3>Single days off</h3>'
+    +'<div class="list-edit" style="margin:8px 0">'
+    +offs.map(d=>'<div class="li"><b>'+D.human(d,true)+'</b><span class="grow">'+esc(y.daysOff[d])+'</span><button class="btn sm danger" data-act="wzDelOff" data-a="'+d+'">✕</button></div>').join('')
+    +'<div class="li"><input type="date" id="wzOffDate"><input type="text" class="grow" id="wzOffLabel" placeholder="Label (e.g. MLK Jr. Day)"><button class="btn sm primary" data-act="wzAddOff">Add</button></div></div>'
+    +'<h3>Breaks (date ranges)</h3>'
+    +'<div class="list-edit" style="margin:8px 0">'
+    +y.breaks.map(b=>'<div class="li"><b>'+D.human(b.start,true)+' – '+D.human(b.end,true)+'</b><span class="grow">'+esc(b.name)+'</span><button class="btn sm danger" data-act="wzDelBrk" data-a="'+b.id+'">✕</button></div>').join('')
+    +'<div class="li"><input type="date" id="wzBrkStart" title="First day of break"><input type="date" id="wzBrkEnd" title="Last day of break"><input type="text" class="grow" id="wzBrkName" placeholder="Name (e.g. Thanksgiving Break)"><button class="btn sm primary" data-act="wzAddBrk">Add</button></div></div>'
+    +'<h3>Quarter / semester ends <span class="chip">optional</span></h3>'
+    +'<p class="small muted">Mark the last day of each grading period if you’d like them shown on your calendar.</p>'
+    +'<div class="list-edit" style="margin:8px 0">'
+    +y.terms.map(t=>'<div class="li"><b>'+D.human(t.end,true)+'</b><span class="grow">'+esc(t.label)+'</span><button class="btn sm danger" data-act="wzDelTerm" data-a="'+t.id+'">✕</button></div>').join('')
+    +'<div class="li"><input type="date" id="wzTermDate"><input type="text" class="grow" id="wzTermLabel" placeholder="Label (e.g. End of Q1)"><button class="btn sm primary" data-act="wzAddTerm">Add</button></div></div>';
+}
+function wzUnits(y){
+  const L=unitLayout(y);
+  return '<h1>Your units & target finish date</h1>'
+    +'<p class="sub">Pick the date all units must be done by (before state testing, or the end of the year), then list your units in order with a rough number of school days each. This is an estimate — you can adjust and rebalance all year.</p>'
+    +'<div class="field"><label>All units finished by</label><input type="date" value="'+esc(y.targetDate)+'" min="'+esc(y.firstDay)+'" max="'+esc(y.lastDay)+'" data-ch="wz" data-f="targetDate"></div>'
+    +budgetSummary(y,L)
+    +'<div class="list-edit" style="margin:10px 0">'
+    +y.units.map((u,i)=>'<div class="li"><span class="ucolor" style="background:'+u.color+'"></span>'
+      +'<input type="text" class="grow" value="'+esc(u.name)+'" data-ch="wzUnitName" data-a="'+u.id+'">'
+      +'<input type="number" min="1" max="200" value="'+u.days+'" style="width:70px" data-ch="wzUnitDays" data-a="'+u.id+'"> <span class="tiny muted">days</span>'
+      +'<button class="btn icon" data-act="wzUnitMove" data-a="'+u.id+'" data-b="-1" '+(i===0?'disabled':'')+'>↑</button>'
+      +'<button class="btn icon" data-act="wzUnitMove" data-a="'+u.id+'" data-b="1" '+(i===y.units.length-1?'disabled':'')+'>↓</button>'
+      +'<button class="btn sm danger" data-act="wzDelUnit" data-a="'+u.id+'">✕</button></div>').join('')
+    +'<div class="li"><input type="text" class="grow" id="wzUnitNew" placeholder="Unit name (e.g. Energy)"><input type="number" id="wzUnitNewDays" min="1" max="200" value="15" style="width:70px"><span class="tiny muted">days</span><button class="btn sm primary" data-act="wzAddUnit">Add unit</button></div></div>';
+}
+function wzPeriods(y){
+  return '<h1>Your daily class periods</h1>'
+    +'<p class="sub">Add each period with its start time and length. Give each teaching period a <b>course</b> name (like "Advanced Science") — courses are what let your plan copy to next year even if the same course meets in a different period. Mark planning periods as Prep.</p>'
+    +'<datalist id="courseList">'+Object.values(S.courses).map(c=>'<option value="'+esc(c.name)+'">').join('')+'</datalist>'
+    +'<div class="list-edit" style="margin:8px 0">'
+    +y.periods.map(p=>'<div class="li">'
+      +'<input type="text" style="width:110px" value="'+esc(p.label)+'" placeholder="e.g. 3rd Period" data-ch="wzPer" data-a="'+p.id+'" data-f="label">'
+      +'<input type="text" class="grow" list="courseList" value="'+esc(p.courseName||'')+'" placeholder="Course (e.g. Advanced Science)" data-ch="wzPer" data-a="'+p.id+'" data-f="courseName" '+(p.isPrep?'disabled':'')+'>'
+      +'<input type="time" value="'+esc(p.start)+'" data-ch="wzPer" data-a="'+p.id+'" data-f="start">'
+      +'<input type="number" min="5" max="600" value="'+p.duration+'" style="width:66px" title="Length in minutes" data-ch="wzPer" data-a="'+p.id+'" data-f="duration"><span class="tiny muted">min</span>'
+      +'<label class="checkline tiny"><input type="checkbox" '+(p.isPrep?'checked':'')+' data-ch="wzPer" data-a="'+p.id+'" data-f="isPrep">Prep</label>'
+      +'<button class="btn sm danger" data-act="wzDelPer" data-a="'+p.id+'">✕</button></div>').join('')
+    +'</div><button class="btn" data-act="wzAddPer">+ Add a period</button>'
+    +(y.copyFrom?'<div class="warnbox" style="margin-top:12px">Match each period’s <b>course name</b> to last year’s course and your lessons will land in the right class automatically — even if the course moved to a different period this year.</div>':'');
+}
+function budgetSummary(y,L){
+  L=L||unitLayout(y);
+  if(!D.valid(y.firstDay)||!D.valid(y.lastDay)) return '';
+  let cls='okbox',msg='✓ Fits: '+L.unassigned+' school days still unassigned.';
+  if(L.unassigned<0){ cls='errbox'; msg='⚠ Over budget: your units total '+L.assigned+' days but only '+L.available+' school days are available before '+D.human(L.endDate,true)+' — trim '+(-L.unassigned)+' day'+(L.unassigned===-1?'':'s')+'.'; }
+  else if(L.unassigned===0){ cls='okbox'; msg='✓ Perfectly balanced: every available school day is assigned.'; }
+  return '<div class="budgetnums"><span><b>'+L.available+'</b> school days available</span><span><b>'+L.assigned+'</b> assigned to units</span><span><b>'+Math.max(0,L.unassigned)+'</b> unassigned</span></div>'
+    +budgetBar(y,L)+'<div class="'+cls+'">'+msg+'</div>';
+}
+function budgetBar(y,L){
+  if(!L.available) return '';
+  let html='<div class="budgetbar">';
+  for(const s of L.spans){ const w=Math.max(0,(s.unit.days-s.shortfall))/L.available*100;
+    if(w>0) html+='<div class="segpart" title="'+esc(s.unit.name)+' ('+s.unit.days+' days)" style="width:'+w+'%;background:'+s.unit.color+'"></div>'; }
+  if(L.unassigned>0) html+='<div class="segpart free" title="Unassigned" style="width:'+(L.unassigned/L.available*100)+'%"></div>';
+  return html+'</div>';
+}
+
+/* ---------- wizard actions ---------- */
+CH.wz=t=>{ UI.wizard.y[t.dataset.f]=t.value; if(t.dataset.f==='firstDay'||t.dataset.f==='lastDay') autoLabel(); render(); };
+function autoLabel(){ const y=UI.wizard.y;
+  if(!y.label&&D.valid(y.firstDay)&&D.valid(y.lastDay)){ const a=y.firstDay.slice(0,4),b=y.lastDay.slice(0,4); y.label=a===b?a:a+'–'+b; } }
+CH.wzDay=t=>{ UI.wizard.y.weekDays[Number(t.dataset.a)]=t.checked; render(); };
+ACT.wzAddOff=()=>{ const d=document.getElementById('wzOffDate').value,l=document.getElementById('wzOffLabel').value.trim();
+  if(!D.valid(d)) return showToast('Pick a date first'); UI.wizard.y.daysOff[d]=l||'No school'; render(); };
+ACT.wzDelOff=t=>{ delete UI.wizard.y.daysOff[t.dataset.a]; render(); };
+ACT.wzAddBrk=()=>{ const s=document.getElementById('wzBrkStart').value,e=document.getElementById('wzBrkEnd').value||s,n=document.getElementById('wzBrkName').value.trim();
+  if(!D.valid(s)) return showToast('Pick the break’s first day');
+  UI.wizard.y.breaks.push({id:'b'+uid(),name:n||'Break',start:s<=e?s:e,end:s<=e?e:s});
+  UI.wizard.y.breaks.sort((a,b)=>a.start<b.start?-1:1); render(); };
+ACT.wzDelBrk=t=>{ const y=UI.wizard.y; y.breaks=y.breaks.filter(b=>b.id!==t.dataset.a); render(); };
+ACT.wzAddTerm=()=>{ const d=document.getElementById('wzTermDate').value,l=document.getElementById('wzTermLabel').value.trim();
+  if(!D.valid(d)) return showToast('Pick a date first');
+  UI.wizard.y.terms.push({id:'t'+uid(),label:l||'End of grading period',end:d});
+  UI.wizard.y.terms.sort((a,b)=>a.end<b.end?-1:1); render(); };
+ACT.wzDelTerm=t=>{ const y=UI.wizard.y; y.terms=y.terms.filter(x=>x.id!==t.dataset.a); render(); };
+ACT.wzAddUnit=()=>{ const n=document.getElementById('wzUnitNew').value.trim(),d=Number(document.getElementById('wzUnitNewDays').value)||15;
+  if(!n) return showToast('Give the unit a name');
+  const y=UI.wizard.y; y.units.push({id:'u'+uid(),name:n,days:Math.max(1,d),color:UNIT_COLORS[y.units.length%UNIT_COLORS.length]}); render(); };
+ACT.wzDelUnit=t=>{ const y=UI.wizard.y; y.units=y.units.filter(u=>u.id!==t.dataset.a); render(); };
+ACT.wzUnitMove=t=>{ const y=UI.wizard.y,i=y.units.findIndex(u=>u.id===t.dataset.a),j=i+Number(t.dataset.b);
+  if(i<0||j<0||j>=y.units.length) return; [y.units[i],y.units[j]]=[y.units[j],y.units[i]]; render(); };
+CH.wzUnitName=t=>{ const u=UI.wizard.y.units.find(u=>u.id===t.dataset.a); if(u) u.name=t.value; };
+CH.wzUnitDays=t=>{ const u=UI.wizard.y.units.find(u=>u.id===t.dataset.a); if(u) u.days=Math.max(1,Number(t.value)||1); render(); };
+ACT.wzAddPer=()=>{ const y=UI.wizard.y; const last=y.periods[y.periods.length-1];
+  const start=last?m2t(Math.min(1435,t2m(last.start)+Number(last.duration)+5)):'08:00';
+  const n=y.periods.length+1, ord=n===1?'1st':n===2?'2nd':n===3?'3rd':n+'th';
+  y.periods.push({id:'p'+uid(),label:ord+' Period',courseName:'',start:start,duration:last?last.duration:55,isPrep:false}); render(); };
+ACT.wzDelPer=t=>{ const y=UI.wizard.y; y.periods=y.periods.filter(p=>p.id!==t.dataset.a); render(); };
+CH.wzPer=t=>{ const p=UI.wizard.y.periods.find(p=>p.id===t.dataset.a); if(!p) return;
+  const f=t.dataset.f; if(f==='isPrep'){ p.isPrep=t.checked; if(p.isPrep) p.courseName=''; render(); }
+  else if(f==='duration') p.duration=Math.max(5,Number(t.value)||5);
+  else p[f]=t.value; };
+ACT.wzBack=()=>{ UI.wizard.step=Math.max(0,UI.wizard.step-1); render(); };
+ACT.wzCancel=()=>{ UI.wizard=null; render(); };
+ACT.wzNext=()=>{
+  const w=UI.wizard,y=w.y;
+  if(w.step===1){
+    if(!D.valid(y.firstDay)||!D.valid(y.lastDay)) return showToast('Enter both the first and last day of school');
+    if(y.lastDay<=y.firstDay) return showToast('The last day must be after the first day');
+    autoLabel(); if(!y.targetDate) y.targetDate=y.lastDay;
+  }
+  if(w.step===2&&!y.weekDays.some(Boolean)) return showToast('Pick at least one school day');
+  w.step++; render();
+};
+ACT.wzFinish=()=>{
+  const w=UI.wizard,y=w.y;
+  if(!y.periods.length) return showToast('Add at least one period');
+  for(const p of y.periods){ if(!p.label.trim()) return showToast('Every period needs a name'); }
+  // resolve course names -> course ids
+  y.periods.forEach(p=>{ p.courseId=p.isPrep?null:findOrCreateCourse(p.courseName); delete p.courseName; });
+  if(w.edit){ S.years[w.editYearId]=y; }
+  else{ S.years[y.id]=y; S.activeYearId=y.id;
+    if(y.copyFrom&&S.years[y.copyFrom]){ const n=doCopyForward(S.years[y.copyFrom],y);
+      showToast('Copied '+plural(n,'lesson day')+' from '+S.years[y.copyFrom].label); } }
+  y.copyFrom=null; UI.wizard=null; UI.tab='plan'; UI.zoom='year'; UI.date=D.today();
+  persist(); render();
+};
+
+/* ---------- copy-forward: map by COURSE, re-flow by instructional-day index ---------- */
+function doCopyForward(oldY,newY){
+  const oldDays=schoolDays(oldY,oldY.firstDay,oldY.lastDay);
+  const newDays=schoolDays(newY,newY.firstDay,newY.lastDay);
+  // course -> period maps
+  const oldByCourse={},newByCourse={};
+  oldY.periods.forEach(p=>{ if(p.courseId&&!(p.courseId in oldByCourse)) oldByCourse[p.courseId]=p.id; });
+  newY.periods.forEach(p=>{ if(p.courseId&&!(p.courseId in newByCourse)) newByCourse[p.courseId]=p.id; });
+  let copied=0;
+  for(let i=0;i<oldDays.length&&i<newDays.length;i++){
+    const rec=oldY.lessons[oldDays[i]]; if(!rec) continue;
+    let touched=false;
+    for(const oldPid in rec.periods){
+      const oldP=oldY.periods.find(p=>p.id===oldPid); if(!oldP||!oldP.courseId) continue;
+      const newPid=newByCourse[oldP.courseId]; if(!newPid) continue;
+      const src=rec.periods[oldPid]; if(!src.blocks.length&&!src.links.length) continue;
+      const dst=lessonFor(newY,newDays[i],newPid,true);
+      dst.blocks=clone(src.blocks); dst.links=clone(src.links||[]); touched=true;
+    }
+    if(rec.note){ dayRec(newY,newDays[i],true).note=rec.note; touched=true; }
+    if(touched) copied++;
+  }
+  return copied;
+}
+
+/* =====================================================================
+   PLAN VIEWS — year / month / day (list + time axis) / minute editor
+   ===================================================================== */
+function unitMap(y){ const m={}; for(const s of unitLayout(y).spans) for(const d of s.days) m[d]=s.unit; return m; }
+
+function PlanView(y){
+  const zoomBtns=[['year','Year'],['month','Month'],['day','Day']];
+  let head='<div class="row between" style="margin-bottom:12px"><div class="seg">'
+    +zoomBtns.map(z=>'<button class="'+(UI.zoom===z[0]||(UI.zoom==='period'&&z[0]==='day')?'on':'')+'" data-act="zoom" data-a="'+z[0]+'">'+z[1]+'</button>').join('')
+    +'</div><div class="row">'
+    +'<button class="btn sm" data-act="goToday">Today</button>'
+    +'<button class="btn sm noprint" data-act="print" data-a="'+(UI.zoom==='year'?'year':UI.zoom==='month'?'month':'day')+'">🖨 Print '+(UI.zoom==='year'?'year':UI.zoom==='month'?'month':'day')+'</button>'
+    +(UI.zoom==='day'||UI.zoom==='period'?'<button class="btn sm noprint" data-act="print" data-a="week">🖨 Print week</button>':'')
+    +'</div></div>';
+  switch(UI.zoom){
+    case 'year': return head+YearView(y);
+    case 'month': return head+MonthView(y);
+    case 'day': return head+DayView(y);
+    case 'period': return head+PeriodEditor(y);
+  }
+  return head;
+}
+ACT.zoom=t=>{ UI.zoom=t.dataset.a; if(UI.zoom==='month'&&!UI.month) UI.month=D.monthKey(UI.date); render(); };
+ACT.goToday=()=>{ UI.date=D.today(); UI.month=D.monthKey(UI.date); if(UI.zoom==='year') UI.zoom='month'; render(); };
+ACT.openMonth=t=>{ UI.month=t.dataset.a; UI.zoom='month'; render(); };
+ACT.openDay=t=>{ UI.date=t.dataset.a; UI.zoom='day'; render(); };
+ACT.openPeriod=t=>{ UI.periodId=t.dataset.a; UI.zoom='period'; render(); };
+
+/* ---------- YEAR ---------- */
+function monthsOfYear(y){
+  const out=[]; let cur=y.firstDay.slice(0,7);
+  const last=y.lastDay.slice(0,7);
+  while(cur<=last){ out.push(cur); let[yy,mm]=cur.split('-').map(Number); mm++; if(mm>12){mm=1;yy++;} cur=yy+'-'+String(mm).padStart(2,'0'); }
+  return out;
+}
+function YearView(y){
+  const L=unitLayout(y),um=unitMap(y),alerts=midUnitAlerts(y),today=D.today();
+  const termByDate={}; y.terms.forEach(t=>termByDate[t.end]=t);
+  let html='<div class="card"><h2>Unit day budget <span class="chip brand">'+esc(y.label)+'</span></h2>'+budgetSummary(y,L)+'</div>';
+  // unit list with spans + live countdown
+  html+='<div class="card"><h2>Units</h2><div class="unit-rows">';
+  if(!y.units.length) html+='<p class="muted">No units yet — add them on the <b>Units</b> tab.</p>';
+  for(const s of L.spans){
+    const p=unitProgress(y,s.unit);
+    html+='<div class="urow"><span class="ucolor" style="background:'+s.unit.color+'"></span><b style="min-width:130px">'+esc(s.unit.name)+'</b>'
+      +'<span class="small muted">'+s.unit.days+' school days</span>'
+      +(s.start?'<span class="chip">'+D.human(s.start)+' → '+D.human(s.end)+'</span>':'<span class="chip red">doesn’t fit before target</span>')
+      +(s.shortfall?'<span class="chip red">'+s.shortfall+' day'+(s.shortfall===1?'':'s')+' don’t fit</span>':'')
+      +(p&&p.used>0&&p.remaining>=0&&today>=s.start&&today<=s.end?'<span class="chip amber">day '+p.used+' of '+p.total+' · '+p.remaining+' left</span>':'')
+      +(p&&s.end&&today>s.end?'<span class="chip green">done</span>':'')
+      +'</div>';
+  }
+  html+='</div></div>';
+  if(alerts.length){
+    html+='<div class="card"><h2>⚠ Breaks that land mid-unit</h2><ul style="margin-left:20px">'
+      +alerts.map(a=>'<li><b>'+esc(a.what)+'</b> falls inside <b>'+esc(a.unit.name)+'</b> — the unit keeps its '+a.unit.days+' instructional days, but its calendar end date shifts past the break. Plan a clean stopping point.</li>').join('')
+      +'</ul></div>';
+  }
+  // month minis
+  html+='<div class="months-grid">';
+  for(const mk of monthsOfYear(y)){
+    const[yy,mm]=mk.split('-').map(Number);
+    const dim=D.daysInMonth(yy,mm), lead=D.dow(mk+'-01');
+    let cells='<div class="mini-grid">'+DOWS.map(d=>'<div class="dh">'+d[0]+'</div>').join('');
+    for(let i=0;i<lead;i++) cells+='<div></div>';
+    for(let d=1;d<=dim;d++){
+      const ds=mk+'-'+String(d).padStart(2,'0');
+      let cls='mini-d',style='',title='';
+      if(ds<y.firstDay||ds>y.lastDay||!y.weekDays[D.dow(ds)]){ cls+=' off'; }
+      else if(y.daysOff[ds]!==undefined){ cls+=' off'; title=y.daysOff[ds]; }
+      else{ const br=y.breaks.find(b=>ds>=b.start&&ds<=b.end);
+        if(br){ cls+=' brk'; title=br.name; }
+        else if(um[ds]){ style='background:'+um[ds].color; title=um[ds].name; } }
+      if(ds===today) cls+=' today';
+      if(termByDate[ds]){ cls+=' term'; title=(title?title+' · ':'')+termByDate[ds].label; }
+      cells+='<div class="'+cls+'" style="'+style+'" title="'+esc(title)+'">'+d+'</div>';
+    }
+    cells+='</div>';
+    html+='<div class="mini-cal" data-act="openMonth" data-a="'+mk+'"><h4>'+MONTHS[mm-1]+' '+yy+'</h4>'+cells+'</div>';
+  }
+  html+='</div>';
+  if(y.terms.length) html+='<p class="tiny muted" style="margin-top:8px">🔴 = end of grading period ('+y.terms.map(t=>esc(t.label)+' '+D.human(t.end)).join(' · ')+')</p>';
+  return html;
+}
+
+/* ---------- MONTH ---------- */
+function MonthView(y){
+  const mk=UI.month||D.monthKey(UI.date), [yy,mm]=mk.split('-').map(Number);
+  const um=unitMap(y),today=D.today();
+  const termByDate={}; y.terms.forEach(t=>termByDate[t.end]=t);
+  const prev=mm===1?(yy-1)+'-12':yy+'-'+String(mm-1).padStart(2,'0');
+  const next=mm===12?(yy+1)+'-01':yy+'-'+String(mm+1).padStart(2,'0');
+  let html='<div class="card"><div class="row between" style="margin-bottom:10px">'
+    +'<button class="btn sm" data-act="openMonth" data-a="'+prev+'">← '+MONTHS[(mm+10)%12].slice(0,3)+'</button>'
+    +'<h2 style="margin:0">'+MONTHS[mm-1]+' '+yy+'</h2>'
+    +'<button class="btn sm" data-act="openMonth" data-a="'+next+'">'+MONTHS[mm%12].slice(0,3)+' →</button></div>';
+  html+='<div class="month-grid">'+DOWS.map(d=>'<div class="mg-head">'+d+'</div>').join('');
+  const dim=D.daysInMonth(yy,mm), lead=D.dow(mk+'-01');
+  for(let i=0;i<lead;i++) html+='<div class="mg-cell blank"></div>';
+  for(let d=1;d<=dim;d++){
+    const ds=mk+'-'+String(d).padStart(2,'0');
+    const inYear=ds>=y.firstDay&&ds<=y.lastDay;
+    const school=inYear&&isSchoolDay(y,ds);
+    let cls='mg-cell'+(school?'':' off')+(ds===today?' today':'');
+    let inner='<span class="dnum">'+d+'</span>';
+    if(termByDate[ds]) inner+=' <span class="chip red" style="font-size:9.5px;padding:0 5px">'+esc(termByDate[ds].label)+'</span>';
+    if(school){
+      const u=um[ds]; if(u) inner+='<span class="ulabel" style="background:'+u.color+'">'+esc(u.name)+'</span>';
+      const rec=y.lessons[ds];
+      if(rec){ const parts=[];
+        for(const pid in rec.periods){ const b=rec.periods[pid].blocks; if(b.length){ parts.push(b[0].label); } }
+        if(parts.length) inner+='<span class="peek">'+esc(parts.slice(0,2).join(' · '))+'</span>';
+        if(rec.note) inner+='<span class="peek">📌 '+esc(rec.note)+'</span>';
+      }
+    }else if(inYear){ const r=offReason(y,ds); if(r) inner+='<span class="offlbl">'+esc(r)+'</span>'; }
+    html+='<div class="'+cls+'" '+(inYear?'data-act="openDay" data-a="'+ds+'"':'')+'>'+inner+'</div>';
+  }
+  html+='</div></div>';
+  return html;
+}
+
+/* ---------- DAY (list + hourly time axis) ---------- */
+function schoolDayNav(y,from,dir){
+  let d=from;
+  for(let i=0;i<400;i++){ d=D.addDays(d,dir); if(d<y.firstDay||d>y.lastDay) return null; if(isSchoolDay(y,d)) return d; }
+  return null;
+}
+function blocksSummary(y,date,pid){
+  const l=lessonFor(y,date,pid,false);
+  if(!l||!l.blocks.length) return '<span class="muted">No plan yet — click to add</span>';
+  const tot=l.blocks.reduce((a,b)=>a+Number(b.duration),0);
+  return esc(l.blocks.map(b=>b.label).join(' → '))+' <span class="tiny muted">('+tot+' min'+(l.links&&l.links.length?' · 🔗'+l.links.length:'')+')</span>';
+}
+function DayView(y){
+  const ds=UI.date;
+  const school=isSchoolDay(y,ds);
+  const prev=schoolDayNav(y,ds,-1),next=schoolDayNav(y,ds,1);
+  const uf=unitForDate(y,ds);
+  let html='<div class="card"><div class="row between">'
+    +'<button class="btn sm" '+(prev?'data-act="openDay" data-a="'+prev+'"':'disabled')+'>← Prev school day</button>'
+    +'<div style="text-align:center"><h2 style="margin:0">'+D.long(ds)+'</h2>'
+    +(uf?'<span class="chip" style="background:'+uf.span.unit.color+';color:#1e293b">'+esc(uf.span.unit.name)+' — day '+(uf.idx+1)+' of '+uf.span.unit.days+' ('+(uf.span.unit.days-uf.idx-1)+' left)</span>':'')
+    +(!school?'<span class="chip">'+esc(offReason(y,ds)||'Not a school day')+'</span>':'')
+    +'</div>'
+    +'<button class="btn sm" '+(next?'data-act="openDay" data-a="'+next+'"':'disabled')+'>Next school day →</button></div></div>';
+  if(!school){ return html+'<div class="card"><p class="muted">No school this day. Use the arrows to jump to the nearest school day.</p></div>'; }
+  html+='<div class="row between" style="margin-bottom:10px"><div class="seg">'
+    +'<button class="'+(UI.dayMode==='list'?'on':'')+'" data-act="dayMode" data-a="list">Periods</button>'
+    +'<button class="'+(UI.dayMode==='axis'?'on':'')+'" data-act="dayMode" data-a="axis">Time axis</button></div></div>';
+  html+= UI.dayMode==='axis'?DayAxis(y,ds):DayList(y,ds);
+  // day note + links
+  const rec=y.lessons[ds];
+  html+='<div class="card"><h3>Note for this day</h3>'
+    +'<textarea rows="2" style="width:100%;margin-top:6px" placeholder="Anything to remember about this day (assembly, fire drill, sub)…" data-ch="dayNote">'+esc(rec?rec.note:'')+'</textarea>'
+    +LinksEditor(rec&&rec.links?rec.links:[],'day')+'</div>';
+  return html;
+}
+ACT.dayMode=t=>{ UI.dayMode=t.dataset.a; render(); };
+function DayList(y,ds){
+  let html='';
+  for(const p of y.periods){
+    const s=t2m(p.start),e=s+Number(p.duration);
+    html+='<div class="period-card'+(p.isPrep?' prep':'')+'" '+(p.isPrep?'':'data-act="openPeriodDay" data-a="'+p.id+'" data-b="'+ds+'"')+'>'
+      +'<div class="pc-time">'+fmt12(s)+'<span class="dur">to '+fmt12(e)+' · '+p.duration+' min</span></div>'
+      +'<div class="pc-main"><span class="cname">'+esc(p.label)+'</span>'
+      +(p.isPrep?' <span class="chip">Prep</span>':(p.courseId?' <span class="chip brand">'+esc(courseName(p.courseId))+'</span>':''))
+      +(p.isPrep?'':'<div class="pc-blocks">'+blocksSummary(y,ds,p.id)+'</div>')
+      +'</div></div>';
+  }
+  if(!y.periods.length) html='<div class="card"><p class="muted">No periods set up yet — add them in Share & Settings → Edit year setup.</p></div>';
+  return html;
+}
+ACT.openPeriodDay=t=>{ UI.periodId=t.dataset.a; UI.date=t.dataset.b; UI.zoom='period'; render(); };
+function DayAxis(y,ds){
+  if(!y.periods.length) return '<div class="card"><p class="muted">No periods set up yet.</p></div>';
+  const starts=y.periods.map(p=>t2m(p.start)),ends=y.periods.map(p=>t2m(p.start)+Number(p.duration));
+  const lo=Math.floor(Math.min(...starts)/60)*60, hi=Math.ceil(Math.max(...ends)/60)*60;
+  const k=1.6, H=(hi-lo)*k+20;
+  let html='<div class="axis" style="height:'+H+'px">';
+  for(let t=lo;t<=hi;t+=60) html+='<div class="hline" style="top:'+((t-lo)*k+10)+'px">'+fmt12(t)+'</div>';
+  for(const p of y.periods){
+    const s=t2m(p.start),dur=Number(p.duration);
+    const l=lessonFor(y,ds,p.id,false);
+    let inner='<div class="aphead">'+esc(p.label)+(p.isPrep?' · Prep':(p.courseId?' · '+esc(courseName(p.courseId)):''))+' <span class="muted">'+fmt12(s)+'–'+fmt12(s+dur)+'</span></div>';
+    if(l&&l.blocks.length){
+      for(const bt of blockTimes(p,l.blocks)){
+        const off=(bt.start-s)*k;
+        inner+='<div class="ablock" style="top:'+(off+22)+'px;height:'+Math.max(12,(bt.end-bt.start)*k)+'px;background:'+(unitForDate(y,ds)?unitForDate(y,ds).span.unit.color:'#e2e8f0')+'55">'+fmt12(bt.start)+' '+esc(bt.label)+'</div>';
+      }
+    }
+    html+='<div class="ap" style="top:'+((s-lo)*k+10)+'px;height:'+Math.max(26,dur*k)+'px" '+(p.isPrep?'':'data-act="openPeriodDay" data-a="'+p.id+'" data-b="'+ds+'"')+'>'+inner+'</div>';
+  }
+  return html+'</div>';
+}
+CH.dayNote=t=>{ const y=activeYear(); const rec=dayRec(y,UI.date,true); rec.note=t.value; cleanDay(y,UI.date); persist(); };
+
+/* ---------- MINUTE EDITOR (the signature zoom) ---------- */
+function PeriodEditor(y){
+  const p=y.periods.find(x=>x.id===UI.periodId);
+  if(!p){ UI.zoom='day'; return DayView(y); }
+  const ds=UI.date;
+  const l=lessonFor(y,ds,p.id,false)||{blocks:[],links:[]};
+  const times=blockTimes(p,l.blocks);
+  const tot=l.blocks.reduce((a,b)=>a+Number(b.duration),0);
+  const pl=Number(p.duration), over=tot>pl;
+  const pEnd=t2m(p.start)+pl;
+  let html='<div class="card"><div class="row between">'
+    +'<button class="btn sm" data-act="openDay" data-a="'+ds+'">← Back to '+D.human(ds)+'</button>'
+    +'<h2 style="margin:0">'+esc(p.label)+(p.courseId?' · '+esc(courseName(p.courseId)):'')+'</h2>'
+    +'<span class="chip brand">'+fmt12(t2m(p.start))+' – '+fmt12(pEnd)+' ('+pl+' min)</span></div></div>';
+  // blocks table
+  html+='<div class="card"><h3>Minute-by-minute plan</h3>'
+    +'<p class="tiny muted">Times compute automatically from the period start — change a length and everything below re-times itself.</p>'
+    +'<table class="plain blocks-table" style="margin-top:8px"><tr><th style="width:150px">Time</th><th>Activity</th><th style="width:90px">Minutes</th><th style="width:120px"></th></tr>';
+  l.blocks.forEach((b,i)=>{
+    const bt=times[i], rowOver=bt.end>pEnd;
+    html+='<tr'+(rowOver?' class="over"':'')+'><td class="tm">'+fmt12(bt.start)+' – '+fmt12(bt.end)+'</td>'
+      +'<td><input type="text" value="'+esc(b.label)+'" data-ch="blkLabel" data-a="'+i+'"></td>'
+      +'<td><input type="number" min="1" max="600" value="'+b.duration+'" data-ch="blkDur" data-a="'+i+'"></td>'
+      +'<td><button class="btn icon" data-act="blkMove" data-a="'+i+'" data-b="-1" '+(i===0?'disabled':'')+'>↑</button> '
+      +'<button class="btn icon" data-act="blkMove" data-a="'+i+'" data-b="1" '+(i===l.blocks.length-1?'disabled':'')+'>↓</button> '
+      +'<button class="btn icon danger" data-act="blkDel" data-a="'+i+'">✕</button></td></tr>';
+  });
+  html+='</table>'
+    +'<div class="row" style="margin-top:10px"><input type="text" id="newBlkLabel" placeholder="Activity (e.g. Warmup, Notes, Lab, Exit Ticket)" style="flex:1;min-width:160px">'
+    +'<input type="number" id="newBlkDur" min="1" max="600" value="10" style="width:74px"> <span class="tiny muted">min</span>'
+    +'<button class="btn primary sm" data-act="blkAdd">+ Add block</button></div>'
+    +'<div class="totline'+(over?' bad':'')+'">'+tot+' of '+pl+' minutes planned'
+    +(over?' — ⚠ '+(tot-pl)+' min past the end of the period!':(tot<pl?' · '+(pl-tot)+' min unplanned':' · perfectly full ✓'))+'</div>';
+  // timer hook
+  if(l.blocks.length) html+='<p class="tiny muted" style="margin-top:6px">Tip: the ⏱ Timer in Compact mode has these block lengths as presets during this period.</p>';
+  html+='</div>';
+  // apply to other periods
+  const others=y.periods.filter(x=>x.id!==p.id&&!x.isPrep);
+  if(others.length&&l.blocks.length){
+    html+='<div class="card"><h3>Copy this plan to other periods (same day)</h3>'
+      +'<p class="tiny muted">Each period renders the same blocks at its own real clock times.</p>'
+      +'<div class="row" style="margin-top:8px">'
+      +others.map(o=>'<label class="checkline"><input type="checkbox" class="applyPer" value="'+o.id+'">'+esc(o.label)+(o.courseId?' <span class="tiny muted">('+esc(courseName(o.courseId))+')</span>':'')+'</label>').join('')
+      +'</div><button class="btn primary sm" style="margin-top:10px" data-act="applyBlocks">Copy to checked periods</button></div>';
+  }
+  // templates
+  html+='<div class="card"><h3>Reusable lesson shapes</h3><div class="row" style="margin-top:6px">'
+    +(l.blocks.length?'<button class="btn sm" data-act="saveTpl">💾 Save these blocks as a template</button>':'')
+    +(S.blockTemplates.length?'<select id="tplSel"><option value="">Insert a saved template…</option>'
+      +S.blockTemplates.map(t=>'<option value="'+t.id+'">'+esc(t.name)+' ('+t.blocks.length+' blocks)</option>').join('')+'</select>'
+      +'<button class="btn sm" data-act="insTpl">Insert</button>'
+      +'<button class="btn sm danger" data-act="delTpl">Delete selected</button>':'<span class="tiny muted">Saved templates will appear here for one-click reuse.</span>')
+    +'</div></div>';
+  // links
+  html+='<div class="card"><h3>Linked resources for this lesson</h3>'+LinksEditor(l.links||[],'per')+'</div>';
+  return html;
+}
+function curLesson(create){ const y=activeYear(); return lessonFor(y,UI.date,UI.periodId,create); }
+function afterBlkEdit(){ const y=activeYear(); cleanDay(y,UI.date); persist(); render(); }
+CH.blkLabel=t=>{ const l=curLesson(false); if(l&&l.blocks[t.dataset.a]){ l.blocks[t.dataset.a].label=t.value; persist(); } };
+CH.blkDur=t=>{ const l=curLesson(false); if(l&&l.blocks[t.dataset.a]){ l.blocks[t.dataset.a].duration=Math.max(1,Number(t.value)||1); afterBlkEdit(); } };
+ACT.blkAdd=()=>{ const lb=document.getElementById('newBlkLabel').value.trim(),du=Number(document.getElementById('newBlkDur').value)||10;
+  if(!lb) return showToast('Name the activity first');
+  curLesson(true).blocks.push({label:lb,duration:Math.max(1,du)}); afterBlkEdit(); };
+ACT.blkDel=t=>{ const l=curLesson(false); if(l){ l.blocks.splice(Number(t.dataset.a),1); afterBlkEdit(); } };
+ACT.blkMove=t=>{ const l=curLesson(false); if(!l) return; const i=Number(t.dataset.a),j=i+Number(t.dataset.b);
+  if(j<0||j>=l.blocks.length) return; [l.blocks[i],l.blocks[j]]=[l.blocks[j],l.blocks[i]]; afterBlkEdit(); };
+ACT.applyBlocks=()=>{ const l=curLesson(false); if(!l||!l.blocks.length) return;
+  const y=activeYear(); let n=0;
+  document.querySelectorAll('.applyPer:checked').forEach(cb=>{ const dst=lessonFor(y,UI.date,cb.value,true); dst.blocks=clone(l.blocks); n++; });
+  if(!n) return showToast('Check at least one period first');
+  persist(); render(); showToast('Copied to '+plural(n,'period')+' — each at its own times'); };
+ACT.saveTpl=()=>{ const l=curLesson(false); if(!l||!l.blocks.length) return;
+  const name=prompt('Name this lesson shape (e.g. "Lab day", "Notes + practice"):'); if(!name) return;
+  S.blockTemplates.push({id:'tpl'+uid(),name:name.trim(),blocks:clone(l.blocks)}); persist(); render(); showToast('Template saved'); };
+ACT.insTpl=()=>{ const sel=document.getElementById('tplSel'); const tpl=S.blockTemplates.find(t=>t.id===sel.value);
+  if(!tpl) return showToast('Pick a template first');
+  const l=curLesson(true); l.blocks=l.blocks.concat(clone(tpl.blocks)); afterBlkEdit(); };
+ACT.delTpl=()=>{ const sel=document.getElementById('tplSel'); if(!sel.value) return showToast('Pick a template first');
+  S.blockTemplates=S.blockTemplates.filter(t=>t.id!==sel.value); persist(); render(); };
+
+/* ---------- links (shared by day + period) ---------- */
+function LinksEditor(links,kind){
+  return '<div class="list-edit" style="margin-top:8px">'
+    +links.map((lk,i)=>'<div class="li">🔗 <a class="grow" href="'+esc(lk.url)+'" target="_blank" rel="noopener">'+esc(lk.label||lk.url)+'</a>'
+      +'<button class="btn sm danger" data-act="delLink" data-a="'+i+'" data-b="'+kind+'">✕</button></div>').join('')
+    +'<div class="li"><input type="text" id="lk_'+kind+'_label" placeholder="Label (e.g. Energy Notes Slides)" style="width:200px">'
+    +'<input type="text" class="grow" id="lk_'+kind+'_url" placeholder="Paste a link (Google Drive, Canvas, TpT…)">'
+    +'<button class="btn sm primary" data-act="addLink" data-a="'+kind+'">Add link</button></div></div>';
+}
+function linkTarget(kind,create){
+  const y=activeYear();
+  if(kind==='per'){ const l=lessonFor(y,UI.date,UI.periodId,create); if(l&&!l.links) l.links=[]; return l?l.links:null; }
+  const r=create?dayRec(y,UI.date,true):dayRec(y,UI.date,false); if(r&&!r.links) r.links=[]; return r?r.links:null;
+}
+ACT.addLink=t=>{ const k=t.dataset.a;
+  const label=document.getElementById('lk_'+k+'_label').value.trim();
+  let url=document.getElementById('lk_'+k+'_url').value.trim();
+  if(!url) return showToast('Paste the link first');
+  if(!/^https?:\/\//i.test(url)) url='https://'+url;
+  linkTarget(k,true).push({label,url}); persist(); render(); };
+ACT.delLink=t=>{ const arr=linkTarget(t.dataset.b,false); if(arr){ arr.splice(Number(t.dataset.a),1); const y=activeYear(); cleanDay(y,UI.date); persist(); render(); } };
+
+/* =====================================================================
+   UNITS TAB — the zero-sum day budget
+   ===================================================================== */
+function UnitsTab(y){
+  const L=unitLayout(y),alerts=midUnitAlerts(y),today=D.today();
+  let html='<div class="card"><h2>Target finish date</h2>'
+    +'<p class="small muted">Every unit draws from the fixed pool of school days between the first day of school and this date. Time is a budget.</p>'
+    +'<div class="field" style="max-width:240px;margin-top:8px"><label>All units finished by</label>'
+    +'<input type="date" value="'+esc(y.targetDate)+'" min="'+esc(y.firstDay)+'" max="'+esc(y.lastDay)+'" data-ch="unitsTarget"></div>'
+    +budgetSummary(y,L)+'</div>';
+  html+='<div class="card"><h2>Units in teaching order</h2><div class="list-edit" style="margin-top:8px">';
+  L.spans.forEach((s,i)=>{
+    const u=s.unit,p=unitProgress(y,u);
+    const started=s.start&&s.start<=today;
+    html+='<div class="li"><span class="ucolor" style="background:'+u.color+'"></span>'
+      +'<input type="text" style="flex:1;min-width:120px" value="'+esc(u.name)+'" data-ch="unitName" data-a="'+u.id+'">'
+      +'<button class="btn icon" data-act="unitMinus" data-a="'+u.id+'" '+(u.days<=1?'disabled':'')+'>−</button>'
+      +'<b style="min-width:56px;text-align:center">'+u.days+' days</b>'
+      +'<button class="btn icon" data-act="unitPlus" data-a="'+u.id+'">+</button>'
+      +(s.start?'<span class="chip">'+D.human(s.start)+' → '+D.human(s.end)+'</span>':'<span class="chip red">doesn’t fit</span>')
+      +(started&&p&&p.remaining>=0&&today<=s.end?'<span class="chip amber">'+p.remaining+' left</span>':'')
+      +'<button class="btn icon" data-act="unitMove" data-a="'+u.id+'" data-b="-1" '+(i===0?'disabled':'')+'>↑</button>'
+      +'<button class="btn icon" data-act="unitMove" data-a="'+u.id+'" data-b="1" '+(i===y.units.length-1?'disabled':'')+'>↓</button>'
+      +'<button class="btn sm danger" data-act="unitDel" data-a="'+u.id+'">✕</button></div>';
+  });
+  html+='<div class="li"><input type="text" class="grow" id="unitNew" placeholder="New unit name"><input type="number" id="unitNewDays" min="1" value="15" style="width:70px"><span class="tiny muted">days</span><button class="btn sm primary" data-act="unitAdd">Add</button></div>'
+    +'</div><p class="tiny muted" style="margin-top:8px">Adding days when the budget is full asks you which future unit gives them up — the pool is zero-sum against your target date.</p></div>';
+  if(alerts.length){
+    html+='<div class="card"><h2>⚠ Mid-unit interruptions</h2><ul style="margin-left:20px">'
+      +alerts.map(a=>'<li><b>'+esc(a.what)+'</b> falls inside <b>'+esc(a.unit.name)+'</b>. The unit keeps all '+a.unit.days+' instructional days but ends later on the calendar — plan a clean stopping point before the break.</li>').join('')+'</ul></div>';
+  }
+  return html;
+}
+CH.unitsTarget=t=>{ const y=activeYear(); y.targetDate=t.value; persist(); render(); };
+CH.unitName=t=>{ const u=activeYear().units.find(u=>u.id===t.dataset.a); if(u){ u.name=t.value; persist(); } };
+ACT.unitAdd=()=>{ const y=activeYear(); const n=document.getElementById('unitNew').value.trim(),d=Number(document.getElementById('unitNewDays').value)||15;
+  if(!n) return showToast('Give the unit a name');
+  y.units.push({id:'u'+uid(),name:n,days:Math.max(1,d),color:UNIT_COLORS[y.units.length%UNIT_COLORS.length]}); persist(); render(); };
+ACT.unitDel=t=>{ const y=activeYear(); const u=y.units.find(u=>u.id===t.dataset.a);
+  if(u&&confirm('Remove unit "'+u.name+'"? Its '+u.days+' days return to the unassigned pool.')){ y.units=y.units.filter(x=>x.id!==t.dataset.a); persist(); render(); } };
+ACT.unitMove=t=>{ const y=activeYear(),i=y.units.findIndex(u=>u.id===t.dataset.a),j=i+Number(t.dataset.b);
+  if(i<0||j<0||j>=y.units.length) return; [y.units[i],y.units[j]]=[y.units[j],y.units[i]]; persist(); render(); };
+ACT.unitMinus=t=>{ const y=activeYear(),u=y.units.find(u=>u.id===t.dataset.a); if(u&&u.days>1){ u.days--; persist(); render(); } };
+ACT.unitPlus=t=>{
+  const y=activeYear(),u=y.units.find(u=>u.id===t.dataset.a),L=unitLayout(y);
+  if(L.unassigned>0){ u.days++; persist(); render(); return; }
+  // pool is full → zero-sum: choose which future unit(s) give up time
+  UI.modal={kind:'realloc',unitId:u.id,need:1,takes:{}}; render();
+};
+function reallocEligible(y,growId){
+  const L=unitLayout(y),today=D.today();
+  return L.spans.filter(s=>s.unit.id!==growId&&s.unit.days>1&&(!s.start||s.start>today)).map(s=>s.unit);
+}
+function ReallocModal(){
+  const y=activeYear(),m=UI.modal,u=y.units.find(x=>x.id===m.unitId);
+  const elig=reallocEligible(y,u.id);
+  const taken=Object.values(m.takes).reduce((a,b)=>a+b,0);
+  let html='<h2>Add days to '+esc(u.name)+'</h2>'
+    +'<p class="small muted">Every school day before your target date is already assigned, so extra days for <b>'+esc(u.name)+'</b> must come from a unit you haven’t taught yet.</p>'
+    +'<div class="field" style="max-width:180px"><label>Days to add</label><input type="number" min="1" max="60" value="'+m.need+'" data-ch="reallocNeed"></div>';
+  if(elig.length){
+    html+='<h3>Take them from:</h3><div class="list-edit" style="margin:8px 0">'
+      +elig.map(e=>{ const take=m.takes[e.id]||0;
+        return '<div class="li"><span class="ucolor" style="background:'+e.color+'"></span><span class="grow"><b>'+esc(e.name)+'</b> <span class="tiny muted">('+e.days+' days now'+(take?' → '+(e.days-take):'')+')</span></span>'
+          +'<button class="btn icon" data-act="reallocTake" data-a="'+e.id+'" data-b="-1" '+(take<=0?'disabled':'')+'>−</button>'
+          +'<b style="min-width:26px;text-align:center">'+take+'</b>'
+          +'<button class="btn icon" data-act="reallocTake" data-a="'+e.id+'" data-b="1" '+(take>=e.days-1||taken>=m.need?'disabled':'')+'>+</button></div>'; }).join('')
+      +'</div><p class="small'+(taken===m.need?'" style="color:var(--green)">✓ Balanced: ':'muted">')+taken+' of '+m.need+' day'+(m.need===1?'':'s')+' chosen</p>';
+  }else{
+    html+='<div class="warnbox">No future unit has spare days to give.</div>';
+  }
+  const alt=targetDateFor(y,m.need);
+  html+='<div class="card tight" style="background:#f8fafc;margin-top:10px"><b>Or mint new days instead:</b> move your target finish date later.'
+    +(alt?'<div style="margin-top:6px"><button class="btn sm" data-act="reallocMoveTarget" data-a="'+alt+'">Move target to '+D.human(alt,true)+' (+'+m.need+' school day'+(m.need===1?'':'s')+')</button></div>':'<p class="tiny muted">No school days remain after your current target.</p>')
+    +'</div>'
+    +'<div class="row between" style="margin-top:14px"><button class="btn" data-act="modalClose">Cancel</button>'
+    +'<button class="btn primary" data-act="reallocApply" '+(taken===m.need?'':'disabled')+'>Apply — move '+m.need+' day'+(m.need===1?'':'s')+'</button></div>';
+  return html;
+}
+function targetDateFor(y,extra){ // earliest date whose pool has `extra` more school days than now
+  const cur=(y.targetDate&&y.targetDate>=y.firstDay)?y.targetDate:y.lastDay;
+  let found=0,d=cur;
+  while(d<y.lastDay){ d=D.addDays(d,1); if(isSchoolDay(y,d)) found++; if(found>=extra) return d; }
+  return null;
+}
+CH.reallocNeed=t=>{ UI.modal.need=Math.max(1,Number(t.value)||1); UI.modal.takes={}; render(); };
+ACT.reallocTake=t=>{ const m=UI.modal,id=t.dataset.a; m.takes[id]=Math.max(0,(m.takes[id]||0)+Number(t.dataset.b)); if(!m.takes[id]) delete m.takes[id]; render(); };
+ACT.reallocApply=()=>{ const y=activeYear(),m=UI.modal,u=y.units.find(x=>x.id===m.unitId);
+  const taken=Object.entries(m.takes).reduce((a,[,v])=>a+v,0); if(taken!==m.need) return;
+  for(const[id,v]of Object.entries(m.takes)){ const g=y.units.find(x=>x.id===id); if(g) g.days=Math.max(1,g.days-v); }
+  u.days+=m.need; UI.modal=null; persist(); render();
+  showToast('Moved '+plural(m.need,'day')+' into '+u.name+' — all downstream dates recomputed'); };
+ACT.reallocMoveTarget=t=>{ const y=activeYear(),m=UI.modal,u=y.units.find(x=>x.id===m.unitId);
+  y.targetDate=t.dataset.a; u.days+=m.need; UI.modal=null; persist(); render();
+  showToast('Target moved to '+D.human(t.dataset.a,true)+' — '+plural(m.need,'new day')+' added to '+u.name); };
+ACT.modalClose=()=>{ UI.modal=null; render(); };
+function Modal(){
+  let inner='';
+  if(UI.modal.kind==='realloc') inner=ReallocModal();
+  else if(UI.modal.kind==='copyFwd') inner=CopyFwdModal();
+  else if(UI.modal.kind==='code') inner=CodeModal();
+  return '<div class="overlay" data-act="overlayClose"><div class="modal" onclick="event.stopPropagation()">'+inner+'</div></div>';
+}
+ACT.overlayClose=(t,e)=>{ if(e.target.classList.contains('overlay')){ UI.modal=null; render(); } };
+
+/* =====================================================================
+   TO DO TAB
+   ===================================================================== */
+function fmtDue(iso){ const d=new Date(iso); return d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}); }
+function TodoTab(){
+  const todos=S.todos.slice().sort((a,b)=>{ if(!!a.doneAt!==!!b.doneAt) return a.doneAt?1:-1;
+    if(a.dueAt&&b.dueAt) return a.dueAt<b.dueAt?-1:1; if(a.dueAt) return -1; if(b.dueAt) return 1; return a.createdAt<b.createdAt?-1:1; });
+  let html='<div class="card"><h2>Add a to-do</h2>'
+    +'<div class="row" style="margin-top:8px;align-items:flex-end">'
+    +'<div class="field" style="flex:1;min-width:220px;margin:0"><label>Note</label><input type="text" id="todoText" placeholder="e.g. Make copies of the Energy lab before 3rd period"></div>'
+    +'<div class="field" style="margin:0"><label>Remind at (optional)</label><input type="datetime-local" id="todoDue"></div>'
+    +'<label class="checkline" style="padding-bottom:8px"><input type="checkbox" id="todoAlert">Pop up an alert</label>'
+    +'<button class="btn primary" data-act="todoAdd" style="margin-bottom:1px">Add</button></div>'
+    +'<p class="tiny muted" style="margin-top:8px">Alerts pop up only while the planner (or its compact window) is open — there’s no server behind this, so nothing can reach you once it’s closed. Anything missed is flagged below.</p></div>';
+  html+='<div class="card"><h2>Your to-dos</h2>';
+  if(!todos.length) html+='<p class="muted">Nothing here — enjoy it while it lasts. 🎉</p>';
+  else html+=todos.map(t=>'<div class="todo-item'+(t.doneAt?' done':'')+'">'
+    +'<input type="checkbox" '+(t.doneAt?'checked':'')+' data-ch="todoDone" data-a="'+t.id+'" title="Mark done">'
+    +'<div class="ttext">'+esc(t.text)
+    +(t.dueAt?' <span class="chip'+(t.alertOn?' brand':'')+'">'+(t.alertOn?'🔔 ':'🕐 ')+fmtDue(t.dueAt)+'</span>':'')
+    +(t.missed?' <span class="chip red">missed while closed</span>':'')
+    +'</div><button class="btn sm danger" data-act="todoDel" data-a="'+t.id+'">Delete</button></div>').join('');
+  html+='</div>';
+  return html;
+}
+ACT.todoAdd=()=>{
+  const text=document.getElementById('todoText').value.trim();
+  if(!text) return showToast('Type the note first');
+  const dueRaw=document.getElementById('todoDue').value;
+  const alertOn=document.getElementById('todoAlert').checked;
+  addTodo(text,dueRaw?new Date(dueRaw).toISOString():null,alertOn);
+  render();
+};
+function addTodo(text,dueAt,alertOn){
+  S.todos.push({id:'td'+uid(),text,dueAt,alertOn:!!(alertOn&&dueAt),createdAt:new Date().toISOString(),doneAt:null,alerted:false,missed:false});
+  if(alertOn&&dueAt) askNotifyPermission();
+  persist();
+}
+CH.todoDone=t=>{ const td=S.todos.find(x=>x.id===t.dataset.a); if(td){ td.doneAt=t.checked?new Date().toISOString():null; persist(); render(); } };
+ACT.todoDel=t=>{ S.todos=S.todos.filter(x=>x.id!==t.dataset.a); persist(); render(); };
+
+/* =====================================================================
+   ROSTERS TAB
+   ===================================================================== */
+function RostersTab(y){
+  const teach=y.periods.filter(p=>!p.isPrep);
+  let html='<div class="card"><h2>Class rosters</h2>'
+    +'<p class="small muted">Paste each class list — one student per line. The Random Name button in Compact mode draws from whichever period you’ve toggled.</p>'
+    +'<div class="okbox">🔒 Rosters stay on this device. They are <b>never</b> included in a transfer code, and only go into a <code>.plan</code> file if you explicitly check the box at export.</div></div>';
+  if(!teach.length) return html+'<div class="card"><p class="muted">No teaching periods set up yet.</p></div>';
+  for(const p of teach){
+    const names=(y.rosters[p.id]||[]);
+    html+='<div class="card"><h3>'+esc(p.label)+(p.courseId?' — '+esc(courseName(p.courseId)):'')+' <span class="chip">'+plural(names.length,'student')+'</span></h3>'
+      +'<textarea rows="6" style="width:100%;margin-top:8px" placeholder="One student name per line…" data-ch="roster" data-a="'+p.id+'">'+esc(names.join('\n'))+'</textarea></div>';
+  }
+  html+='<div class="card"><label class="checkline"><input type="checkbox" '+(S.settings.pureRandom?'checked':'')+' data-ch="setPureRandom"><span><b>Pure random draws</b> — allow the same student to be drawn twice in a row. Off (recommended): no repeats until everyone has been called, then reshuffle.</span></label></div>';
+  return html;
+}
+CH.roster=t=>{ const y=activeYear();
+  const names=t.value.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(names.length) y.rosters[t.dataset.a]=names; else delete y.rosters[t.dataset.a];
+  delete S.draws[t.dataset.a]; persist(); render(); };
+CH.setPureRandom=t=>{ S.settings.pureRandom=t.checked; persist(); };
+
+/* =====================================================================
+   SHARE & SETTINGS TAB — transfer code, .plan file, years, archive, copy-forward
+   ===================================================================== */
+function ShareTab(y){
+  let html='<div class="card"><h2>Transfer code — share your setup with a colleague</h2>'
+    +'<p class="small muted">The code carries the <b>structure</b>: year dates, school week, holidays & breaks, units, target date, periods & courses, and saved lesson shapes. It never includes your lessons, rosters, or to-dos.</p>'
+    +'<div class="row" style="margin-top:10px"><button class="btn primary" data-act="genCode">Create my transfer code</button>'
+    +'<button class="btn" data-act="importCodeDlg">I have a code — import it</button></div></div>';
+  html+='<div class="card"><h2>Full backup — <code>.plan</code> file</h2>'
+    +'<p class="small muted">Downloads everything: every year, every lesson, minute-by-minute. Use it to back up, move devices, or hand a colleague your complete year.</p>'
+    +'<label class="checkline" style="margin:10px 0"><input type="checkbox" id="expPrivate"><span>Also include my <b>rosters and to-dos</b> <span class="tiny muted">(rosters are student names — leave this off if you’re sharing the file with anyone else)</span></span></label>'
+    +'<div class="row"><button class="btn primary" data-act="exportPlan">⬇ Download .plan file</button>'
+    +'<button class="btn" data-act="importFile">⬆ Import a .plan file</button>'
+    +'<input type="file" id="planFile" accept=".plan,.json" class="hidden" data-ch="planFile"></div></div>';
+  // years
+  const years=Object.values(S.years).sort((a,b)=>a.firstDay<b.firstDay?-1:1);
+  html+='<div class="card"><h2>School years</h2><table class="plain" style="margin-top:6px"><tr><th>Year</th><th>Dates</th><th>Status</th><th></th></tr>';
+  for(const yr of years){
+    html+='<tr><td><b>'+esc(yr.label)+'</b></td><td class="small">'+D.human(yr.firstDay,true)+' – '+D.human(yr.lastDay,true)+'</td>'
+      +'<td>'+(yr.id===S.activeYearId?'<span class="chip green">active</span>':'')+(yr.archived?' <span class="chip">archived</span>':'')+'</td>'
+      +'<td class="row" style="justify-content:flex-end">'
+      +(yr.id!==S.activeYearId?'<button class="btn sm" data-act="yearOpen" data-a="'+yr.id+'">Open</button>':'')
+      +'<button class="btn sm" data-act="yearArchive" data-a="'+yr.id+'">'+(yr.archived?'Unarchive':'Archive')+'</button>'
+      +(years.length>1?'<button class="btn sm danger" data-act="yearDel" data-a="'+yr.id+'">Delete</button>':'')
+      +'</td></tr>';
+  }
+  html+='</table><div class="row" style="margin-top:12px">'
+    +'<button class="btn primary" data-act="copyFwdDlg">📋 Plan next year (copy this one forward)</button>'
+    +'<button class="btn" data-act="newBlankYear">+ New blank year</button></div>'
+    +'<p class="tiny muted" style="margin-top:8px">Copy-forward maps by <b>course</b> — if Advanced Science moves from 3rd period to 4th next year, its lessons follow the course, not the period. Rosters never copy (new students!).</p></div>';
+  // setup + options
+  html+='<div class="card"><h2>This year’s setup</h2>'
+    +'<p class="small muted">Dates, school week, holidays & breaks, units, periods & courses — everything stays editable all year.</p>'
+    +'<button class="btn" style="margin-top:8px" data-act="editSetup">✏️ Edit year setup</button></div>';
+  html+='<div class="card"><h2>Options</h2>'
+    +'<label class="checkline" style="margin-top:6px"><input type="checkbox" '+(S.settings.timerSound?'checked':'')+' data-ch="setTimerSound"><span>Play a sound when the classroom timer ends <span class="tiny muted">(off by default — no surprise beeps mid-lesson)</span></span></label>'
+    +'<p class="tiny muted" style="margin-top:10px">Storage: '+(Store.kind==='local'?'saved automatically in this browser on this device.':'<b>preview mode — nothing persists between visits; download a .plan file to keep your work.</b>')+'</p></div>';
+  return html;
+}
+CH.setTimerSound=t=>{ S.settings.timerSound=t.checked; persist(); };
+ACT.yearOpen=t=>{ S.activeYearId=t.dataset.a; UI.zoom='year'; persist(); render(); };
+ACT.yearArchive=t=>{ const yr=S.years[t.dataset.a]; yr.archived=!yr.archived; persist(); render();
+  if(yr.archived) showToast(yr.label+' archived — it stays here for reference and copy-forward'); };
+ACT.yearDel=t=>{ const yr=S.years[t.dataset.a];
+  if(!confirm('Delete "'+yr.label+'" and ALL of its lessons? This cannot be undone.')) return;
+  if(!confirm('Really sure? Consider downloading a .plan backup first. Delete '+yr.label+' forever?')) return;
+  delete S.years[t.dataset.a];
+  if(S.activeYearId===t.dataset.a) S.activeYearId=Object.keys(S.years)[0]||null;
+  persist(); if(!S.activeYearId) startWizard(); else render(); };
+ACT.newBlankYear=()=>startWizard({skipWelcome:true});
+ACT.editSetup=()=>startWizard({editYearId:S.activeYearId,skipWelcome:true});
+ACT.copyFwdDlg=()=>{ UI.modal={kind:'copyFwd',src:S.activeYearId}; render(); };
+function CopyFwdModal(){
+  const years=Object.values(S.years).sort((a,b)=>a.firstDay<b.firstDay?-1:1);
+  return '<h2>Plan next year</h2>'
+    +'<p class="small muted">Pick which year to copy. You’ll enter the new year’s dates and its own holidays & breaks (those change every year), assign your courses to their new periods, and every lesson re-flows onto the new calendar automatically — school day 1 to school day 1, matched by course.</p>'
+    +'<div class="field" style="margin-top:10px"><label>Copy from</label><select data-ch="copyFwdSrc">'
+    +years.map(yr=>'<option value="'+yr.id+'" '+(UI.modal.src===yr.id?'selected':'')+'>'+esc(yr.label)+'</option>').join('')+'</select></div>'
+    +'<div class="row between" style="margin-top:14px"><button class="btn" data-act="modalClose">Cancel</button>'
+    +'<button class="btn primary" data-act="copyFwdGo">Start the new year →</button></div>';
+}
+CH.copyFwdSrc=t=>{ UI.modal.src=t.value; };
+ACT.copyFwdGo=()=>{ const src=UI.modal.src; UI.modal=null; startWizard({copyFrom:src,skipWelcome:true}); };
+
+/* ---------- transfer code (structure only — NEVER rosters/lessons/todos) ---------- */
+function b64urlEnc(buf){ let s=''; const b=new Uint8Array(buf); for(let i=0;i<b.length;i++) s+=String.fromCharCode(b[i]);
+  return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+function b64urlDec(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='=';
+  const bin=atob(s),b=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) b[i]=bin.charCodeAt(i); return b; }
+async function compressJSON(obj){
+  const json=JSON.stringify(obj);
+  if(typeof CompressionStream==='undefined') return 'TPU.'+b64urlEnc(new TextEncoder().encode(json));
+  const stream=new Blob([json]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+  return 'TPC.'+b64urlEnc(await new Response(stream).arrayBuffer());
+}
+async function decompressCode(code){
+  code=code.trim();
+  const kind=code.slice(0,4),body=code.slice(4);
+  const bytes=b64urlDec(body);
+  if(kind==='TPU.') return JSON.parse(new TextDecoder().decode(bytes));
+  if(kind==='TPC.'){
+    const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return JSON.parse(await new Response(stream).text());
+  }
+  throw new Error('not a planner code');
+}
+function structurePayload(y){
+  return { k:'tp-structure', v:1, label:y.label, firstDay:y.firstDay, lastDay:y.lastDay,
+    weekDays:y.weekDays, daysOff:y.daysOff, breaks:y.breaks, terms:y.terms, targetDate:y.targetDate,
+    units:y.units.map(u=>({name:u.name,days:u.days,color:u.color})),
+    periods:y.periods.map(p=>({label:p.label,courseName:courseName(p.courseId),start:p.start,duration:p.duration,isPrep:p.isPrep})),
+    blockTemplates:S.blockTemplates.map(t=>({name:t.name,blocks:t.blocks})) };
+}
+ACT.genCode=async()=>{
+  const code=await compressJSON(structurePayload(activeYear()));
+  UI.modal={kind:'code',mode:'show',code}; render();
+};
+ACT.importCodeDlg=()=>{ UI.modal={kind:'code',mode:'import'}; render(); };
+function CodeModal(){
+  const m=UI.modal;
+  if(m.mode==='show') return '<h2>Your transfer code</h2>'
+    +'<p class="small muted">Send this to a colleague (email, text, anything). They paste it into their planner and get your whole setup — no lessons, rosters, or to-dos, just the framework.</p>'
+    +'<textarea rows="6" style="width:100%;margin:10px 0;font-family:monospace;font-size:11px" readonly id="codeOut">'+esc(m.code)+'</textarea>'
+    +'<div class="row between"><span class="tiny muted">'+m.code.length+' characters</span><div class="row">'
+    +'<button class="btn primary" data-act="copyCode">📋 Copy code</button>'
+    +'<button class="btn" data-act="modalClose">Done</button></div></div>';
+  return '<h2>Import a transfer code</h2>'
+    +'<p class="small muted">Paste the code a colleague sent you. It becomes a new school year in your planner — your existing years are untouched.</p>'
+    +'<textarea rows="6" style="width:100%;margin:10px 0;font-family:monospace;font-size:11px" id="codeIn" placeholder="Paste the code here…"></textarea>'
+    +(m.err?'<div class="errbox">'+esc(m.err)+'</div>':'')
+    +'<div class="row between"><button class="btn" data-act="modalClose">Cancel</button>'
+    +'<button class="btn primary" data-act="importCodeGo">Import</button></div>';
+}
+ACT.copyCode=()=>{ const ta=document.getElementById('codeOut'); ta.select();
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(()=>showToast('Copied ✓'),()=>{document.execCommand('copy');showToast('Copied ✓');});
+  else{ document.execCommand('copy'); showToast('Copied ✓'); } };
+ACT.importCodeGo=async()=>{
+  const raw=document.getElementById('codeIn').value;
+  try{
+    const o=await decompressCode(raw);
+    if(o.k!=='tp-structure') throw new Error('bad kind');
+    const y=newYearDraft();
+    y.label=o.label||'Imported year'; y.firstDay=o.firstDay; y.lastDay=o.lastDay;
+    y.weekDays=o.weekDays; y.daysOff=o.daysOff||{}; y.breaks=(o.breaks||[]).map(b=>({...b,id:'b'+uid()}));
+    y.terms=(o.terms||[]).map(t=>({...t,id:'t'+uid()})); y.targetDate=o.targetDate||o.lastDay;
+    y.units=(o.units||[]).map((u,i)=>({id:'u'+uid(),name:u.name,days:u.days,color:u.color||UNIT_COLORS[i%UNIT_COLORS.length]}));
+    y.periods=(o.periods||[]).map(p=>({id:'p'+uid(),label:p.label,courseId:p.isPrep?null:findOrCreateCourse(p.courseName),start:p.start,duration:p.duration,isPrep:!!p.isPrep}));
+    (o.blockTemplates||[]).forEach(t=>{ if(!S.blockTemplates.some(x=>x.name===t.name)) S.blockTemplates.push({id:'tpl'+uid(),name:t.name,blocks:t.blocks}); });
+    if(!S.years) S.years={};
+    S.years[y.id]=y; S.activeYearId=y.id; UI.modal=null; UI.wizard=null; UI.tab='plan'; UI.zoom='year';
+    persist(); render(); showToast('Imported "'+y.label+'" ✓ — it’s now your active year');
+  }catch(e){ UI.modal.err='That doesn’t look like a valid transfer code — check that the whole thing was copied.'; render(); }
+};
+
+/* ---------- .plan file export / import ---------- */
+ACT.exportPlan=()=>{
+  const inclPrivate=!!(document.getElementById('expPrivate')&&document.getElementById('expPrivate').checked);
+  const years=clone(S.years);
+  if(!inclPrivate) for(const id in years) years[id].rosters={};
+  let linkCount=0; for(const id in years){ const yr=years[id];
+    for(const d in yr.lessons){ const r=yr.lessons[d]; linkCount+=(r.links||[]).length;
+      for(const pid in r.periods) linkCount+=(r.periods[pid].links||[]).length; } }
+  const payload={ format:'tobinscience-plan', version:1, exportedAt:new Date().toISOString(),
+    from:'Teacher Planner — TobinScience.com', linkCount,
+    activeYearId:S.activeYearId, years, courses:S.courses, blockTemplates:S.blockTemplates,
+    todos:inclPrivate?S.todos:[] , includesPrivate:inclPrivate };
+  const blob=new Blob([JSON.stringify(payload,null,1)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='Teacher Planner '+(activeYear()?activeYear().label.replace(/[^\w–-]+/g,'_'):'backup')+'.plan';
+  a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  showToast(inclPrivate?'Downloaded — includes rosters & to-dos':'Downloaded — rosters & to-dos NOT included');
+};
+ACT.importFile=()=>{ let f=document.getElementById('planFile');
+  if(!f){ f=document.createElement('input'); f.type='file'; f.accept='.plan,.json'; f.id='planFile';
+    f.className='hidden'; f.setAttribute('data-ch','planFile'); document.body.appendChild(f); }
+  f.value=''; f.click(); };
+CH.planFile=t=>{
+  const file=t.files&&t.files[0]; if(!file) return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const o=JSON.parse(rd.result);
+      if(o.format!=='tobinscience-plan') throw new Error('bad format');
+      const nYears=Object.keys(o.years||{}).length;
+      if(activeYear()&&!confirm('Import "'+file.name+'"?\n\nIt contains '+plural(nYears,'school year')+'. This REPLACES everything currently in this planner. (Download a .plan backup of your current data first if you want to keep it.)')) return;
+      S=defaultState();
+      S.years=o.years||{}; S.courses=o.courses||{}; S.blockTemplates=o.blockTemplates||[];
+      S.todos=o.todos||[]; S.activeYearId=(o.activeYearId&&S.years[o.activeYearId])?o.activeYearId:(Object.keys(S.years)[0]||null);
+      persist(); UI.wizard=null; UI.modal=null; UI.tab='plan'; UI.zoom='year';
+      if(!S.activeYearId) startWizard(); else render();
+      showToast('Imported ✓'+(o.linkCount?' — '+plural(o.linkCount,'linked resource')+' came through as URLs (check any private-share permissions)':''));
+    }catch(e){ alert('That file doesn’t look like a Teacher Planner .plan file.'); }
+  };
+  rd.readAsText(file);
+};
+
+/* =====================================================================
+   PRINTING — yearly / monthly / weekly / daily, all with computed times
+   ===================================================================== */
+function pHead(title,sub){ const y=activeYear();
+  return '<div class="ph"><h1>'+esc(title)+'</h1><div>'+esc(sub||'')+' · '+esc(y.label)+'</div></div>'; }
+function pFoot(){ return '<div class="pf">Find more great resources at <b>TobinScience.com</b></div>'; }
+ACT.print=t=>{
+  const kind=t.dataset.a,y=activeYear(); let html='';
+  if(kind==='year') html=printYear(y);
+  else if(kind==='month') html=printMonth(y,UI.month||D.monthKey(UI.date));
+  else if(kind==='week') html=printWeek(y,UI.date);
+  else html=printDay(y,UI.date);
+  document.getElementById('printArea').innerHTML=html;
+  window.print();
+};
+function printYear(y){
+  const L=unitLayout(y);
+  let html=pHead('Year plan','First day '+D.human(y.firstDay,true)+' — last day '+D.human(y.lastDay,true));
+  html+='<p><b>'+L.available+'</b> school days available through '+D.human(L.endDate,true)+' · <b>'+L.assigned+'</b> assigned to units · <b>'+L.unassigned+'</b> unassigned</p>';
+  html+='<table style="margin:8px 0"><tr><th>#</th><th>Unit</th><th>School days</th><th>Runs</th></tr>'
+    +L.spans.map((s,i)=>'<tr><td>'+(i+1)+'</td><td><b>'+esc(s.unit.name)+'</b></td><td>'+s.unit.days+'</td><td>'+(s.start?D.human(s.start,true)+' – '+D.human(s.end,true):'does not fit before target')+'</td></tr>').join('')+'</table>';
+  if(y.breaks.length) html+='<p><b>Breaks:</b> '+y.breaks.map(b=>esc(b.name)+' ('+D.human(b.start)+(b.end!==b.start?'–'+D.human(b.end):'')+')').join(' · ')+'</p>';
+  const offs=Object.keys(y.daysOff).sort();
+  if(offs.length) html+='<p><b>No-school days:</b> '+offs.map(d=>D.human(d)+' ('+esc(y.daysOff[d])+')').join(' · ')+'</p>';
+  if(y.terms.length) html+='<p><b>Grading periods:</b> '+y.terms.map(t=>esc(t.label)+' — '+D.human(t.end,true)).join(' · ')+'</p>';
+  const um=unitMap(y);
+  html+='<table style="margin-top:10px"><tr><th style="width:9em">Month</th><th>School days & units</th></tr>';
+  for(const mk of monthsOfYear(y)){
+    const[yy,mm]=mk.split('-').map(Number),dim=D.daysInMonth(yy,mm);
+    const runs=[]; let cur=null;
+    for(let d=1;d<=dim;d++){ const ds=mk+'-'+String(d).padStart(2,'0');
+      if(ds<y.firstDay||ds>y.lastDay||!isSchoolDay(y,ds)) continue;
+      const un=um[ds]?um[ds].name:'—';
+      if(cur&&cur.u===un) cur.to=d; else{ cur={u:un,from:d,to:d}; runs.push(cur); } }
+    html+='<tr><td><b>'+MONTHS[mm-1]+' '+yy+'</b></td><td>'+(runs.length?runs.map(r=>r.u+' ('+(r.from===r.to?r.from:r.from+'–'+r.to)+')').join(' · '):'no school days')+'</td></tr>';
+  }
+  return html+'</table>'+pFoot();
+}
+function printMonth(y,mk){
+  const[yy,mm]=mk.split('-').map(Number),dim=D.daysInMonth(yy,mm),lead=D.dow(mk+'-01'),um=unitMap(y);
+  let html=pHead(MONTHS[mm-1]+' '+yy,'Month plan');
+  html+='<table><tr>'+DOWS.map(d=>'<th style="width:14.3%">'+d+'</th>').join('')+'</tr>';
+  let cells=[]; for(let i=0;i<lead;i++) cells.push('<td></td>');
+  for(let d=1;d<=dim;d++){
+    const ds=mk+'-'+String(d).padStart(2,'0');
+    const inYear=ds>=y.firstDay&&ds<=y.lastDay,school=inYear&&isSchoolDay(y,ds);
+    let c='<td style="height:5.2em"><b>'+d+'</b>';
+    if(school){ if(um[ds]) c+='<br><i>'+esc(um[ds].name)+'</i>';
+      const rec=y.lessons[ds];
+      if(rec){ const parts=[]; for(const pid in rec.periods){ const b=rec.periods[pid].blocks; if(b.length) parts.push(esc(b.map(x=>x.label).join(', '))); break; }
+        if(parts.length) c+='<br><span style="font-size:10px">'+parts[0]+'</span>';
+        if(rec.note) c+='<br><span style="font-size:10px">📌 '+esc(rec.note)+'</span>'; } }
+    else if(inYear){ c+='<br><span style="font-size:10px">'+esc(offReason(y,ds)||'No school')+'</span>'; }
+    else c='<td>';
+    cells.push(c+'</td>');
+    if((lead+d)%7===0||d===dim){ while(cells.length%7) cells.push('<td></td>'); html+='<tr>'+cells.join('')+'</tr>'; cells=[]; }
+  }
+  return html+'</table>'+pFoot();
+}
+function weekDates(y,anchor){ // the Sun–Sat calendar week around the anchor, school days only
+  const start=D.addDays(anchor,-D.dow(anchor)); const out=[];
+  for(let i=0;i<7;i++){ const d=D.addDays(start,i); if(isSchoolDay(y,d)) out.push(d); }
+  return out;
+}
+function printWeek(y,anchor){
+  const days=weekDates(y,anchor);
+  if(!days.length) return pHead('Week plan','No school days this week')+pFoot();
+  let html=pHead('Week of '+D.human(days[0],true),'Week at a glance');
+  html+='<table><tr><th style="width:9em">Period</th>'+days.map(d=>'<th>'+DOWS[D.dow(d)]+' '+D.human(d)+'</th>').join('')+'</tr>';
+  for(const p of y.periods){
+    html+='<tr><td><b>'+esc(p.label)+'</b>'+(p.isPrep?'<br><i>Prep</i>':(p.courseId?'<br><i>'+esc(courseName(p.courseId))+'</i>':''))
+      +'<br><span style="font-size:10px">'+fmt12(t2m(p.start))+'–'+fmt12(t2m(p.start)+Number(p.duration))+'</span></td>';
+    for(const d of days){
+      if(p.isPrep){ html+='<td style="background:#f4f4f4"></td>'; continue; }
+      const l=lessonFor(y,d,p.id,false);
+      html+='<td>'+(l&&l.blocks.length?l.blocks.map(b=>esc(b.label)+' ('+b.duration+')').join('<br>'):'')+'</td>';
+    }
+    html+='</tr>';
+  }
+  return html+'</table>'+pFoot();
+}
+function printDay(y,ds){
+  const uf=unitForDate(y,ds);
+  let html=pHead(D.long(ds),(uf?uf.span.unit.name+' — day '+(uf.idx+1)+' of '+uf.span.unit.days:'Daily plan'));
+  const rec=y.lessons[ds];
+  if(rec&&rec.note) html+='<p><b>Note:</b> '+esc(rec.note)+'</p>';
+  for(const p of y.periods){
+    const s=t2m(p.start),e=s+Number(p.duration);
+    html+='<h3 style="margin:10px 0 4px">'+esc(p.label)+(p.courseId?' — '+esc(courseName(p.courseId)):'')+(p.isPrep?' (Prep)':'')+' · '+fmt12(s)+'–'+fmt12(e)+'</h3>';
+    if(p.isPrep) continue;
+    const l=lessonFor(y,ds,p.id,false);
+    if(!l||!l.blocks.length){ html+='<p style="font-size:11px"><i>No plan entered.</i></p>'; continue; }
+    html+='<table><tr><th style="width:12em">Time</th><th>Activity</th><th style="width:5em">Minutes</th></tr>'
+      +blockTimes(p,l.blocks).map(bt=>'<tr><td>'+fmt12(bt.start)+' – '+fmt12(bt.end)+'</td><td>'+esc(bt.label)+'</td><td>'+bt.duration+'</td></tr>').join('')+'</table>';
+    if(l.links&&l.links.length) html+='<p style="font-size:10px">Links: '+l.links.map(k=>esc(k.label||k.url)).join(' · ')+'</p>';
+  }
+  return html+pFoot();
+}
+
+/* =====================================================================
+   COMPACT MODE — floating mini window (Document PiP → popup → panel)
+   ===================================================================== */
+const CP={win:null,doc:null,tier:null,panel:null};
+function guessPeriod(){
+  const y=activeYear(); if(!y) return null;
+  const teach=y.periods.filter(p=>!p.isPrep); if(!teach.length) return null;
+  const n=nowMin();
+  for(const p of teach){ const s=t2m(p.start); if(n>=s&&n<s+Number(p.duration)) return p.id; }
+  for(const p of teach){ if(t2m(p.start)>n) return p.id; }
+  return teach[teach.length-1].id;
+}
+ACT.openCompact=async()=>{
+  if(CP.doc){ renderCompact(); try{CP.win&&CP.win.focus&&CP.win.focus();}catch(e){} return; }
+  if(!UI.compactPeriod) UI.compactPeriod=guessPeriod();
+  UI.compactMode='home';
+  try{
+    if(window.documentPictureInPicture){
+      const w=await documentPictureInPicture.requestWindow({width:300,height:200});
+      CP.win=w; CP.doc=w.document; CP.tier='pip';
+      const st=w.document.createElement('style'); st.textContent=document.querySelector('style').textContent;
+      w.document.head.appendChild(st); w.document.body.className='cp-body';
+      w.addEventListener('pagehide',()=>{ CP.win=CP.doc=null; });
+      wireDoc(w.document); renderCompact(); return;
+    }
+  }catch(e){}
+  try{
+    const w=window.open('','tpCompact','width=310,height=230,menubar=no,toolbar=no,location=no,status=no,resizable=yes');
+    if(w){
+      CP.win=w; CP.doc=w.document; CP.tier='popup';
+      w.document.write('<title>Planner</title><body class="cp-body">');
+      const st=w.document.createElement('style'); st.textContent=document.querySelector('style').textContent;
+      w.document.head.appendChild(st);
+      w.addEventListener('pagehide',()=>{ setTimeout(()=>{ if(w.closed){CP.win=CP.doc=null;} },200); });
+      wireDoc(w.document); renderCompact();
+      showToast('Tip: this window can’t stay on top in your browser — Chrome or Edge give a true floating window.');
+      return;
+    }
+  }catch(e){}
+  // in-page floating panel (last resort)
+  const d=document.createElement('div');
+  d.id='cpPanel'; d.style.cssText='position:fixed;right:18px;bottom:18px;width:290px;height:200px;z-index:200;border-radius:12px;overflow:hidden;box-shadow:0 10px 34px rgba(0,0,0,.4);';
+  document.body.appendChild(d);
+  CP.panel=d; CP.doc=null; CP.tier='panel';
+  renderCompact();
+  showToast('Floating panel opened (this browser can’t make a separate always-on-top window).');
+};
+function compactRoot(){ return CP.tier==='panel'?CP.panel:(CP.doc?CP.doc.body:null); }
+function renderCompactIfOpen(){ if(compactRoot()&&UI.compactMode==='home') renderCompact(); }
+function renderCompact(){
+  const root=compactRoot(); if(!root) return;
+  const y=activeYear(); if(!y){ root.innerHTML=''; return; }
+  if(CP.tier==='panel') root.innerHTML='<div class="cp-body" style="height:100%">'+compactHTML(y)+'</div>';
+  else root.innerHTML=compactHTML(y);
+  if(UI.compactMode==='timer') updateTimerFace();
+}
+function compactHTML(y){
+  const teach=y.periods.filter(p=>!p.isPrep);
+  if(UI.compactMode==='todo') return '<div class="cp-top"><b style="font-size:13px">✏️ Quick to-do</b></div>'
+    +'<div class="cp-form"><textarea id="cpTdText" rows="2" placeholder="Type the note…"></textarea>'
+    +'<input type="datetime-local" id="cpTdDue">'
+    +'<label class="cl"><input type="checkbox" id="cpTdAlert"> Alert me at that time</label>'
+    +'<div class="cp-row"><button data-act="cpBack">Back</button><button class="pri" data-act="cpTdSave">Save</button></div></div>';
+  if(UI.compactMode==='timer'){
+    const presets=[60,180,300,600];
+    const blocks=currentPeriodBlocks(y);
+    return '<div class="cp-timer"><div class="cp-clock" id="cpClock">--:--</div>'
+      +'<div class="cp-presets">'+presets.map(s=>'<button data-act="cpTset" data-a="'+s+'">'+(s/60)+'m</button>').join('')
+      +blocks.map(b=>'<button data-act="cpTset" data-a="'+(b.duration*60)+'" title="'+esc(b.label)+'">'+esc(b.label.slice(0,8))+' '+b.duration+'m</button>').join('')
+      +'<button data-act="cpTcustom">Custom</button></div>'
+      +'<div class="cp-row" style="width:100%"><button data-act="cpBack">Back</button>'
+      +'<button data-act="cpTstartpause" id="cpStartBtn">'+(TIMER.running?'Pause':'Start')+'</button>'
+      +'<button data-act="cpTreset">Reset</button>'
+      +'<button data-act="cpTmode" title="Switch count up / down">'+(TIMER.mode==='down'?'⬆ count up':'⬇ countdown')+'</button></div></div>';
+  }
+  const cur=teach.find(p=>p.id===UI.compactPeriod);
+  return '<div class="cp-top"><span style="font-size:12px;opacity:.85">Now:</span>'
+    +'<select data-ch="cpPeriod">'+teach.map(p=>'<option value="'+p.id+'" '+(p.id===UI.compactPeriod?'selected':'')+'>'+esc(p.label)+(p.courseId?' · '+esc(courseName(p.courseId)):'')+'</option>').join('')+'</select>'
+    +'<button style="border:0;background:transparent;color:#fff;font-size:15px" title="Back to the full planner" data-act="cpExpand">⤢</button></div>'
+    +'<div class="cp-btns">'
+    +'<button data-act="cpTodo"><span class="ico">✏️</span>To Do</button>'
+    +'<button data-act="cpDraw"><span class="ico">🎲</span>Random<br>Name</button>'
+    +'<button data-act="cpTimer"><span class="ico">⏱</span>Timer</button></div>'
+    +'<div class="cp-name" id="cpName">'+(UI.lastDraw&&UI.lastDraw.pid===UI.compactPeriod?'<b>'+esc(UI.lastDraw.name)+'</b> <span style="opacity:.8">('+UI.lastDraw.called+' of '+UI.lastDraw.total+')</span>':(cur?'<span style="opacity:.75">'+esc(cur.label)+' ready</span>':''))+'</div>';
+}
+function currentPeriodBlocks(y){
+  const pid=UI.compactPeriod; if(!pid) return [];
+  const l=lessonFor(y,D.today(),pid,false);
+  if(!l) return [];
+  const seen={},out=[];
+  for(const b of l.blocks){ const k=b.duration; if(!seen[k]&&out.length<3){ seen[k]=1; out.push(b); } }
+  return out;
+}
+CH.cpPeriod=t=>{ UI.compactPeriod=t.value; renderCompact(); };
+ACT.cpExpand=()=>{ try{window.focus();}catch(e){}
+  if(CP.tier==='panel'){ CP.panel.remove(); CP.panel=null; CP.tier=null; }
+  else if(CP.win){ CP.win.close(); CP.win=CP.doc=null; } };
+ACT.cpBack=()=>{ UI.compactMode='home'; renderCompact(); };
+ACT.cpTodo=()=>{ UI.compactMode='todo'; renderCompact(); };
+ACT.cpTdSave=()=>{
+  const doc=CP.tier==='panel'?document:CP.doc;
+  const text=doc.getElementById('cpTdText').value.trim();
+  if(!text) return;
+  const due=doc.getElementById('cpTdDue').value;
+  addTodo(text,due?new Date(due).toISOString():null,doc.getElementById('cpTdAlert').checked);
+  UI.compactMode='home'; renderCompact(); render();
+};
+ACT.cpDraw=()=>{
+  const y=activeYear(),pid=UI.compactPeriod;
+  const res=drawName(y,pid);
+  if(res.err){ UI.lastDraw=null; const el=compactRoot()&&(CP.tier==='panel'?document:CP.doc).getElementById('cpName');
+    if(el) el.innerHTML='<span style="opacity:.9">'+esc(res.err)+'</span>'; return; }
+  UI.lastDraw={pid,name:res.name,called:res.called,total:res.total};
+  renderCompact();
+};
+function drawName(y,pid){
+  if(!pid) return {err:'Pick a period first'};
+  const roster=(y.rosters[pid]||[]).filter(Boolean);
+  if(!roster.length){ const p=y.periods.find(x=>x.id===pid);
+    return {err:'No roster for '+(p?p.label:'this period')+' yet — paste it on the Rosters tab.'}; }
+  if(S.settings.pureRandom){
+    const name=roster[Math.floor(Math.random()*roster.length)];
+    return {name,called:'—',total:roster.length};
+  }
+  let st=S.draws[pid]; const today=D.today();
+  if(!st||st.date!==today||st.total!==roster.length) st=S.draws[pid]={date:today,pool:shuffle(roster.slice()),total:roster.length};
+  if(!st.pool.length) st.pool=shuffle(roster.slice());
+  const name=st.pool.pop(); persist();
+  return {name,called:st.total-st.pool.length,total:st.total};
+}
+
+/* ---------- classroom timer (timestamp-driven; survives throttling) ---------- */
+const TIMER={mode:'down',running:false,duration:300,endAt:null,remain:300,upStart:null,elapsed:0,done:false};
+let timerInt=null;
+ACT.cpTimer=()=>{ UI.compactMode='timer'; renderCompact(); ensureTimerTick(); };
+ACT.cpTset=t=>{ TIMER.mode='down'; TIMER.duration=Number(t.dataset.a); TIMER.remain=TIMER.duration;
+  TIMER.running=false; TIMER.endAt=null; TIMER.done=false; renderCompact(); };
+ACT.cpTcustom=()=>{ const w=CP.tier==='panel'?window:CP.win;
+  const v=(w&&w.prompt?w.prompt('Minutes:','5'):prompt('Minutes:','5')); const m=Number(v);
+  if(m>0){ TIMER.mode='down'; TIMER.duration=Math.round(m*60); TIMER.remain=TIMER.duration; TIMER.running=false; TIMER.endAt=null; TIMER.done=false; renderCompact(); } };
+ACT.cpTmode=()=>{ TIMER.mode=TIMER.mode==='down'?'up':'down'; TIMER.running=false; TIMER.done=false;
+  TIMER.remain=TIMER.duration; TIMER.elapsed=0; TIMER.upStart=null; renderCompact(); };
+ACT.cpTstartpause=()=>{
+  if(TIMER.running){ // pause: bank the current value
+    if(TIMER.mode==='down') TIMER.remain=Math.max(0,Math.round((TIMER.endAt-Date.now())/1000));
+    else TIMER.elapsed=Math.round((Date.now()-TIMER.upStart)/1000);
+    TIMER.running=false;
+  }else{
+    TIMER.done=false;
+    if(TIMER.mode==='down'){ if(TIMER.remain<=0) TIMER.remain=TIMER.duration; TIMER.endAt=Date.now()+TIMER.remain*1000; }
+    else TIMER.upStart=Date.now()-(TIMER.elapsed||0)*1000;
+    TIMER.running=true;
+  }
+  ensureTimerTick(); renderCompact();
+};
+ACT.cpTreset=()=>{ TIMER.running=false; TIMER.done=false; TIMER.remain=TIMER.duration; TIMER.elapsed=0; renderCompact(); };
+function ensureTimerTick(){ if(!timerInt) timerInt=setInterval(updateTimerFace,300); }
+function updateTimerFace(){
+  const root=compactRoot(); if(!root||UI.compactMode!=='timer') return;
+  const doc=CP.tier==='panel'?document:CP.doc; if(!doc) return;
+  const el=doc.getElementById('cpClock'); if(!el) return;
+  let secs;
+  if(TIMER.mode==='down'){
+    secs=TIMER.running?Math.max(0,Math.round((TIMER.endAt-Date.now())/1000)):TIMER.remain;
+    if(TIMER.running&&secs===0){ TIMER.running=false; TIMER.remain=0; TIMER.done=true;
+      if(S.settings.timerSound) beep();
+      const sb=doc.getElementById('cpStartBtn'); if(sb) sb.textContent='Start'; }
+  }else secs=TIMER.running?Math.round((Date.now()-TIMER.upStart)/1000):(TIMER.elapsed||0);
+  const h=Math.floor(secs/3600),m=Math.floor(secs%3600/60),s=secs%60;
+  el.textContent=(h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s).padStart(2,'0');
+  el.classList.toggle('flash',TIMER.done);
+}
+function beep(){
+  try{ const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    for(let i=0;i<3;i++){ const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination); o.frequency.value=880;
+      const t0=ctx.currentTime+i*0.35; g.gain.setValueAtTime(0.001,t0);
+      g.gain.exponentialRampToValueAtTime(0.3,t0+0.03); g.gain.exponentialRampToValueAtTime(0.001,t0+0.28);
+      o.start(t0); o.stop(t0+0.3); } }catch(e){}
+}
+
+/* =====================================================================
+   ALERTS — fire only while the planner (or its mini window) is open
+   ===================================================================== */
+function askNotifyPermission(){
+  if(typeof Notification!=='undefined'&&Notification.permission==='default') Notification.requestPermission();
+}
+function fireAlert(td){
+  const msg='⏰ '+td.text;
+  if(typeof Notification!=='undefined'&&Notification.permission==='granted'){
+    try{ new Notification('Teacher Planner',{body:td.text}); }catch(e){ showToast(msg,'alert'); }
+  }else showToast(msg,'alert');
+}
+function alertSweep(initial){
+  const now=Date.now(); let missed=0,changed=false;
+  for(const td of S.todos){
+    if(td.doneAt||!td.alertOn||td.alerted||!td.dueAt) continue;
+    if(new Date(td.dueAt).getTime()<=now){
+      td.alerted=true; changed=true;
+      if(initial&&now-new Date(td.dueAt).getTime()>90000){ td.missed=true; missed++; }
+      else fireAlert(td);
+    }
+  }
+  if(changed) persist();
+  if(missed) showToast('You missed '+plural(missed,'alert')+' while the planner was closed — see the To Do tab','alert');
+}
+setInterval(()=>alertSweep(false),20000);
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+function migrate(s){
+  const d=defaultState();
+  for(const k in d) if(s[k]===undefined) s[k]=d[k];
+  for(const k in d.settings) if(s.settings[k]===undefined) s.settings[k]=d.settings[k];
+  return s;
+}
+S=Store.get();
+if(S){ S=migrate(S); }else{ S=defaultState(); }
+UI.month=D.monthKey(D.today());
+wireDoc(document);
+if(!activeYear()) UI.wizard=null; // Wizard() self-starts when no year exists
+render();
+alertSweep(true);
+</script>
+</body>
+</html>
