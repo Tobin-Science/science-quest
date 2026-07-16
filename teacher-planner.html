@@ -267,6 +267,25 @@ function m2t(min){ return String(Math.floor(min/60)).padStart(2,'0')+':'+String(
 function fmt12(min){ min=((min%1440)+1440)%1440; let h=Math.floor(min/60),m=min%60; const ap=h>=12?'PM':'AM'; h=((h+11)%12)+1; return h+':'+String(m).padStart(2,'0')+' '+ap; }
 function nowMin(){ const n=new Date(); return n.getHours()*60+n.getMinutes(); }
 
+/* ---------- attached-file store (IndexedDB — real files, on-device only) ---------- */
+const FileStore=(()=>{
+  if(typeof indexedDB==='undefined') return null;
+  let dbp=null;
+  function db(){ if(!dbp) dbp=new Promise((res,rej)=>{ const r=indexedDB.open('tp_files',1);
+    r.onupgradeneeded=()=>r.result.createObjectStore('files',{keyPath:'id'});
+    r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); return dbp; }
+  return {
+    async put(rec){ const d=await db(); return new Promise((res,rej)=>{ const tx=d.transaction('files','readwrite'); tx.objectStore('files').put(rec); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); }); },
+    async get(id){ const d=await db(); return new Promise((res,rej)=>{ const rq=d.transaction('files').objectStore('files').get(id); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); }); },
+    async del(id){ const d=await db(); return new Promise((res,rej)=>{ const tx=d.transaction('files','readwrite'); tx.objectStore('files').delete(id); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); }); }
+  };
+})();
+function fmtSize(b){ return b>=1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round((b||0)/1024))+' KB'; }
+function blobToB64(blob){ return new Promise((res,rej)=>{ const r=new FileReader();
+  r.onload=()=>res(String(r.result).split(',')[1]); r.onerror=()=>rej(r.error); r.readAsDataURL(blob); }); }
+function b64ToBlob(b64,mime){ const bin=atob(b64),u=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return new Blob([u],{type:mime||'application/octet-stream'}); }
+
 /* ---------- misc utils ---------- */
 function uid(){ return Math.random().toString(36).slice(2,10); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -334,6 +353,16 @@ function unitLayoutFor(y,units){
 }
 function courseUnits(y,cid){ return y.units.filter(u=>u.courseId===cid); }
 function unitLayout(y,cid){ return unitLayoutFor(y,courseUnits(y,cid)); }
+/* Two periods overlap if their time ranges intersect — a teacher can't be in two rooms at once. */
+function periodConflicts(periods){
+  const bad=new Set();
+  for(let i=0;i<periods.length;i++) for(let j=i+1;j<periods.length;j++){
+    const a=periods[i],b=periods[j];
+    const as=t2m(a.start),ae=as+Number(a.duration),bs=t2m(b.start),be=bs+Number(b.duration);
+    if(as<be&&bs<ae){ bad.add(a.id); bad.add(b.id); }
+  }
+  return bad;
+}
 function teachingCourses(y){ const seen=new Set(),out=[];
   for(const p of y.periods){ if(!p.isPrep&&p.courseId&&!seen.has(p.courseId)){ seen.add(p.courseId); out.push(p.courseId); } }
   return out; }
@@ -589,8 +618,9 @@ function wzPeriods(y){
   return '<h1>Your daily class periods</h1>'
     +'<p class="sub">Add each period with its start time and length. Give each teaching period a <b>course</b> name (like "Advanced Science"). Periods that share a course name share one unit plan and lesson content — separate courses get their own units (next step). Courses are also what let your plan copy to next year even if a course moves to a different period. Mark planning periods as Prep.</p>'
     +'<datalist id="courseList">'+Object.values(S.courses).map(c=>'<option value="'+esc(c.name)+'">').join('')+'</datalist>'
+    +(periodConflicts(y.periods).size?'<div class="errbox">⚠ The highlighted periods overlap in time — you can’t teach two classes at once. Adjust the start times or lengths before continuing.</div>':'')
     +'<div class="list-edit" style="margin:8px 0">'
-    +y.periods.map(p=>'<div class="li">'
+    +y.periods.map(p=>'<div class="li"'+(periodConflicts(y.periods).has(p.id)?' style="border-color:#fca5a5;background:#fee2e2"':'')+'>'
       +'<input type="text" style="width:110px" value="'+esc(p.label)+'" placeholder="e.g. 3rd Period" data-ch="wzPer" data-a="'+p.id+'" data-f="label">'
       +'<input type="text" class="grow" list="courseList" value="'+esc(p.courseName||'')+'" placeholder="Course (e.g. Advanced Science)" data-ch="wzPer" data-a="'+p.id+'" data-f="courseName" '+(p.isPrep?'disabled':'')+'>'
       +'<input type="time" value="'+esc(p.start)+'" data-ch="wzPer" data-a="'+p.id+'" data-f="start">'
@@ -673,6 +703,7 @@ ACT.wzNext=()=>{
     if(!y.periods.length) return showToast('Add at least one period');
     for(const p of y.periods){ if(!p.label.trim()) return showToast('Every period needs a name'); }
     if(!wzCourseNames(y).length) return showToast('Give at least one period a course name (e.g. Physical Science)');
+    if(periodConflicts(y.periods).size) return showToast('Two of your periods overlap in time — fix the highlighted rows first');
     // drop units whose course no longer exists (renamed/removed on this pass)
     const names=wzCourseNames(y);
     y.units=y.units.filter(u=>names.some(n=>sameCN(n,u.courseName)));
@@ -683,6 +714,7 @@ ACT.wzFinish=()=>{
   const w=UI.wizard,y=w.y;
   if(!y.periods.length) return showToast('Add at least one period');
   for(const p of y.periods){ if(!p.label.trim()) return showToast('Every period needs a name'); }
+  if(periodConflicts(y.periods).size) return showToast('Two of your periods overlap in time — go back and fix the highlighted rows');
   // resolve course names -> course ids (periods AND units)
   y.periods.forEach(p=>{ p.courseId=p.isPrep?null:findOrCreateCourse(p.courseName); delete p.courseName; });
   y.units.forEach(u=>{ u.courseId=findOrCreateCourse(u.courseName); delete u.courseName; });
@@ -766,10 +798,12 @@ function YearView(y){
   const L=unitLayout(y,cid),um=unitMap(y,cid),alerts=midUnitAlerts(y,cid),today=D.today();
   const termByDate={}; y.terms.forEach(t=>termByDate[t.end]=t);
   let html=courseChips(y);
-  html+='<div class="card"><h2>Unit day budget <span class="chip brand">'+esc(y.label)+'</span>'
-    +(cid?' <span class="chip">'+esc(courseName(cid))+'</span>':'')+'</h2>'+budgetSummary(y,L)+'</div>';
+  html+='<div class="card"><div class="row between"><h2 style="margin:0">Unit day budget <span class="chip brand">'+esc(y.label)+'</span>'
+    +(cid?' <span class="chip">'+esc(courseName(cid))+'</span>':'')+'</h2>'
+    +'<button class="btn sm" data-act="tab" data-a="units">✏️ Edit units</button></div>'+budgetSummary(y,L)+'</div>';
   // unit list with spans + live countdown
-  html+='<div class="card"><h2>Units'+(cid?' — '+esc(courseName(cid)):'')+'</h2><div class="unit-rows">';
+  html+='<div class="card"><div class="row between"><h2 style="margin:0">Units'+(cid?' — '+esc(courseName(cid)):'')+'</h2>'
+    +'<button class="btn sm" data-act="tab" data-a="units">✏️ Edit units</button></div><div class="unit-rows">';
   if(!L.spans.length) html+='<p class="muted">No units for this class yet — add them on the <b>Units</b> tab.</p>';
   for(const s of L.spans){
     const p=unitProgress(y,s.unit);
@@ -1014,12 +1048,37 @@ ACT.delTpl=()=>{ const sel=document.getElementById('tplSel'); if(!sel.value) ret
 /* ---------- links (shared by day + period) ---------- */
 function LinksEditor(links,kind){
   return '<div class="list-edit" style="margin-top:8px">'
-    +links.map((lk,i)=>'<div class="li">🔗 <a class="grow" href="'+esc(lk.url)+'" target="_blank" rel="noopener">'+esc(lk.label||lk.url)+'</a>'
+    +links.map((lk,i)=>'<div class="li">'
+      +(lk.fileId
+        ?'📎 <a class="grow" href="#" data-act="openFile" data-a="'+esc(lk.fileId)+'">'+esc(lk.label||'Attachment')+'</a><span class="tiny muted">'+fmtSize(lk.size)+'</span>'
+        :'🔗 <a class="grow" href="'+esc(lk.url)+'" target="_blank" rel="noopener">'+esc(lk.label||lk.url)+'</a>')
       +'<button class="btn sm danger" data-act="delLink" data-a="'+i+'" data-b="'+kind+'">✕</button></div>').join('')
     +'<div class="li"><input type="text" id="lk_'+kind+'_label" placeholder="Label (e.g. Energy Notes Slides)" style="width:200px">'
     +'<input type="text" class="grow" id="lk_'+kind+'_url" placeholder="Paste a link (Google Drive, Canvas, TpT…)">'
-    +'<button class="btn sm primary" data-act="addLink" data-a="'+kind+'">Add link</button></div></div>';
+    +'<button class="btn sm primary" data-act="addLink" data-a="'+kind+'">Add link</button>'
+    +(FileStore?'<span class="tiny muted">or</span><button class="btn sm" data-act="attachFile" data-a="'+kind+'">📎 Attach a file</button>'
+      +'<input type="file" id="fi_'+kind+'" class="hidden" data-ch="attachFile" data-a="'+kind+'">':'')
+    +'</div>'
+    +(FileStore?'<p class="tiny muted" style="margin:2px 0 0">Attached files (Word, PowerPoint, PDFs…) are stored in this browser on this device. They travel in .plan backups but never in transfer codes.</p>':'')
+    +'</div>';
 }
+ACT.attachFile=t=>{ const fi=document.getElementById('fi_'+t.dataset.a); if(fi){ fi.value=''; fi.click(); } };
+CH.attachFile=async t=>{
+  const f=t.files&&t.files[0]; if(!f) return;
+  if(f.size>52428800) return showToast('Over 50 MB — too big to store in the browser. Put it in Drive and paste the link instead.');
+  const id='f'+uid();
+  try{ await FileStore.put({id,name:f.name,mime:f.type,blob:f}); }
+  catch(e){ return showToast('Couldn’t store the file — your browser may be low on storage.'); }
+  linkTarget(t.dataset.a,true).push({label:f.name,fileId:id,size:f.size,mime:f.type});
+  persist(); render(); showToast('Attached ✓ — stored on this device');
+};
+ACT.openFile=async t=>{
+  const rec=await FileStore.get(t.dataset.a);
+  if(!rec) return showToast('This attachment isn’t on this device — re-attach it or use a link.');
+  const url=URL.createObjectURL(rec.blob);
+  const a=document.createElement('a'); a.href=url; a.download=rec.name||'attachment'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+};
 function linkTarget(kind,create){
   const y=activeYear();
   if(kind==='per'){ const l=lessonFor(y,UI.date,UI.periodId,create); if(l&&!l.links) l.links=[]; return l?l.links:null; }
@@ -1031,7 +1090,10 @@ ACT.addLink=t=>{ const k=t.dataset.a;
   if(!url) return showToast('Paste the link first');
   if(!/^https?:\/\//i.test(url)) url='https://'+url;
   linkTarget(k,true).push({label,url}); persist(); render(); };
-ACT.delLink=t=>{ const arr=linkTarget(t.dataset.b,false); if(arr){ arr.splice(Number(t.dataset.a),1); const y=activeYear(); cleanDay(y,UI.date); persist(); render(); } };
+ACT.delLink=t=>{ const arr=linkTarget(t.dataset.b,false); if(arr){
+  const removed=arr.splice(Number(t.dataset.a),1)[0];
+  if(removed&&removed.fileId&&FileStore) FileStore.del(removed.fileId).catch(()=>{});
+  const y=activeYear(); cleanDay(y,UI.date); persist(); render(); } };
 
 /* =====================================================================
    UNITS TAB — the zero-sum day budget
@@ -1228,9 +1290,11 @@ function ShareTab(y){
     +'<p class="small muted">The code carries the <b>structure</b>: year dates, school week, holidays & breaks, units, target date, periods & courses, and saved lesson shapes. It never includes your lessons, rosters, or to-dos.</p>'
     +'<div class="row" style="margin-top:10px"><button class="btn primary" data-act="genCode">Create my transfer code</button>'
     +'<button class="btn" data-act="importCodeDlg">I have a code — import it</button></div></div>';
+  const fileLinks=allFileLinks(S.years),fileBytes=fileLinks.reduce((a,l)=>a+(l.size||0),0);
   html+='<div class="card"><h2>Full backup — <code>.plan</code> file</h2>'
     +'<p class="small muted">Downloads everything: every year, every lesson, minute-by-minute. Use it to back up, move devices, or hand a colleague your complete year.</p>'
     +'<label class="checkline" style="margin:10px 0"><input type="checkbox" id="expPrivate"><span>Also include my <b>rosters and to-dos</b> <span class="tiny muted">(rosters are student names — leave this off if you’re sharing the file with anyone else)</span></span></label>'
+    +(fileLinks.length?'<label class="checkline" style="margin:10px 0"><input type="checkbox" id="expFiles" checked><span>Include my <b>attached files</b> — '+plural(fileLinks.length,'attachment')+', about '+fmtSize(fileBytes)+' <span class="tiny muted">(uncheck for a smaller backup; attachments then show as a re-attach checklist on import)</span></span></label>':'')
     +'<div class="row"><button class="btn primary" data-act="exportPlan">⬇ Download .plan file</button>'
     +'<button class="btn" data-act="importFile">⬆ Import a .plan file</button>'
     +'<input type="file" id="planFile" accept=".plan,.json" class="hidden" data-ch="planFile"></div></div>';
@@ -1357,22 +1421,44 @@ ACT.importCodeGo=async()=>{
 };
 
 /* ---------- .plan file export / import ---------- */
-ACT.exportPlan=()=>{
+function allFileLinks(years){
+  const out=[];
+  for(const id in years){ const yr=years[id];
+    for(const d in yr.lessons){ const r=yr.lessons[d];
+      (r.links||[]).forEach(l=>{ if(l.fileId) out.push(l); });
+      for(const pid in r.periods) (r.periods[pid].links||[]).forEach(l=>{ if(l.fileId) out.push(l); });
+    } }
+  return out;
+}
+ACT.exportPlan=async()=>{
   const inclPrivate=!!(document.getElementById('expPrivate')&&document.getElementById('expPrivate').checked);
+  const expFilesBox=document.getElementById('expFiles');
+  const inclFiles=!!(expFilesBox&&expFilesBox.checked)&&!!FileStore;
   const years=clone(S.years);
   if(!inclPrivate) for(const id in years) years[id].rosters={};
   let linkCount=0; for(const id in years){ const yr=years[id];
     for(const d in yr.lessons){ const r=yr.lessons[d]; linkCount+=(r.links||[]).length;
       for(const pid in r.periods) linkCount+=(r.periods[pid].links||[]).length; } }
+  // attached files → base64 (skips any missing from this device)
+  const files={};
+  if(inclFiles){
+    for(const lk of allFileLinks(years)){
+      if(files[lk.fileId]) continue;
+      try{ const rec=await FileStore.get(lk.fileId);
+        if(rec) files[lk.fileId]={name:rec.name,mime:rec.mime,b64:await blobToB64(rec.blob)}; }catch(e){}
+    }
+  }
   const payload={ format:'tobinscience-plan', version:1, exportedAt:new Date().toISOString(),
     from:'Teacher Planner — TobinScience.com', linkCount,
     activeYearId:S.activeYearId, years, courses:S.courses, blockTemplates:S.blockTemplates,
-    todos:inclPrivate?S.todos:[] , includesPrivate:inclPrivate };
+    todos:inclPrivate?S.todos:[] , includesPrivate:inclPrivate,
+    files, includesFiles:inclFiles };
   const blob=new Blob([JSON.stringify(payload,null,1)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='Teacher Planner '+(activeYear()?activeYear().label.replace(/[^\w–-]+/g,'_'):'backup')+'.plan';
   a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
-  showToast(inclPrivate?'Downloaded — includes rosters & to-dos':'Downloaded — rosters & to-dos NOT included');
+  const nf=Object.keys(files).length;
+  showToast('Downloaded — '+(inclPrivate?'includes':'no')+' rosters/to-dos'+(nf?', '+plural(nf,'attachment')+' included':''));
 };
 ACT.importFile=()=>{ let f=document.getElementById('planFile');
   if(!f){ f=document.createElement('input'); f.type='file'; f.accept='.plan,.json'; f.id='planFile';
@@ -1381,7 +1467,7 @@ ACT.importFile=()=>{ let f=document.getElementById('planFile');
 CH.planFile=t=>{
   const file=t.files&&t.files[0]; if(!file) return;
   const rd=new FileReader();
-  rd.onload=()=>{
+  rd.onload=async()=>{
     try{
       const o=JSON.parse(rd.result);
       if(o.format!=='tobinscience-plan') throw new Error('bad format');
@@ -1390,9 +1476,22 @@ CH.planFile=t=>{
       S=defaultState();
       S.years=o.years||{}; S.courses=o.courses||{}; S.blockTemplates=o.blockTemplates||[];
       S.todos=o.todos||[]; S.activeYearId=(o.activeYearId&&S.years[o.activeYearId])?o.activeYearId:(Object.keys(S.years)[0]||null);
-      persist(); UI.wizard=null; UI.modal=null; UI.tab='plan'; UI.zoom='year';
+      persist();
+      // restore attached files; build the "re-attach" checklist for any not in the backup
+      let restored=0; const missing=[];
+      const wanted=allFileLinks(S.years);
+      for(const lk of wanted){
+        const f=(o.files||{})[lk.fileId];
+        if(f&&FileStore){ try{ await FileStore.put({id:lk.fileId,name:f.name,mime:f.mime,blob:b64ToBlob(f.b64,f.mime)}); restored++; }catch(e){ missing.push(lk.label); } }
+        else if(!f) missing.push(lk.label);
+      }
+      UI.wizard=null; UI.modal=null; UI.tab='plan'; UI.zoom='year';
       if(!S.activeYearId) startWizard(); else render();
-      showToast('Imported ✓'+(o.linkCount?' — '+plural(o.linkCount,'linked resource')+' came through as URLs (check any private-share permissions)':''));
+      showToast('Imported ✓'+(restored?' — '+plural(restored,'attachment')+' restored':''));
+      if(missing.length){
+        const names=[...new Set(missing)];
+        alert('Documents to re-attach ('+names.length+'):\n\nThese attachments weren’t included in the backup file, so their spots are saved but the files themselves need re-attaching on this device:\n\n• '+names.slice(0,20).join('\n• ')+(names.length>20?'\n…and '+(names.length-20)+' more':''));
+      }
     }catch(e){ alert('That file doesn’t look like a Teacher Planner .plan file.'); }
   };
   rd.readAsText(file);
