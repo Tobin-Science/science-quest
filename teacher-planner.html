@@ -38,6 +38,16 @@ a{color:var(--brand)}
 .brandbtn:hover{filter:brightness(1.06)}
 .compactbtn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:7px 12px;font-weight:600;font-size:13px}
 .compactbtn:hover{background:rgba(255,255,255,.25)}
+.bellbtn{position:relative;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:7px 10px;line-height:1;display:flex;align-items:center}
+.bellbtn:hover{background:rgba(255,255,255,.25)}
+.bellbadge{position:absolute;top:-7px;right:-7px;background:#dc2626;color:#fff;font-size:11px;font-weight:800;border-radius:999px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--brand-dk)}
+.bellveil{position:fixed;inset:0;z-index:85}
+.belldrop{position:fixed;top:58px;right:16px;width:360px;max-width:92vw;max-height:70vh;overflow:auto;background:#fff;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.35);z-index:90;padding:14px;color:var(--ink)}
+.belldrop .bi{display:flex;gap:8px;align-items:flex-start;padding:9px 4px;border-bottom:1px solid var(--line);font-size:14px}
+.belldrop .bi:last-of-type{border-bottom:0}
+.belldrop .bi .bt{flex:1;min-width:0;overflow-wrap:anywhere}
+.cp-bell{position:relative;border:0;background:transparent;color:#fff;display:flex;align-items:center;padding:2px 6px;cursor:pointer}
+.cp-bell .bellbadge{top:-5px;right:-4px;border-color:#0f766e}
 .wrap{max-width:1160px;margin:0 auto;padding:18px 16px 60px}
 .footer{max-width:1160px;margin:0 auto;padding:22px 16px 40px;text-align:center;color:var(--ink2);font-size:13px}
 .footer .brandbtn{margin-bottom:10px}
@@ -444,6 +454,9 @@ function showToast(msg,cls){
 }
 const LOGO_B64='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';
 function brandBtn(){ return '<a class="brandbtn" href="https://www.tobinscience.com" target="_blank" rel="noopener"><img src="data:image/png;base64,'+LOGO_B64+'" alt="TobinScience logo">Find more great resources at TobinScience.com</a>'; }
+function bellSVG(sz){ return '<svg viewBox="0 0 24 24" width="'+sz+'" height="'+sz+'" fill="currentColor" aria-hidden="true"><path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm8-6-1.8-2.2V10a6.2 6.2 0 0 0-4.7-6V3a1.5 1.5 0 0 0-3 0v1A6.2 6.2 0 0 0 5.8 10v3.8L4 16v2h16Z"/></svg>'; }
+function pendingAlerts(){ return S.todos.filter(t=>t.alerted&&!t.seen&&!t.doneAt); }
+function markAlertsSeen(){ let ch=false; S.todos.forEach(t=>{ if(t.alerted&&!t.seen){ t.seen=true; ch=true; } }); if(ch) persist(); return ch; }
 
 /* ---------- root ---------- */
 function App(){
@@ -458,17 +471,40 @@ function TopBar(y){
     +'<div class="logo">🗓️ Teacher Planner <span class="yr">'+esc(y.label)+(y.archived?' · ARCHIVED':'')+'</span></div>'
     +'<div class="tabs">'+tabs.map(t=>'<button class="tab'+(UI.tab===t[0]?' on':'')+'" data-act="tab" data-a="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'
     +'<span class="spacer"></span>'
+    +BellBtn()
     +'<button class="compactbtn" data-act="openCompact" title="Open the floating classroom toolbox — to-do notes, random name picker, timer">🧰 Toolbox</button>'
     +brandBtn()
-    +'</div></div>';
+    +'</div></div>'
+    +(UI.bellOpen?BellDrop():'');
 }
+function BellBtn(){
+  const n=pendingAlerts().length;
+  return '<button class="bellbtn" data-act="bellToggle" title="Alarms — reminders land here quietly, nothing pops up on screen">'+bellSVG(18)
+    +(n?'<span class="bellbadge">'+(n>9?'9+':n)+'</span>':'')+'</button>';
+}
+function BellDrop(){
+  const alerts=pendingAlerts();
+  return '<div class="bellveil" data-act="bellToggle"></div><div class="belldrop">'
+    +'<div class="row between" style="margin-bottom:4px"><h3 style="margin:0">Alarms</h3>'
+    +(alerts.length?'<button class="btn sm" data-act="bellClear">Clear all</button>':'')+'</div>'
+    +(alerts.length
+      ?alerts.map(t=>'<div class="bi"><span>🔔</span><span class="bt">'+esc(t.text)
+        +'<br><span class="tiny muted">'+fmtDue(t.dueAt)+(t.missed?' · was due while the planner was closed':'')+'</span></span>'
+        +'<button class="btn sm" data-act="bellSeen" data-a="'+t.id+'" title="Dismiss">✓</button></div>').join('')
+      :'<p class="muted small" style="padding:8px 4px">No alarms right now. Reminders from your to-dos show up here — quietly, so nothing ever pops up while you’re projecting.</p>')
+    +'<div class="row" style="margin-top:10px"><button class="btn sm" data-act="bellTodos">Open the To Do tab</button></div></div>';
+}
+ACT.bellToggle=()=>{ UI.bellOpen=!UI.bellOpen; render(); };
+ACT.bellClear=()=>{ markAlertsSeen(); UI.bellOpen=false; render(); };
+ACT.bellSeen=t=>{ const td=S.todos.find(x=>x.id===t.dataset.a); if(td){ td.seen=true; persist(); } render(); };
+ACT.bellTodos=()=>{ UI.bellOpen=false; UI.tab='todo'; markAlertsSeen(); render(); };
 function Footer(){
   return '<div class="footer">'+brandBtn()
     +'<div class="tiny" style="margin-top:8px">Free forever · All of your data stays on this device — nothing is uploaded anywhere.'
     +(Store.kind==='memory'?' <b>(Preview mode: this environment can’t save between visits — use Export before leaving.)</b>':'')
     +'</div></div>';
 }
-ACT.tab=t=>{ UI.tab=t.dataset.a; render(); };
+ACT.tab=t=>{ UI.tab=t.dataset.a; if(UI.tab==='todo') markAlertsSeen(); render(); };
 
 function MainBody(y){
   switch(UI.tab){
@@ -1246,9 +1282,9 @@ function TodoTab(){
     +'<div class="row" style="margin-top:8px;align-items:flex-end">'
     +'<div class="field" style="flex:1;min-width:220px;margin:0"><label>Note</label><input type="text" id="todoText" placeholder="e.g. Make copies of the Energy lab before 3rd period"></div>'
     +'<div class="field" style="margin:0"><label>Remind at (optional)</label><input type="datetime-local" id="todoDue"></div>'
-    +'<label class="checkline" style="padding-bottom:8px"><input type="checkbox" id="todoAlert">Pop up an alert</label>'
+    +'<label class="checkline" style="padding-bottom:8px"><input type="checkbox" id="todoAlert">Set an alarm 🔔</label>'
     +'<button class="btn primary" data-act="todoAdd" style="margin-bottom:1px">Add</button></div>'
-    +'<p class="tiny muted" style="margin-top:8px">Alerts pop up only while the planner (or its compact window) is open — there’s no server behind this, so nothing can reach you once it’s closed. Anything missed is flagged below.</p></div>';
+    +'<p class="tiny muted" style="margin-top:8px">Alarms are projector-safe: nothing ever pops up on screen. When the time comes, a red count appears on the 🔔 bell in the top bar (and in the Toolbox) and you look when you’re ready. The bell only updates while the planner or Toolbox is open — anything that came due while it was closed is flagged below.</p></div>';
   html+='<div class="card"><h2>Your to-dos</h2>';
   if(!todos.length) html+='<p class="muted">Nothing here — enjoy it while it lasts. 🎉</p>';
   else html+=todos.map(t=>'<div class="todo-item'+(t.doneAt?' done':'')+'">'
@@ -1269,8 +1305,7 @@ ACT.todoAdd=()=>{
   render();
 };
 function addTodo(text,dueAt,alertOn){
-  S.todos.push({id:'td'+uid(),text,dueAt,alertOn:!!(alertOn&&dueAt),createdAt:new Date().toISOString(),doneAt:null,alerted:false,missed:false});
-  if(alertOn&&dueAt) askNotifyPermission();
+  S.todos.push({id:'td'+uid(),text,dueAt,alertOn:!!(alertOn&&dueAt),createdAt:new Date().toISOString(),doneAt:null,alerted:false,seen:true,missed:false});
   persist();
 }
 CH.todoDone=t=>{ const td=S.todos.find(x=>x.id===t.dataset.a); if(td){ td.doneAt=t.checked?new Date().toISOString():null; persist(); render(); } };
@@ -1675,7 +1710,7 @@ function compactHTML(y){
   if(UI.compactMode==='todo') return '<div class="cp-top"><b style="font-size:13px">✏️ Quick to-do</b></div>'
     +'<div class="cp-form"><textarea id="cpTdText" rows="2" placeholder="Type the note…"></textarea>'
     +'<input type="datetime-local" id="cpTdDue">'
-    +'<label class="cl"><input type="checkbox" id="cpTdAlert"> Alert me at that time</label>'
+    +'<label class="cl"><input type="checkbox" id="cpTdAlert"> Set an alarm 🔔 (shows on the bell)</label>'
     +'<div class="cp-row"><button data-act="cpBack">Back</button><button class="pri" data-act="cpTdSave">Save</button></div></div>';
   if(UI.compactMode==='timer'){
     const presets=[60,180,300,600];
@@ -1689,9 +1724,20 @@ function compactHTML(y){
       +'<button data-act="cpTreset">Reset</button>'
       +'<button data-act="cpTmode" title="Switch count up / down">'+(TIMER.mode==='down'?'⬆ count up':'⬇ countdown')+'</button></div></div>';
   }
+  if(UI.compactMode==='alerts'){
+    const alerts=pendingAlerts();
+    return '<div class="cp-top"><b style="font-size:13px">🔔 Alarms</b></div>'
+      +'<div class="cp-form">'
+      +(alerts.length?alerts.map(t=>'<div style="background:rgba(255,255,255,.14);border-radius:7px;padding:6px 8px;font-size:12.5px">'+esc(t.text)+'<br><span style="opacity:.75;font-size:11px">'+fmtDue(t.dueAt)+'</span></div>').join('')
+        :'<div style="opacity:.8;font-size:12.5px;padding:4px">Nothing waiting.</div>')
+      +'<div class="cp-row"><button data-act="cpBack">Back</button>'
+      +(alerts.length?'<button class="pri" data-act="cpAlertsSeen">Got it — clear</button>':'')+'</div></div>';
+  }
   const cur=teach.find(p=>p.id===UI.compactPeriod);
+  const nAl=pendingAlerts().length;
   return '<div class="cp-top"><span style="font-size:12px;opacity:.85">Now:</span>'
     +'<select data-ch="cpPeriod">'+teach.map(p=>'<option value="'+p.id+'" '+(p.id===UI.compactPeriod?'selected':'')+'>'+esc(p.label)+(p.courseId?' · '+esc(courseName(p.courseId)):'')+'</option>').join('')+'</select>'
+    +'<button class="cp-bell" data-act="cpBell" title="Alarms">'+bellSVG(15)+(nAl?'<span class="bellbadge">'+(nAl>9?'9+':nAl)+'</span>':'')+'</button>'
     +'<button style="border:0;background:transparent;color:#fff;font-size:15px" title="Back to the full planner" data-act="cpExpand">⤢</button></div>'
     +'<div class="cp-btns">'
     +'<button data-act="cpTodo"><span class="ico">✏️</span>To Do</button>'
@@ -1712,6 +1758,8 @@ ACT.cpExpand=()=>{ try{window.focus();}catch(e){}
   if(CP.tier==='panel'){ CP.panel.remove(); CP.panel=null; CP.tier=null; }
   else if(CP.win){ CP.win.close(); CP.win=CP.doc=null; } };
 ACT.cpBack=()=>{ UI.compactMode='home'; renderCompact(); };
+ACT.cpBell=()=>{ UI.compactMode='alerts'; renderCompact(); };
+ACT.cpAlertsSeen=()=>{ markAlertsSeen(); UI.compactMode='home'; renderCompact(); render(); };
 ACT.cpTodo=()=>{ UI.compactMode='todo'; renderCompact(); };
 ACT.cpTdSave=()=>{
   const doc=CP.tier==='panel'?document:CP.doc;
@@ -1796,29 +1844,20 @@ function beep(){
 }
 
 /* =====================================================================
-   ALERTS — fire only while the planner (or its mini window) is open
+   ALARMS — projector-safe by design: nothing ever pops up on screen.
+   A fired alarm just lights the red badge on the 🔔 bell (and in the
+   Toolbox); the teacher clicks when THEY want to look.
    ===================================================================== */
-function askNotifyPermission(){
-  if(typeof Notification!=='undefined'&&Notification.permission==='default') Notification.requestPermission();
-}
-function fireAlert(td){
-  const msg='⏰ '+td.text;
-  if(typeof Notification!=='undefined'&&Notification.permission==='granted'){
-    try{ new Notification('Teacher Planner',{body:td.text}); }catch(e){ showToast(msg,'alert'); }
-  }else showToast(msg,'alert');
-}
 function alertSweep(initial){
-  const now=Date.now(); let missed=0,changed=false;
+  const now=Date.now(); let changed=false;
   for(const td of S.todos){
     if(td.doneAt||!td.alertOn||td.alerted||!td.dueAt) continue;
     if(new Date(td.dueAt).getTime()<=now){
-      td.alerted=true; changed=true;
-      if(initial&&now-new Date(td.dueAt).getTime()>90000){ td.missed=true; missed++; }
-      else fireAlert(td);
+      td.alerted=true; td.seen=false; changed=true;
+      if(initial&&now-new Date(td.dueAt).getTime()>90000) td.missed=true;
     }
   }
-  if(changed) persist();
-  if(missed) showToast('You missed '+plural(missed,'alert')+' while the planner was closed — see the To Do tab','alert');
+  if(changed){ persist(); render(); }
 }
 setInterval(()=>alertSweep(false),20000);
 
@@ -1829,6 +1868,8 @@ function migrate(s){
   const d=defaultState();
   for(const k in d) if(s[k]===undefined) s[k]=d[k];
   for(const k in d.settings) if(s.settings[k]===undefined) s.settings[k]=d.settings[k];
+  // alarms v2: `seen` flag drives the bell badge; anything alerted pre-update was already shown
+  (s.todos||[]).forEach(t=>{ if(t.seen===undefined) t.seen=true; });
   // v1 → v2: units gained a courseId (each class has its own unit plan)
   for(const id in s.years){ const y=s.years[id];
     const firstCid=((y.periods||[]).find(p=>p.courseId)||{}).courseId||null;
