@@ -3,138 +3,174 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Squad Points</title>
+<title>Squad Points — Free Team Points Tracker for Teachers</title>
+<meta name="description" content="Free classroom team points tracker. Organize students into squads, award points in three taps, run live leaderboards with daily, weekly, and all-time records — no accounts, all data stays on your device.">
+<link rel="icon" type="image/png" href="/favicon.png">
 <style>
-  :root{ --ink:#1d2433; --mut:#5b6579; --bg:#eef1f9; --card:#fff; --brand:#5b5bd6; --brand2:#4747c2;
-         --green:#16a34a; --gold:#f59e0b; --line:#e3e7f2; --danger:#dc2626; }
+  :root{ --ink:#182135; --mut:#5f6b83; --bg:#f2f4fb; --card:#fff; --brand:#5b5bd6; --brand2:#4640c9;
+         --grad:linear-gradient(135deg,#6366f1,#8b5cf6); --green:#16a34a;
+         --green-grad:linear-gradient(160deg,#22c55e,#15803d); --gold:#f59e0b; --line:#e4e8f4; --danger:#dc2626;
+         --shadow:0 2px 10px rgba(23,32,64,.07); --shadow-lift:0 12px 26px rgba(23,32,64,.14); }
   *{box-sizing:border-box} html,body{height:100%}
-  body{font-family:system-ui,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink);margin:0;
+  body{font-family:system-ui,"Segoe UI",Arial,sans-serif;color:var(--ink);margin:0;
+       background:radial-gradient(1100px 420px at 50% -140px,#e4e7ff 0%,rgba(228,231,255,0) 62%),var(--bg);
        display:flex;flex-direction:column;min-height:100vh}
   button{font-family:inherit;cursor:pointer}
   .muted{color:var(--mut)} .hidden{display:none!important}
 
   /* header */
-  header{background:var(--card);border-bottom:1px solid var(--line);padding:.6rem 1rem;display:flex;
-         align-items:center;gap:.7rem;flex-wrap:wrap;position:sticky;top:0;z-index:20}
-  header h1{font-size:1.15rem;margin:0;display:flex;align-items:center;gap:.4rem}
-  .qlabel{background:#eef;color:var(--brand2);border-radius:999px;padding:.15rem .7rem;font-weight:600;font-size:.85rem}
+  header{background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+         padding:.6rem 1.1rem;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;position:sticky;top:0;z-index:20}
+  header h1{font-size:1.18rem;margin:0;display:flex;align-items:center;gap:.55rem;letter-spacing:-.2px}
+  .logo{width:36px;height:36px;border-radius:11px;background:var(--grad);display:grid;place-items:center;
+        font-size:19px;box-shadow:0 4px 10px rgba(99,102,241,.35)}
+  .qlabel{background:#eceeff;color:var(--brand2);border-radius:999px;padding:.22rem .8rem;font-weight:700;font-size:.85rem}
   .spacer{flex:1}
-  .hbtn{background:#f2f4fd;border:1px solid var(--line);border-radius:9px;padding:.45rem .8rem;font-size:.9rem;color:var(--ink)}
-  .hbtn:hover{background:#e8ebfa}
-  .hbtn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .hbtn{background:#fff;border:1px solid var(--line);border-radius:999px;padding:.45rem .9rem;font-size:.9rem;
+        color:var(--ink);box-shadow:var(--shadow);transition:transform .12s,box-shadow .12s}
+  .hbtn:hover{transform:translateY(-1px);box-shadow:var(--shadow-lift)}
+  .hbtn.primary{background:var(--grad);border-color:transparent;color:#fff}
 
   /* period tabs */
-  nav.tabs{display:flex;gap:.4rem;padding:.6rem 1rem 0;overflow-x:auto}
-  nav.tabs button{border:0;background:transparent;padding:.55rem 1rem;border-radius:11px 11px 0 0;font-size:.95rem;
-                  font-weight:600;color:var(--mut);white-space:nowrap}
-  nav.tabs button.on{background:var(--card);color:var(--brand2);box-shadow:0 -2px 6px rgba(20,30,60,.05)}
+  nav.tabs{display:flex;gap:.45rem;padding:.8rem 1rem .1rem;overflow-x:auto;scrollbar-width:none}
+  nav.tabs::-webkit-scrollbar{display:none}
+  nav.tabs button{border:0;background:#e7eaf7;padding:.5rem 1.1rem;border-radius:999px;font-size:.93rem;
+                  font-weight:700;color:var(--mut);white-space:nowrap;transition:background .15s,color .15s}
+  nav.tabs button:hover{background:#dde1f3}
+  nav.tabs button.on{background:var(--grad);color:#fff;box-shadow:0 4px 12px rgba(99,102,241,.35)}
+  nav.tabs button.addtab{background:transparent;border:2px dashed #c2c9e6;color:var(--brand2);padding:.4rem 1rem}
 
   /* main grid */
-  main{flex:1;padding:1rem;max-width:1180px;width:100%;margin:0 auto}
-  .banner{background:linear-gradient(90deg,#fff7e0,#fff);border:1px solid #f3e2ac;border-radius:12px;
-          padding:.55rem .9rem;margin-bottom:.8rem;font-size:.95rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
-  .goalwrap{margin:-.2rem 0 .9rem}
-  .goalbar{height:12px;background:#dfe4f2;border-radius:999px;overflow:hidden}
-  .goalbar>div{height:100%;background:linear-gradient(90deg,#34d399,#16a34a);border-radius:999px;transition:width .6s}
-  .goaltext{font-size:.8rem;color:var(--mut);margin-top:.25rem}
-  .gridtools{display:flex;align-items:center;gap:.6rem;margin-bottom:.7rem;flex-wrap:wrap}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem}
-  .sq{background:var(--card);border-radius:16px;padding:1rem .9rem .9rem;position:relative;text-align:center;
-      border:1px solid var(--line);box-shadow:0 2px 8px rgba(20,30,60,.06);cursor:pointer;transition:transform .12s}
-  .sq:hover{transform:translateY(-3px)}
-  .sq .pts{position:absolute;top:-11px;right:-8px;background:var(--green);color:#fff;border-radius:999px;
-           min-width:44px;padding:.32rem .5rem;font-weight:800;font-size:1rem;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+  main{flex:1;padding:1rem 1rem 108px;max-width:1180px;width:100%;margin:0 auto}
+  .banner{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--gold);border-radius:13px;
+          padding:.6rem .95rem;margin-bottom:.7rem;font-size:.95rem;display:flex;gap:.5rem;align-items:center;
+          flex-wrap:wrap;box-shadow:var(--shadow)}
+  .goalwrap{margin:.1rem 0 1rem}
+  .goalbar{height:14px;background:#e0e4f4;border-radius:999px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(23,32,64,.12)}
+  .goalbar>div{height:100%;background:var(--green-grad);border-radius:999px;transition:width .6s}
+  .goaltext{font-size:.8rem;color:var(--mut);margin-top:.3rem;font-weight:600}
+  .gridtools{display:flex;align-items:center;gap:.6rem;margin:.2rem 0 .4rem;flex-wrap:wrap}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.05rem;padding-top:14px}
+  .sq{background:var(--card);border-radius:18px;padding:1.05rem .9rem .95rem;position:relative;text-align:center;
+      border:1px solid var(--line);box-shadow:var(--shadow);cursor:pointer;transition:transform .13s,box-shadow .13s}
+  .sq:hover{transform:translateY(-4px);box-shadow:var(--shadow-lift)}
+  .sq.r1{border-color:#f3ce6d;box-shadow:0 4px 18px rgba(245,158,11,.22)}
+  .sq.r2{border-color:#c9d1de}
+  .sq.r3{border-color:#e5b48b}
+  .sq .pts{position:absolute;top:-13px;right:-9px;background:var(--green-grad);color:#fff;border-radius:999px;
+           min-width:46px;padding:.34rem .55rem;font-weight:800;font-size:1.02rem;border:3px solid #fff;
+           box-shadow:0 3px 9px rgba(0,0,0,.22)}
   .sq .pts.bump{animation:bump .5s}
   @keyframes bump{30%{transform:scale(1.35)}}
-  .sq .avatar{width:86px;height:86px;margin:0 auto .4rem;border-radius:14px;overflow:hidden;background:#f5f6fc;
-              display:flex;align-items:center;justify-content:center}
+  .sq .avatar{width:88px;height:88px;margin:0 auto .45rem;border-radius:16px;overflow:hidden;background:#f3f5fd;
+              border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
   .sq .avatar img,.sq .avatar svg{width:100%;height:100%;object-fit:contain}
   .sq .nm{font-weight:700;font-size:1rem;line-height:1.25;overflow:hidden;display:-webkit-box;
           -webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:2.5em}
-  .sq .meta{margin-top:.35rem;font-size:.8rem;color:var(--mut);display:flex;justify-content:center;gap:.55rem;flex-wrap:wrap}
-  .sq .medal{position:absolute;top:-11px;left:-8px;font-size:1.4rem;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}
-  .sq .flame{position:absolute;top:32px;right:6px;font-size:.95rem;background:#fff3;border-radius:999px}
-  .sq .bdg{margin-top:.3rem;font-size:.95rem;letter-spacing:.1em;min-height:1.2em}
-  .sq.add{border:2px dashed #c9cfe4;background:transparent;box-shadow:none;display:flex;align-items:center;
-          justify-content:center;color:var(--mut);font-weight:600;min-height:190px}
-  .empty{max-width:520px;margin:3rem auto;text-align:center;background:var(--card);border-radius:16px;
-         padding:2rem;border:1px solid var(--line)}
+  .sq .meta{margin-top:.4rem;font-size:.76rem;color:var(--mut);display:flex;justify-content:center;gap:.35rem;flex-wrap:wrap}
+  .sq .meta span{background:#f1f3fb;border-radius:999px;padding:.18rem .55rem;font-weight:600}
+  .sq .medal{position:absolute;top:-13px;left:-9px;font-size:1.5rem;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))}
+  .sq .flame{position:absolute;top:34px;right:8px;font-size:.95rem}
+  .sq .bdg{margin-top:.32rem;font-size:1.02rem;letter-spacing:.12em;min-height:1.2em}
+  .sq.add{border:2px dashed #c2c9e6;background:rgba(255,255,255,.5);box-shadow:none;display:flex;align-items:center;
+          justify-content:center;color:var(--brand2);font-weight:700;min-height:196px}
+  .sq.add:hover{background:#fff;transform:none}
+  .empty{max-width:520px;margin:3rem auto;text-align:center;background:var(--card);border-radius:20px;
+         padding:2.4rem 2rem;border:1px solid var(--line);box-shadow:var(--shadow)}
+  .empty h2{margin-top:0}
 
-  /* toolbar */
-  .toolbar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;
-           justify-content:center;gap:.5rem;padding:.55rem .6rem;flex-wrap:wrap;z-index:20}
-  .toolbar button{background:#f2f4fd;border:1px solid var(--line);border-radius:999px;padding:.55rem 1rem;font-size:.92rem}
-  .toolbar button:hover{background:#e8ebfa}
+  /* floating toolbar */
+  .toolbar{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;background:rgba(255,255,255,.94);
+           backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;display:flex;gap:.15rem;
+           padding:.35rem .45rem;z-index:30;box-shadow:var(--shadow-lift);max-width:calc(100vw - 16px)}
+  .toolbar button{background:transparent;border:0;border-radius:999px;padding:.55rem .8rem;font-size:.9rem;
+                  color:var(--ink);white-space:nowrap;font-weight:600}
+  .toolbar button:hover{background:#eef0fa}
 
   /* overlays & modals */
   .ovl{position:fixed;inset:0;background:rgba(18,24,44,.55);z-index:50;display:flex;align-items:center;
        justify-content:center;padding:1rem;overflow:auto}
-  .panel{background:var(--card);border-radius:18px;max-width:760px;width:100%;max-height:92vh;overflow:auto;
-         padding:1.3rem;position:relative}
-  .panel h2{margin:.1rem 0 .8rem;font-size:1.25rem}
-  .panel h3{margin:1.2rem 0 .45rem;font-size:1rem;border-top:1px solid var(--line);padding-top:1rem}
+  .panel{background:var(--card);border-radius:20px;max-width:760px;width:100%;max-height:92vh;overflow:auto;
+         padding:1.4rem;position:relative;box-shadow:0 24px 60px rgba(12,18,40,.35)}
+  .panel h2{margin:.1rem 0 .9rem;font-size:1.3rem;letter-spacing:-.2px}
+  .panel h3{margin:1.25rem 0 .5rem;font-size:1rem;border-top:1px solid var(--line);padding-top:1.05rem}
   .panel h3:first-of-type{border-top:0;padding-top:0}
-  .x{position:absolute;top:.7rem;right:.8rem;border:0;background:#eef0f8;border-radius:999px;width:34px;height:34px;font-size:1rem}
-  .row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.3rem 0}
-  .btn{background:var(--brand);color:#fff;border:0;border-radius:9px;padding:.55rem 1rem;font-size:.95rem}
-  .btn.gray{background:#eef0f8;color:var(--ink)} .btn.red{background:var(--danger)}
+  .x{position:absolute;top:.75rem;right:.85rem;border:0;background:#eef0f8;border-radius:999px;width:36px;height:36px;font-size:1rem}
+  .x:hover{background:#e2e5f2}
+  .row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.35rem 0}
+  .btn{background:var(--grad);color:#fff;border:0;border-radius:10px;padding:.55rem 1.05rem;font-size:.95rem;
+       font-weight:600;box-shadow:0 3px 9px rgba(99,102,241,.3)}
+  .btn.gray{background:#eef0f8;color:var(--ink);box-shadow:none} .btn.red{background:var(--danger);box-shadow:none}
   .btn:disabled{opacity:.45;cursor:default}
-  input[type=text],input[type=number],textarea,select{font-family:inherit;font-size:.95rem;border:1px solid #c9cfe4;
-       border-radius:8px;padding:.5rem .6rem;background:#fff;color:var(--ink)}
+  input[type=text],input[type=number],textarea,select{font-family:inherit;font-size:.95rem;border:1px solid #c6cde6;
+       border-radius:9px;padding:.5rem .65rem;background:#fff;color:var(--ink)}
+  input:focus,textarea:focus{outline:2px solid #b9bcf5;outline-offset:0}
   textarea{width:100%;min-height:110px}
   .chip{display:inline-flex;align-items:center;gap:.3rem;background:#eef0f8;border-radius:999px;
-        padding:.25rem .7rem;font-size:.85rem;margin:.15rem}
+        padding:.28rem .75rem;font-size:.85rem;margin:.15rem;font-weight:600}
   .chip button{border:0;background:transparent;font-size:.8rem;color:var(--mut)}
   .chip.off{opacity:.45;text-decoration:line-through}
 
   /* award modal */
-  .award .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin:.9rem 0}
-  .award .nums button{font-size:2rem;font-weight:800;padding:1.05rem 0;border-radius:14px;border:0;
-        background:linear-gradient(180deg,#6d6de2,#5b5bd6);color:#fff;box-shadow:0 3px 0 #3f3fae}
-  .award .nums button:active{transform:translateY(2px);box-shadow:0 1px 0 #3f3fae}
-  .award .nums button.custom{background:linear-gradient(180deg,#f6b73c,#f59e0b);box-shadow:0 3px 0 #b45309}
+  .award .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin:1rem 0}
+  .award .nums button{font-size:2.1rem;font-weight:800;padding:1.1rem 0;border-radius:16px;border:0;
+        background:var(--grad);color:#fff;box-shadow:0 4px 0 #4338ca;transition:transform .08s}
+  .award .nums button:hover{filter:brightness(1.07)}
+  .award .nums button:active{transform:translateY(3px);box-shadow:0 1px 0 #4338ca}
+  .award .nums button.custom{background:linear-gradient(135deg,#f6b73c,#f59e0b);box-shadow:0 4px 0 #b45309}
 
   /* randomizer */
   .rand{ text-align:center }
-  .rand .big{font-size:clamp(2rem,7vw,3.6rem);font-weight:900;min-height:1.4em;margin:1.4rem 0;color:var(--brand2)}
+  .rand .big{font-size:clamp(2rem,7vw,3.6rem);font-weight:900;min-height:1.4em;margin:1.4rem 0;color:var(--brand2);letter-spacing:-.5px}
   .rand .big.landed{animation:pop .45s}
   @keyframes pop{40%{transform:scale(1.18)}}
 
   /* standings */
-  .stTabs{display:flex;gap:.4rem;margin-bottom:.9rem;flex-wrap:wrap}
-  .stTabs button{border:1px solid var(--line);background:#f2f4fd;border-radius:999px;padding:.4rem .95rem;font-size:.9rem}
-  .stTabs button.on{background:var(--brand);border-color:var(--brand);color:#fff}
-  table.lb{width:100%;border-collapse:collapse;font-size:.95rem}
-  table.lb td,table.lb th{padding:.5rem .5rem;text-align:left;border-bottom:1px solid var(--line)}
-  table.lb td.r{text-align:right;font-weight:700}
-  .rec{background:#fff8e6;border:1px solid #f3e2ac;border-radius:10px;padding:.6rem .8rem;margin-bottom:.8rem;font-size:.95rem}
+  .stTabs{display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap}
+  .stTabs button{border:1px solid var(--line);background:#f2f4fd;border-radius:999px;padding:.42rem 1rem;font-size:.9rem;font-weight:600}
+  .stTabs button.on{background:var(--grad);border-color:transparent;color:#fff}
+  table.lb{width:100%;border-collapse:collapse;font-size:.95rem;background:var(--card);border:1px solid var(--line);
+           border-radius:12px;overflow:hidden}
+  table.lb th{background:#f6f7fd;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+  table.lb td,table.lb th{padding:.55rem .6rem;text-align:left;border-bottom:1px solid var(--line)}
+  table.lb tr:last-child td{border-bottom:0}
+  table.lb td.r{text-align:right;font-weight:800}
+  .rec{background:linear-gradient(90deg,#fff8e6,#fff);border:1px solid #f3e2ac;border-radius:12px;
+       padding:.65rem .9rem;margin-bottom:.8rem;font-size:.95rem}
 
   /* undo pill */
-  #undoPill{position:fixed;left:50%;transform:translateX(-50%);bottom:78px;background:#1d2433;color:#fff;
-    border-radius:999px;padding:.55rem .6rem .55rem 1.1rem;display:flex;gap:.7rem;align-items:center;z-index:60;
-    box-shadow:0 4px 14px rgba(0,0,0,.3);font-size:.92rem}
-  #undoPill button{background:#fff;color:#1d2433;border:0;border-radius:999px;padding:.35rem .9rem;font-weight:700}
+  #undoPill{position:fixed;left:50%;transform:translateX(-50%);bottom:82px;background:#182135;color:#fff;
+    border-radius:999px;padding:.55rem .6rem .55rem 1.15rem;display:flex;gap:.7rem;align-items:center;z-index:60;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);font-size:.92rem}
+  #undoPill button{background:#fff;color:#182135;border:0;border-radius:999px;padding:.35rem .95rem;font-weight:800}
 
   /* projector */
-  .proj{position:fixed;inset:0;background:#141a2e;color:#fff;z-index:80;padding:2.2rem;overflow:auto}
-  .proj h1{font-size:2rem;margin:0 0 1.4rem;display:flex;gap:1rem;align-items:baseline}
+  .proj{position:fixed;inset:0;background:radial-gradient(1000px 500px at 50% -8%,#26305c,#121831);color:#fff;
+        z-index:80;padding:2.2rem;overflow:auto}
+  .proj h1{font-size:2.1rem;margin:0 0 1.5rem;display:flex;gap:1rem;align-items:baseline;letter-spacing:-.4px}
   .proj .grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-  .proj .sq{background:#1f2742;border-color:#2c3555;color:#fff;cursor:default}
-  .proj .sq:hover{transform:none}
-  .proj .sq .nm{color:#fff} .proj .sq .meta{color:#9aa6c8}
-  .proj .first{outline:3px solid var(--gold);box-shadow:0 0 22px #f59e0b66}
-  .proj .exit{position:fixed;top:1rem;right:1rem;background:#ffffff22;color:#fff;border:0;border-radius:9px;padding:.5rem .9rem}
+  .proj .sq{background:#1e2749;border-color:#2c3767;color:#fff;cursor:default}
+  .proj .sq:hover{transform:none;box-shadow:var(--shadow)}
+  .proj .sq .nm{color:#fff} .proj .sq .meta span{background:#273156;color:#a3aed0}
+  .proj .first{outline:3px solid var(--gold);box-shadow:0 0 26px rgba(245,158,11,.5)}
+  .proj .exit{position:fixed;top:1rem;right:1rem;background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:10px;padding:.5rem .95rem}
 
   #confetti{position:fixed;inset:0;pointer-events:none;z-index:100}
-  footer{padding:.7rem;text-align:center}
+  footer{padding:.7rem 1rem 86px;text-align:center}
   footer a{color:var(--brand2);font-size:.85rem;text-decoration:none;background:#fff;border:1px solid var(--line);
-           border-radius:999px;padding:.4rem .9rem;display:inline-block}
-  @media (max-width:640px){ .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))} main{padding: .7rem} }
+           border-radius:999px;padding:.42rem .95rem;display:inline-block;box-shadow:var(--shadow)}
+  @media (max-width:700px){
+    .toolbar button span{display:none}
+    .toolbar button{font-size:1.15rem;padding:.5rem .62rem}
+    .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.85rem}
+    main{padding:.75rem .65rem 96px}
+    .sq .avatar{width:70px;height:70px}
+  }
 </style>
 </head>
 <body>
 <header>
-  <h1>🏆 Squad Points</h1>
+  <h1><span class="logo">🏆</span> Squad Points</h1>
   <span class="qlabel" id="qLabel">Q1</span>
   <span class="spacer"></span>
   <button class="hbtn" id="btnStandings2">🏆 Standings</button>
@@ -143,13 +179,13 @@
 <nav class="tabs" id="tabs"></nav>
 <main id="main"></main>
 <div class="toolbar" id="toolbar">
-  <button data-act="random">🎲 Random Student</button>
-  <button data-act="randomsquad">🎲 Random Squad</button>
-  <button data-act="standings">🏆 Standings</button>
-  <button data-act="share">📤 Share</button>
-  <button data-act="projector">📽️ Projector</button>
-  <button data-act="timer">⏱️ Timer</button>
-  <button data-act="setup">⚙️ Setup</button>
+  <button data-act="random" title="Random Student">🎲 <span>Random Student</span></button>
+  <button data-act="randomsquad" title="Random Squad">🔀 <span>Random Squad</span></button>
+  <button data-act="standings" title="Standings">🏆 <span>Standings</span></button>
+  <button data-act="share" title="Share standings">📤 <span>Share</span></button>
+  <button data-act="projector" title="Projector mode">📽️ <span>Projector</span></button>
+  <button data-act="timer" title="Timer">⏱️ <span>Timer</span></button>
+  <button data-act="setup" title="Setup">⚙️ <span>Setup</span></button>
 </div>
 <footer><a href="https://tobinscience.com" target="_blank" rel="noopener">Find more great resources at TobinScience.com →</a></footer>
 <div id="overlays"></div>
@@ -868,8 +904,17 @@ const IMGDB = {
     $("#overlays").appendChild(o);
     return o;
   }
-  function close(o) { if (o && o.parentNode) o.parentNode.removeChild(o); }
+  function close(o) {
+    if (!o) return;
+    if (o._cleanup) { try { o._cleanup(); } catch (e) {} o._cleanup = null; }
+    if (o.parentNode) o.parentNode.removeChild(o);
+  }
   function fullscreen(innerHTML, cls) { const o = el("div", cls); o.innerHTML = innerHTML; $("#overlays").appendChild(o); return o; }
+  addEventListener("keydown", e => {           // Esc closes the topmost dialog
+    if (e.key !== "Escape") return;
+    const tops = $("#overlays").children;
+    if (tops.length) close(tops[tops.length - 1]);
+  });
 
   // ---------- toast/confetti/sound ----------
   const confettiCanvas = $("#confetti"), cctx = confettiCanvas.getContext("2d");
@@ -912,8 +957,7 @@ const IMGDB = {
       b.onclick = () => { activePeriodId = p.id; render(); };
       nav.appendChild(b);
     }
-    const add = el("button", "", "＋ Class");
-    add.style.color = "var(--brand)";
+    const add = el("button", "addtab", "＋ Class");
     add.onclick = addPeriodFlow;
     nav.appendChild(add);
   }
@@ -958,11 +1002,11 @@ const IMGDB = {
     // squad grid
     const grid = el("div", "grid");
     let rows = rows0.slice();
-    if (!sortByPoints) rows.sort((a, b) => a.name.localeCompare(b.name)); // stable "by name/number" default
+    if (!sortByPoints) rows.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" })); // "2" before "10"
     for (const r of rows) {
-      const card = el("div", "sq");
+      const card = el("div", "sq" + (r.rank <= 3 && r.total > 0 ? " r" + r.rank : ""));
       card.dataset.squad = r.squad.id;
-      const medal = r.rank === 1 ? "🥇" : r.rank === 2 ? "🥈" : r.rank === 3 ? "🥉" : "";
+      const medal = r.total > 0 ? (r.rank === 1 ? "🥇" : r.rank === 2 ? "🥈" : r.rank === 3 ? "🥉" : "") : "";
       const badgeIcons = r.badges.map(b => SP.BADGES[b] ? SP.BADGES[b].icon : "").join("");
       card.innerHTML = `${medal ? `<div class="medal">${medal}</div>` : ""}
         <div class="pts" data-pts>${r.total}</div>
@@ -1048,13 +1092,31 @@ const IMGDB = {
   }
   function openRoster(periodId) {
     const p = st.periods.find(x => x.id === periodId);
-    const existing = st.students.filter(s => s.periodId === periodId && s.active);
     const o = modal(`<h2>Roster — ${esc(p.name)}</h2>
       <p class="muted">Paste your student list below (one name per line — "First Last" or "Last, First" both work; numbering and tabs are fine).</p>
       <textarea id="rIn" placeholder="Ava Smith&#10;Jones, Ben&#10;1. Cara Diaz"></textarea>
-      <div class="row"><button class="btn" id="rPrev">Preview names</button>
-        <span class="muted">${existing.length} student${existing.length === 1 ? "" : "s"} currently in this class</span></div>
-      <div id="rPreview"></div>`);
+      <div class="row"><button class="btn" id="rPrev">Preview names</button></div>
+      <div id="rPreview"></div>
+      <h3>Current roster <span class="muted" id="rCountLbl"></span></h3>
+      <div id="rList"></div>`);
+    const drawRList = () => {
+      const roster = st.students.filter(s => s.periodId === periodId && s.active);
+      $("#rCountLbl").textContent = `(${roster.length})`;
+      const box = $("#rList");
+      if (!roster.length) { box.innerHTML = `<p class="muted">No students yet — paste your list above.</p>`; return; }
+      box.innerHTML = roster
+        .slice().sort((a, b) => a.name.localeCompare(b.name))
+        .map(s => `<span class="chip">${esc(s.name)} <button data-rm="${s.id}" title="Remove from roster" aria-label="Remove ${esc(s.name)}">✕</button></span>`).join("");
+      box.querySelectorAll("[data-rm]").forEach(b => b.onclick = () => {
+        const s = st.students.find(x => x.id === b.dataset.rm); if (!s) return;
+        if (!confirm(`Remove ${s.name} from ${p.name}? Their squad keeps its points — they just leave the roster and the random picker.`)) return;
+        s.active = false;
+        const q = SP.currentQuarter(st);
+        for (const sq of st.squads) if (sq.quarterId === q.id) sq.memberIds = sq.memberIds.filter(id => id !== s.id);
+        persist(); drawRList(); render();
+      });
+    };
+    drawRList();
     $("#rPrev").onclick = () => {
       const names = SP.parseRoster($("#rIn").value);
       const box = $("#rPreview"); box.innerHTML = "";
@@ -1062,7 +1124,7 @@ const IMGDB = {
       box.appendChild(el("h3", null, `Found ${names.length} name${names.length === 1 ? "" : "s"}`));
       box.appendChild(el("div", null, names.map(n => `<span class="chip">${esc(n)}</span>`).join("")));
       const go = el("button", "btn", `Add ${names.length} to ${esc(p.name)}`);
-      go.onclick = () => { const r = SP.addStudents(st, periodId, names); persist(); close(o); render(); toast(`Added ${r.added.length} student${r.added.length === 1 ? "" : "s"}${r.skipped.length ? ` (${r.skipped.length} already there)` : ""}.`); };
+      go.onclick = () => { const r = SP.addStudents(st, periodId, names); persist(); $("#rIn").value = ""; box.innerHTML = ""; drawRList(); render(); toast(`Added ${r.added.length} student${r.added.length === 1 ? "" : "s"}${r.skipped.length ? ` (${r.skipped.length} already there)` : ""}.`); };
       box.appendChild(el("div", "row", "")).appendChild(go);
     };
   }
@@ -1221,13 +1283,17 @@ const IMGDB = {
     $("#sGo").onclick = go;
   }
   function spinInto(elm, pool, finalName, done) {
-    let ticks = 0; const total = 22 + Math.floor(Math.random() * 8);
+    let ticks = 0, delay = 45;
+    const total = 20 + Math.floor(Math.random() * 6);
     elm.classList.remove("landed");
-    const iv = setInterval(() => {
+    const step = () => {
+      if (!elm.isConnected) return;              // dialog closed mid-spin
+      if (++ticks >= total) { elm.textContent = finalName; elm.classList.add("landed"); done && done(); return; }
       elm.textContent = pool[Math.floor(Math.random() * pool.length)] || finalName;
-      if (++ticks >= total) { clearInterval(iv); elm.textContent = finalName; elm.classList.add("landed"); done && done(); }
-    }, Math.min(30 + ticks * 6, 140));
-    // accelerate-decelerate via variable interval: emulate by clearing and re-scheduling
+      delay = Math.min(delay * 1.14, 240);       // decelerate like a slot machine
+      setTimeout(step, delay);
+    };
+    step();
   }
 
   // ================= STANDINGS =================
@@ -1271,8 +1337,8 @@ const IMGDB = {
     if (!activePeriodId) return;
     const rows = SP.periodStandings(st, activePeriodId, now());
     const cards = rows.map(r => {
-      const medal = r.rank === 1 ? "🥇" : r.rank === 2 ? "🥈" : r.rank === 3 ? "🥉" : "";
-      return `<div class="sq ${r.rank === 1 ? "first" : ""}"><div class="pts">${r.total}</div>${medal ? `<div class="medal">${medal}</div>` : ""}<div class="avatar" data-avp="${r.squad.builtinAvatar}" data-key="${r.squad.imageKey || ""}"></div><div class="nm">${esc(r.name)}</div><div class="meta"><span>Today ${r.daily}</span><span>Week ${r.weekly}</span></div></div>`;
+      const medal = r.total > 0 ? (r.rank === 1 ? "🥇" : r.rank === 2 ? "🥈" : r.rank === 3 ? "🥉" : "") : "";
+      return `<div class="sq ${r.rank === 1 && r.total > 0 ? "first" : ""}"><div class="pts">${r.total}</div>${medal ? `<div class="medal">${medal}</div>` : ""}<div class="avatar" data-avp="${r.squad.builtinAvatar}" data-key="${r.squad.imageKey || ""}"></div><div class="nm">${esc(r.name)}</div><div class="meta"><span>Today ${r.daily}</span><span>Week ${r.weekly}</span></div></div>`;
     }).join("");
     const o = fullscreen(`<div class="proj"><button class="exit" data-close>✕ Exit</button><h1>🏆 ${esc(curPeriod().name)} <span class="muted" style="font-size:1rem;color:#9aa6c8">${esc(SP.currentQuarter(st).label)}</span></h1><div class="grid">${cards}</div></div>`, "");
     o.querySelector("[data-close]").onclick = () => close(o);
@@ -1288,12 +1354,12 @@ const IMGDB = {
       <div class="row" style="justify-content:center">${[1,2,3,5,10].map(m => `<button class="btn gray" data-m="${m}">${m} min</button>`).join("")}</div>
       <div class="row" style="justify-content:center"><button class="btn" id="tStart">Start</button><button class="btn gray" id="tStop">Stop</button></div>`);
     let remain = 0, iv = 0;
+    o._cleanup = () => clearInterval(iv);      // whatever way the dialog closes, the timer stops
     const disp = $("#tDisp");
     const show = () => disp.textContent = Math.floor(remain / 60) + ":" + String(remain % 60).padStart(2, "0");
     o.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { remain = +b.dataset.m * 60; show(); });
     $("#tStart").onclick = () => { clearInterval(iv); iv = setInterval(() => { if (remain > 0) { remain--; show(); if (remain === 0) { clearInterval(iv); blip(8); confetti(40); disp.textContent = "Time!"; } } }, 1000); };
     $("#tStop").onclick = () => clearInterval(iv);
-    o.addEventListener("click", e => { if (e.target.matches("[data-close]")) clearInterval(iv); });
   }
 
   // ================= SHARE =================
@@ -1332,6 +1398,9 @@ const IMGDB = {
       <h3>Quarter</h3>
       <p class="muted">Current: <b>${esc(q.label)}</b>. Starting a new quarter keeps your classes and rosters, archives this quarter's squads &amp; points into the records, and gives you fresh squads to build.</p>
       <div class="row"><button class="btn" id="suNewQ">Start new quarter</button></div>
+      <h3>Point history</h3>
+      <p class="muted">The most recent awards across all classes — undo any mistake.</p>
+      <div id="suHist"></div>
       <h3>Move to another device</h3>
       <p class="muted">Copy this code, then paste it into Squad Points on the other device (Setup → Paste transfer code). Carries everything except uploaded images.</p>
       <div class="row"><button class="btn gray" id="suGetCode">Get transfer code</button><button class="btn gray" id="suPaste">Paste transfer code</button></div>
@@ -1342,7 +1411,7 @@ const IMGDB = {
       <div class="row"><label><input type="checkbox" id="suSound" ${st.settings.soundOn ? "checked" : ""}> Sound effects</label>
         <label><input type="checkbox" id="suConf" ${st.settings.confettiOn ? "checked" : ""}> Confetti</label></div>
       <div class="row"><label>School year: <input type="text" id="suYear" value="${esc(st.settings.schoolYearLabel)}" placeholder="2026-27" style="width:110px"></label></div>
-      <div class="row"><label>Class goal (combined pts, blank = off): <input type="number" id="suGoal" min="0" value="${activePeriodId && st.goals[activePeriodId] ? st.goals[activePeriodId] : ""}" style="width:100px"></label></div>`);
+      <div class="row"><label>Class goal for <b>${activePeriodId && curPeriod() ? esc(curPeriod().name) : "—"}</b> (combined pts, blank = off): <input type="number" id="suGoal" min="0" value="${activePeriodId && st.goals[activePeriodId] ? st.goals[activePeriodId] : ""}" style="width:100px"></label></div>`);
 
     const drawPeriods = () => {
       const box = $("#suPeriods"); box.innerHTML = "";
@@ -1361,7 +1430,24 @@ const IMGDB = {
       st.periods.forEach(p => { const b = el("button", "btn gray", esc(p.name)); b.onclick = () => { activePeriodId = p.id; close(o); render(); openClassManage(p.id); }; box.appendChild(b); });
       if (!st.periods.length) box.innerHTML = `<span class="muted">Add a class first.</span>`;
     };
-    drawPeriods(); drawClassBtns();
+    const drawHist = () => {
+      const box = $("#suHist"); if (!box) return;
+      const last = st.awards.slice(-20).reverse();
+      if (!last.length) { box.innerHTML = `<p class="muted">No points awarded yet.</p>`; return; }
+      box.innerHTML = "";
+      for (const a of last) {
+        const sq = st.squads.find(s => s.id === a.squadId);
+        const pd = sq ? st.periods.find(x => x.id === sq.periodId) : null;
+        const when = new Date(a.ts).toLocaleString([], { month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" });
+        const r = el("div", "row");
+        r.innerHTML = `<b style="color:var(--green)">+${a.points}</b>
+          <span style="flex:1">${esc(sq ? sq.name : "(removed squad)")} <span class="muted">· ${esc(pd ? pd.name : "")} · ${when}${a.note ? ` · “${esc(a.note)}”` : ""}</span></span>`;
+        const u = el("button", "btn gray", "Undo");
+        u.onclick = () => { SP.undoAward(st, a.id); persist(); drawHist(); render(); };
+        r.appendChild(u); box.appendChild(r);
+      }
+    };
+    drawPeriods(); drawClassBtns(); drawHist();
     if (st.settings.lastBackupAt) { const days = Math.floor((now() - st.settings.lastBackupAt) / 864e5); $("#suBackupNote").textContent = `Last backup: ${days === 0 ? "today" : days + " day" + (days === 1 ? "" : "s") + " ago"}.`; }
 
     $("#suAddP").onclick = () => { close(o); addPeriodFlow(); };
