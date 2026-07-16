@@ -458,7 +458,7 @@ function TopBar(y){
     +'<div class="logo">🗓️ Teacher Planner <span class="yr">'+esc(y.label)+(y.archived?' · ARCHIVED':'')+'</span></div>'
     +'<div class="tabs">'+tabs.map(t=>'<button class="tab'+(UI.tab===t[0]?' on':'')+'" data-act="tab" data-a="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'
     +'<span class="spacer"></span>'
-    +'<button class="compactbtn" data-act="openCompact" title="Shrink to a small floating window">🗕 Compact mode</button>'
+    +'<button class="compactbtn" data-act="openCompact" title="Open the floating classroom toolbox — to-do notes, random name picker, timer">🧰 Toolbox</button>'
     +brandBtn()
     +'</div></div>';
 }
@@ -502,7 +502,8 @@ function startWizard(opts){
   }
   UI.wizUnitsCourse=null;
   if(!draft.periods.length) draft.periods=[];
-  UI.wizard={step:opts.skipWelcome?1:0,y:draft,edit:!!opts.editYearId,editYearId:opts.editYearId||null};
+  UI.wizard={step:opts.step!=null?opts.step:(opts.skipWelcome?1:0),y:draft,edit:!!opts.editYearId,editYearId:opts.editYearId||null,
+    origCourseNames:draft.periods.map(p=>(p.courseName||'').trim()).filter(Boolean)};
   render();
 }
 function Wizard(){
@@ -704,9 +705,21 @@ ACT.wzNext=()=>{
     for(const p of y.periods){ if(!p.label.trim()) return showToast('Every period needs a name'); }
     if(!wzCourseNames(y).length) return showToast('Give at least one period a course name (e.g. Physical Science)');
     if(periodConflicts(y.periods).size) return showToast('Two of your periods overlap in time — fix the highlighted rows first');
-    // drop units whose course no longer exists (renamed/removed on this pass)
+    // units whose course was renamed/removed on this pass: follow a rename, confirm a removal
     const names=wzCourseNames(y);
-    y.units=y.units.filter(u=>names.some(n=>sameCN(n,u.courseName)));
+    const orphanNames=[...new Set(y.units.filter(u=>!names.some(n=>sameCN(n,u.courseName))).map(u=>u.courseName))];
+    if(orphanNames.length){
+      // a "new" name is one that wasn't on any period when this edit began AND has no units yet
+      const orig=UI.wizard.origCourseNames||[];
+      const newNames=names.filter(n=>!orig.some(o=>sameCN(o,n))&&!y.units.some(u=>sameCN(u.courseName,n)));
+      if(orphanNames.length===1&&newNames.length===1){
+        y.units.forEach(u=>{ if(sameCN(u.courseName,orphanNames[0])) u.courseName=newNames[0]; });
+        showToast('Moved the units from "'+orphanNames[0]+'" to "'+newNames[0]+'"');
+      }else{
+        if(!confirm('You removed or renamed: '+orphanNames.join(', ')+'.\n\nThe units set up for '+(orphanNames.length===1?'that class':'those classes')+' will be deleted. Continue?')) return;
+        y.units=y.units.filter(u=>names.some(n=>sameCN(n,u.courseName)));
+      }
+    }
   }
   w.step++; render();
 };
@@ -756,12 +769,15 @@ function doCopyForward(oldY,newY){
    ===================================================================== */
 function unitMap(y,cid){ const m={}; if(!cid) return m; for(const s of unitLayout(y,cid).spans) for(const d of s.days) m[d]=s.unit; return m; }
 function courseChips(y){
-  const cs=teachingCourses(y); if(cs.length<2) return '';
+  const cs=teachingCourses(y); if(!cs.length) return '';
   const sel=curCourse(y);
-  return '<div class="row" style="margin-bottom:10px"><span class="small muted">Class:</span>'
-    +cs.map(c=>'<button class="btn sm'+(c===sel?' primary':'')+'" data-act="selCourse" data-a="'+c+'">'+esc(courseName(c))+'</button>').join('')+'</div>';
+  return '<div class="row" style="margin-bottom:10px">'
+    +(cs.length>1?'<span class="small muted">Class:</span>'
+      +cs.map(c=>'<button class="btn sm'+(c===sel?' primary':'')+'" data-act="selCourse" data-a="'+c+'">'+esc(courseName(c))+'</button>').join(''):'')
+    +'<button class="btn sm" data-act="editClasses" title="Add, remove, rename, or re-time your periods and courses">✏️ Edit classes</button></div>';
 }
 ACT.selCourse=t=>{ UI.courseSel=t.dataset.a; render(); };
+ACT.editClasses=()=>startWizard({editYearId:S.activeYearId,step:4});
 
 function PlanView(y){
   const zoomBtns=[['year','Year'],['month','Month'],['day','Day']];
@@ -910,7 +926,8 @@ function DayView(y){
   if(!school){ return html+'<div class="card"><p class="muted">No school this day. Use the arrows to jump to the nearest school day.</p></div>'; }
   html+='<div class="row between" style="margin-bottom:10px"><div class="seg">'
     +'<button class="'+(UI.dayMode==='list'?'on':'')+'" data-act="dayMode" data-a="list">Periods</button>'
-    +'<button class="'+(UI.dayMode==='axis'?'on':'')+'" data-act="dayMode" data-a="axis">Time axis</button></div></div>';
+    +'<button class="'+(UI.dayMode==='axis'?'on':'')+'" data-act="dayMode" data-a="axis">Time axis</button></div>'
+    +'<button class="btn sm" data-act="editClasses" title="Add, remove, rename, or re-time your periods and courses">✏️ Edit classes</button></div>';
   html+= UI.dayMode==='axis'?DayAxis(y,ds):DayList(y,ds);
   // day note + links
   const rec=y.lessons[ds];
@@ -933,7 +950,7 @@ function DayList(y,ds){
       +(p.isPrep?'':'<div class="pc-blocks">'+blocksSummary(y,ds,p.id)+'</div>')
       +'</div></div>';
   }
-  if(!y.periods.length) html='<div class="card"><p class="muted">No periods set up yet — add them in Share & Settings → Edit year setup.</p></div>';
+  if(!y.periods.length) html='<div class="card"><p class="muted">No periods set up yet.</p><button class="btn sm" data-act="editClasses">✏️ Edit classes</button></div>';
   return html;
 }
 ACT.openPeriodDay=t=>{ UI.periodId=t.dataset.a; UI.date=t.dataset.b; UI.zoom='period'; render(); };
@@ -998,7 +1015,7 @@ function PeriodEditor(y){
     +'<div class="totline'+(over?' bad':'')+'">'+tot+' of '+pl+' minutes planned'
     +(over?' — ⚠ '+(tot-pl)+' min past the end of the period!':(tot<pl?' · '+(pl-tot)+' min unplanned':' · perfectly full ✓'))+'</div>';
   // timer hook
-  if(l.blocks.length) html+='<p class="tiny muted" style="margin-top:6px">Tip: the ⏱ Timer in Compact mode has these block lengths as presets during this period.</p>';
+  if(l.blocks.length) html+='<p class="tiny muted" style="margin-top:6px">Tip: the ⏱ Timer in the 🧰 Toolbox has these block lengths as presets during this period.</p>';
   html+='</div>';
   // apply to other periods
   const others=y.periods.filter(x=>x.id!==p.id&&!x.isPrep);
@@ -1265,7 +1282,7 @@ ACT.todoDel=t=>{ S.todos=S.todos.filter(x=>x.id!==t.dataset.a); persist(); rende
 function RostersTab(y){
   const teach=y.periods.filter(p=>!p.isPrep);
   let html='<div class="card"><h2>Class rosters</h2>'
-    +'<p class="small muted">Paste each class list — one student per line. The Random Name button in Compact mode draws from whichever period you’ve toggled.</p>'
+    +'<p class="small muted">Paste each class list — one student per line. The Random Name button in the 🧰 Toolbox draws from whichever period you’ve toggled.</p>'
     +'<div class="okbox">🔒 Rosters stay on this device. They are <b>never</b> included in a transfer code, and only go into a <code>.plan</code> file if you explicitly check the box at export.</div></div>';
   if(!teach.length) return html+'<div class="card"><p class="muted">No teaching periods set up yet.</p></div>';
   for(const p of teach){
