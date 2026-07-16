@@ -38,7 +38,7 @@ input:focus{outline:none; border-color:var(--accent);}
 input[type=range]{accent-color:var(--accent); width:170px; vertical-align:middle;}
 /* ---------- home ---------- */
 #homeHead{text-align:center; padding:22px 10px 8px;}
-#homeHead .flask{font-size:2.6em;}
+#homeHead img{width:78px; height:78px; border-radius:50%; margin-bottom:6px;}
 #nameGate{max-width:430px; margin:26px auto; text-align:center;}
 #nameGate input{width:100%; margin:12px 0; text-align:center; font-size:1.1em;}
 #labGrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-top:16px;}
@@ -83,6 +83,19 @@ canvas{width:100%; border-radius:12px; display:block; background:#0a1420; touch-
 .big{font-size:1.5em;}
 #allDone{display:none; border:2px solid var(--gold); background:#241d05; text-align:center; padding:18px; border-radius:16px; margin-top:16px;}
 .readout{font-family:Consolas,monospace; background:#04121f; color:#7dd3fc; border-radius:8px; padding:4px 10px; font-size:1.05em; border:1px solid #1e3a5c;}
+/* ---------- icons & footer ---------- */
+.icn{width:1.15em; height:1.15em; vertical-align:-0.2em; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; display:inline-block;}
+h2 .icn{color:var(--accent);}
+#doneBanner h2 .icn,#allDone h2 .icn{color:var(--gold);}
+.labCard .ic{display:block; color:var(--accent);}
+.labCard .ic .icn{width:42px; height:42px; stroke-width:1.7;}
+.labCard.complete .ic{color:var(--gold);}
+.labCard .done{color:var(--gold);}
+.labCard .done .icn{width:24px; height:24px;}
+#tsFoot{text-align:center; margin:30px 0 14px;}
+.tsBtn{display:inline-flex; align-items:center; gap:13px; background:var(--panel); border:2px solid #2a4568; border-radius:16px; padding:10px 22px 10px 12px; color:var(--ink); text-decoration:none; font-weight:700; font-size:1.02em; text-align:left; transition:transform .12s,border-color .12s;}
+.tsBtn:hover{transform:translateY(-2px); border-color:var(--accent);}
+.tsBtn img{width:46px; height:46px; border-radius:50%;}
 </style>
 </head>
 <body>
@@ -91,13 +104,13 @@ canvas{width:100%; border-radius:12px; display:block; background:#0a1420; touch-
 <!-- ================= HOME ================= -->
 <div id="home">
   <div id="homeHead">
-    <div class="flask">⚗️</div>
+    <img id="logoTop" alt="Tobin Science">
     <h1>Tobin Science — Virtual Lab Bench</h1>
     <div class="dim">Real measurements. Real data. Your numbers are different from everyone else's — so do the lab!</div>
   </div>
 
   <div id="nameGate" class="card">
-    <h2>🥽 Sign in to the lab</h2>
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 3h5M10.5 3v5.2L5 17.4A2.3 2.3 0 0 0 7.1 21h9.8a2.3 2.3 0 0 0 2.1-3.6L13.5 8.2V3M7.8 14.5h8.4"/></svg> Sign in to the lab</h2>
     <div class="dim">First and last name (this is how your teacher gives you credit)</div>
     <input type="text" id="nameInput" maxlength="24" placeholder="e.g. Jordan Smith" autocomplete="off">
     <button class="btn" id="nameGo">Enter the Lab →</button>
@@ -106,7 +119,7 @@ canvas{width:100%; border-radius:12px; display:block; background:#0a1420; touch-
   <div id="homeMain" style="display:none">
     <div class="card">
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <h2 style="flex:1">🧑‍🔬 Scientist: <span id="whoName" style="color:var(--accent)"></span></h2>
+        <h2 style="flex:1"><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5"/><path d="M4.5 20.5c1.4-3.6 4.2-5.5 7.5-5.5s6.1 1.9 7.5 5.5"/></svg> Scientist: <span id="whoName" style="color:var(--accent)"></span></h2>
         <button class="btn gray small" id="switchUser">Switch user</button>
       </div>
       <div id="progressBar"><div id="progressFill"></div></div>
@@ -118,14 +131,14 @@ canvas{width:100%; border-radius:12px; display:block; background:#0a1420; touch-
     </div>
 
     <div id="allDone">
-      <h2 style="color:var(--gold)">🏆 MASTER SCIENTIST — ALL LABS COMPLETE!</h2>
+      <h2 style="color:var(--gold)"><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4.5a5 5 0 0 1-10 0V4zM7 5.5H4a3 3 0 0 0 3.2 4M17 5.5h3a3 3 0 0 1-3.2 4"/></svg> MASTER SCIENTIST — ALL LABS COMPLETE!</h2>
       <div style="margin-top:6px">Show your teacher the progress code above for full credit.</div>
     </div>
 
     <div id="labGrid"></div>
 
     <details class="teach">
-      <summary>🔑 Teacher Tools</summary>
+      <summary><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.5" cy="15.5" r="4"/><path d="M10.5 12.5L20 3M16.5 6.5l3 3M13.5 9.5l2.5 2.5"/></svg> Teacher Tools</summary>
       <div class="card" style="margin-top:8px">
         <b>Verify a progress code</b>
         <div style="margin:8px 0"><input type="text" id="verifyIn" placeholder="Paste student code" style="width:260px"> <button class="btn small" id="verifyBtn">Check</button></div>
@@ -152,26 +165,51 @@ canvas{width:100%; border-radius:12px; display:block; background:#0a1420; touch-
   </div>
   <div id="workRow">
     <div class="card">
-      <h2>📓 Lab Notebook</h2>
+      <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 3v18M12.5 8h3.5M12.5 12h3.5"/></svg> Lab Notebook</h2>
       <div class="dim" style="margin:4px 0 6px">Use the equipment above to measure, then record your data.</div>
       <div id="nbArea"></div>
     </div>
     <div class="card">
-      <h2>✅ Checkpoint</h2>
+      <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.4l2.7 2.7 5.3-5.6"/></svg> Checkpoint</h2>
       <div class="dim" style="margin:4px 0 6px">Prove you've got it.</div>
       <div id="cpArea"></div>
     </div>
   </div>
   <div id="doneBanner">
-    <h2>⭐ LAB COMPLETE! ⭐</h2>
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12 2.6l2.9 5.8 6.4 1-4.6 4.6 1 6.4-5.7-3-5.7 3 1-6.4L2.7 9.4l6.4-1z"/></svg> LAB COMPLETE! <svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12 2.6l2.9 5.8 6.4 1-4.6 4.6 1 6.4-5.7-3-5.7 3 1-6.4L2.7 9.4l6.4-1z"/></svg></h2>
     <div style="margin-top:6px">Great science! Your progress code has been updated on the Lab Bench.</div>
     <button class="btn gold" style="margin-top:10px" id="doneBack">← Back to the Lab Bench</button>
   </div>
 </div>
 
+<div id="tsFoot">
+  <a class="tsBtn" href="https://www.tobinscience.com" target="_blank" rel="noopener">
+    <img id="logoFoot" alt="Tobin Science logo">
+    <span>Find more great resources at<br><span style="color:var(--accent)">TobinScience.com</span></span>
+  </a>
+</div>
+
 </div>
 <script>
 "use strict";
+/* ============ branding & icons ============ */
+const LOGO="data:image/png;base64,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";
+const SVG={
+  density:'<rect x="7.5" y="4" width="9" height="9" rx="1"/><path d="M2.5 18.5c1.6-1.5 3.15-1.5 4.75 0s3.15 1.5 4.75 0 3.15-1.5 4.75 0 3.15 1.5 4.75 0"/>',
+  motion:'<path d="M4 4v16h16M7 16.5l4-5.5 3 2.5 5.5-7.5"/>',
+  force:'<rect x="3" y="10.5" width="8" height="7.5" rx="1"/><path d="M13.5 14.2h6M16.8 11.5l2.7 2.7-2.7 2.7"/>',
+  waves:'<path d="M2 12c2-6.5 4-6.5 6 0s4 6.5 6 0 4-6.5 6 0"/>',
+  circuit:'<path d="M9.5 17.5h5M10 20.5h4M12 3.5a5.5 5.5 0 0 1 3.3 9.9c-.6.5-1 1.2-1.2 2.1h-4.2c-.2-.9-.6-1.6-1.2-2.1A5.5 5.5 0 0 1 12 3.5z"/>',
+  heat:'<path d="M12 3c2.8 3.7 5.5 6 5.5 9.7a5.5 5.5 0 0 1-11 0C6.5 10.5 7.8 8.6 9.3 7c.3 1.4 1 2.4 1.9 2.9C11.2 7.6 11.4 5.3 12 3z"/>',
+  energy:'<path d="M2.5 19.5h19M21.5 19.5V9L2.5 19.5z"/><circle cx="8.6" cy="13.6" r="2.4"/>',
+  magnet:'<path d="M6 3.5h4v7a2 2 0 0 0 4 0v-7h4v7a6 6 0 0 1-12 0zM6 6.5h4M14 6.5h4"/>',
+  decay:'<circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(-60 12 12)"/>',
+  star:'<path fill="currentColor" stroke="none" d="M12 2.6l2.9 5.8 6.4 1-4.6 4.6 1 6.4-5.7-3-5.7 3 1-6.4L2.7 9.4l6.4-1z"/>',
+  check:'<path d="M4.5 12.6l5 5L19.5 7.2"/>',
+  xmark:'<path d="M6 6l12 12M18 6L6 18"/>',
+  target:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.7"/><circle cx="12" cy="12" r="1.2"/>'
+};
+function icn(n,s){return '<svg class="icn"'+(s?' style="'+s+'"':'')+' viewBox="0 0 24 24" aria-hidden="true">'+SVG[n]+'</svg>';}
 /* ============ util ============ */
 const $=id=>document.getElementById(id);
 function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
@@ -232,7 +270,7 @@ function renderHome(){
     const L=LABS[id],done=userLabs()[id]&&userLabs()[id].done;
     const b=document.createElement("button");
     b.className="labCard"+(done?" complete":"");
-    b.innerHTML='<span class="ic">'+L.icon+'</span>'+(done?'<span class="done">⭐</span>':'')+
+    b.innerHTML='<span class="ic">'+icn(L.icon)+'</span>'+(done?'<span class="done">'+icn("star")+'</span>':'')+
       '<h3>'+L.title+'</h3><div class="dim" style="font-size:.9em">'+L.blurb+'</div>'+
       L.std.map(s=>'<span class="std">'+s+'</span>').join("");
     b.onclick=()=>openLab(id);
@@ -244,9 +282,9 @@ $("nameInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("nameGo").cli
 $("switchUser").onclick=()=>{if(confirm("Switch user? Your progress is saved under your name.")){S.name="";saveS();renderHome();}};
 $("verifyBtn").onclick=()=>{
   const r=decodeCode($("verifyIn").value);
-  if(!r){$("verifyOut").innerHTML='<span style="color:var(--red)">❌ Invalid or altered code.</span>';return;}
-  const labs=LABIDS.filter((id,i)=>r.mask&(1<<i)).map(id=>LABS[id].icon+" "+LABS[id].title);
-  $("verifyOut").innerHTML='✅ <b style="color:var(--green)">'+r.name+'</b> — '+(labs.length?labs.length+"/"+LABIDS.length+" complete ("+labs.join(", ")+")":"no labs complete yet")+' — 20'+r.date.slice(0,2)+"-"+r.date.slice(2,4)+"-"+r.date.slice(4,6);
+  if(!r){$("verifyOut").innerHTML='<span style="color:var(--red)">'+icn("xmark")+' Invalid or altered code.</span>';return;}
+  const labs=LABIDS.filter((id,i)=>r.mask&(1<<i)).map(id=>LABS[id].title);
+  $("verifyOut").innerHTML='<span style="color:var(--green)">'+icn("check")+'</span> <b style="color:var(--green)">'+r.name+'</b> — '+(labs.length?labs.length+"/"+LABIDS.length+" complete ("+labs.join(", ")+")":"no labs complete yet")+' — 20'+r.date.slice(0,2)+"-"+r.date.slice(2,4)+"-"+r.date.slice(4,6);
 };
 $("resetDevice").onclick=()=>{if(confirm("Erase ALL saved progress on this device?")){localStorage.removeItem("tvl_state");loadS();renderHome();}};
 
@@ -267,9 +305,9 @@ function cbtn(txt,cls,fn){const b=document.createElement("button");b.className="
 function openLab(id){
   const L=LABS[id];
   $("home").style.display="none";$("labView").style.display="block";
-  $("labTitle").textContent=L.icon+" "+L.title;
+  $("labTitle").innerHTML=icn(L.icon)+" "+L.title;
   $("labStd").textContent=L.std.join(" · ");
-  $("labGoal").innerHTML="🎯 <b>Mission:</b> "+L.goal;
+  $("labGoal").innerHTML=icn("target")+' <b>Mission:</b> '+L.goal;
   $("controls").innerHTML="";$("doneBanner").style.display="none";
   window.scrollTo(0,0);
   const rng=mulberry32(hashStr(S.name.toLowerCase()+"|"+id));
@@ -296,18 +334,18 @@ function renderQ(area,qs,stArr,id,kind){
     const row=document.createElement("div");row.className="qrow"+(stArr[i]?" right":"");
     let inner='<div class="qtext">'+q.q+'</div>';
     if(stArr[i]){
-      inner+='<div style="color:var(--green);font-weight:700">✔ '+(q.type==="num"?fmt(q.a)+(q.unit||""):q.opts[q.a])+'</div>';
+      inner+='<div style="color:var(--green);font-weight:700">'+icn("check")+' '+(q.type==="num"?fmt(q.a)+(q.unit||""):q.opts[q.a])+'</div>';
       row.innerHTML=inner;area.appendChild(row);return;
     }
     if(q.type==="num"){
-      inner+='<input type="number" step="any" placeholder="?"> <span class="dim">'+(q.unit||"")+'</span> <button class="btn small">Check</button><span class="mark"></span><div class="hint">💡 '+q.hint+'</div>';
+      inner+='<input type="number" step="any" placeholder="?"> <span class="dim">'+(q.unit||"")+'</span> <button class="btn small">Check</button><span class="mark"></span><div class="hint">Hint: '+q.hint+'</div>';
       row.innerHTML=inner;area.appendChild(row);
       const inp=row.querySelector("input"),btn=row.querySelector("button"),mark=row.querySelector(".mark");
       let tries=0;
       const go=()=>{
         const v=parseFloat(inp.value);if(isNaN(v))return;
-        if(Math.abs(v-q.a)<=q.tol){stArr[i]=true;saveS();row.className="qrow right";row.innerHTML='<div class="qtext">'+q.q+'</div><div style="color:var(--green);font-weight:700">✔ '+fmt(q.a)+(q.unit||"")+'</div>';checkDone(id,cur);}
-        else{tries++;mark.textContent="✖ try again";mark.style.color="var(--red)";row.classList.remove("wrong");void row.offsetWidth;row.classList.add("wrong");if(tries>=2)row.querySelector(".hint").style.display="block";}
+        if(Math.abs(v-q.a)<=q.tol){stArr[i]=true;saveS();row.className="qrow right";row.innerHTML='<div class="qtext">'+q.q+'</div><div style="color:var(--green);font-weight:700">'+icn("check")+' '+fmt(q.a)+(q.unit||"")+'</div>';checkDone(id,cur);}
+        else{tries++;mark.innerHTML=icn("xmark")+" try again";mark.style.color="var(--red)";row.classList.remove("wrong");void row.offsetWidth;row.classList.add("wrong");if(tries>=2)row.querySelector(".hint").style.display="block";}
       };
       btn.onclick=go;inp.addEventListener("keydown",e=>{if(e.key==="Enter")go();});
     }else{ // mc
@@ -315,7 +353,7 @@ function renderQ(area,qs,stArr,id,kind){
       q.opts.forEach((opt,oi)=>{
         const b=document.createElement("button");b.className="mcopt";b.textContent=opt;
         b.onclick=()=>{
-          if(oi===q.a){stArr[i]=true;saveS();b.classList.add("right");setTimeout(()=>{row.className="qrow right";row.innerHTML='<div class="qtext">'+q.q+'</div><div style="color:var(--green);font-weight:700">✔ '+q.opts[q.a]+'</div>';checkDone(id,cur);},350);}
+          if(oi===q.a){stArr[i]=true;saveS();b.classList.add("right");setTimeout(()=>{row.className="qrow right";row.innerHTML='<div class="qtext">'+q.q+'</div><div style="color:var(--green);font-weight:700">'+icn("check")+' '+q.opts[q.a]+'</div>';checkDone(id,cur);},350);}
           else{b.classList.add("wrong");b.disabled=true;row.classList.remove("wrong");void row.offsetWidth;row.classList.add("wrong");}
         };
         row.appendChild(b);
@@ -344,7 +382,7 @@ function meter(x,y,w,title,value,col){
    LAB 1 — DENSITY DIVE
 ========================================================= */
 defLab("density",{
-  icon:"🧊",title:"Density Dive",blurb:"Weigh, dunk, and measure four mystery blocks — then predict which ones float.",
+  icon:"density",title:"Density Dive",blurb:"Weigh, dunk, and measure four mystery blocks — then predict which ones float.",
   std:["S8P1c","SPS2"],
   goal:"Click a block to pick it up, then use the <b>balance</b> (mass), the <b>graduated cylinder</b> (volume by water displacement), and the <b>tank</b> to test each block. Density = mass ÷ volume.",
   build(rng){
@@ -363,9 +401,9 @@ defLab("density",{
       const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*900/r.width,y=(e.clientY-r.top)*400/r.height;
       blocks.forEach((b,i)=>{const[hx,hy]=homes[i];if(x>hx-28&&x<hx+28&&y>hy-28&&y<hy+28){sel=i;station="";}});
     };
-    cbtn("⚖️ Balance","gray",()=>{if(sel>=0){station="bal";}});
-    cbtn("🧪 Cylinder","gray",()=>{if(sel>=0){station="cyl";}});
-    cbtn("🌊 Drop in Tank","",()=>{if(sel>=0){station="tank";anim=0;dropY=70;}});
+    cbtn("Balance","gray",()=>{if(sel>=0){station="bal";}});
+    cbtn("Cylinder","gray",()=>{if(sel>=0){station="cyl";}});
+    cbtn("Drop in Tank","",()=>{if(sel>=0){station="tank";anim=0;dropY=70;}});
     ctrlGroup('<label>Tip: water = 1.0 g/cm³ · cylinder starts at 100 mL</label>');
     function drawBlock(b,x,y,s){s=s||44;ctx.fillStyle=b.col;rr(ctx,x-s/2,y-s/2,s,s,7);ctx.fill();ctx.strokeStyle="rgba(255,255,255,.5)";ctx.lineWidth=2;ctx.stroke();ctx.lineWidth=1;label(b.n,x,y+6,18,"#08202f","center");}
     const nb=blocks.map((b,i)=>({type:"num",q:"Density of Block <b>"+b.n+"</b>? (measure mass & volume first!)",a:Math.round(b.m/b.v*100)/100,tol:0.06,unit:" g/cm³",hint:"density = mass ÷ volume = "+fmt(b.m)+" ÷ "+fmt(b.v)}));
@@ -384,13 +422,13 @@ defLab("density",{
       blocks.forEach((b,i)=>{const[hx,hy]=homes[i];if(sel===i&&station){/* at station */}else drawBlock(b,hx,hy);if(sel===i){ctx.strokeStyle="#fbbf24";ctx.lineWidth=3;ctx.strokeRect(hx-30,hy-30,60,60);ctx.lineWidth=1;}});
       // balance
       ctx.fillStyle="#152a44";rr(ctx,390,120,150,180,12);ctx.fill();
-      label("⚖️ Balance",465,145,14,"#eaf2fb","center");
+      label("Balance",465,145,14,"#eaf2fb","center");
       ctx.fillStyle="#33507a";rr(ctx,420,250,90,14,4);ctx.fill();ctx.fillRect(460,264,10,24);ctx.fillRect(430,288,70,8);
       if(sel>=0&&station==="bal"){meter(400,158,130,"MASS (g)",fmt(blocks[sel].m),"#fbbf24");drawBlock(blocks[sel],465,228);}
       else meter(400,158,130,"MASS (g)","---");
       // cylinder
       ctx.fillStyle="#152a44";rr(ctx,570,80,140,220,12);ctx.fill();
-      label("🧪 Cylinder (mL)",640,105,14,"#eaf2fb","center");
+      label("Cylinder (mL)",640,105,14,"#eaf2fb","center");
       const cx=615,cw=50,cb=285,ch=160; // cylinder body
       ctx.strokeStyle="#7dd3fc";ctx.strokeRect(cx,cb-ch,cw,ch);
       const base=100,lvl=sel>=0&&station==="cyl"?base+blocks[sel].v:base;
@@ -401,7 +439,7 @@ defLab("density",{
       label("reads: "+fmt(lvl)+" mL",640,120,12,"#7dd3fc","center");
       // tank
       ctx.fillStyle="#152a44";rr(ctx,740,60,140,240,12);ctx.fill();
-      label("🌊 Water Tank",810,85,14,"#eaf2fb","center");
+      label("Water Tank",810,85,14,"#eaf2fb","center");
       ctx.fillStyle="rgba(56,189,248,.3)";ctx.fillRect(752,140,116,150);
       ctx.strokeStyle="#7dd3fc";ctx.strokeRect(752,140,116,150);
       if(sel>=0&&station==="tank"){
@@ -412,7 +450,7 @@ defLab("density",{
         drawBlock(b,810,Math.max(110,dropY),36);
         if(anim>1)label(b.d<1?"FLOATS! (d < 1)":"SINKS! (d > 1)",810,320,13,b.d<1?"#34d399":"#f87171","center");
       }
-      if(sel<0)label("👆 Click a block in the tray to begin",450,375,14,"#fbbf24","center");
+      if(sel<0)label("Click a block in the tray to begin",450,375,14,"#fbbf24","center");
       else label("Holding Block "+blocks[sel].n+" — choose a station button below",450,375,13,"#fbbf24","center");
     }};
   }
@@ -422,17 +460,17 @@ defLab("density",{
    LAB 2 — MOTION GRAPHER
 ========================================================= */
 defLab("motion",{
-  icon:"🏎️",title:"Motion Grapher",blurb:"Drive a rover and watch its position-time graph draw itself live. Then catch the Mystery Runner.",
+  icon:"motion",title:"Motion Grapher",blurb:"Drive a rover and watch its position-time graph draw itself live. Then catch the Mystery Runner.",
   std:["S8P3a","SPS8"],
   goal:"Use the speed slider and <b>Start</b> to drive the rover — its position-time graph draws live. Then press <b>Mystery Runner</b> and use the graph to find its speed (speed = distance ÷ time).",
   build(rng){
     let speed=5,run=false,t=0,x=0,trace=[],myst=false,mtrace=[],mx=0;
     const mv=pick(rng,[2,2.5,3,4,5,6]); // mystery speed
     const sl=slider("Rover speed",-10,10,1,5," m/s",v=>speed=v);
-    cbtn("▶ Start","green",()=>{run=true;});
-    cbtn("⏸ Pause","gray",()=>{run=false;});
-    cbtn("↺ Reset","gray",()=>{run=false;t=0;x=0;trace=[];myst=false;mtrace=[];mx=0;});
-    cbtn("🕵️ Mystery Runner","gold",()=>{run=false;myst=true;t=0;x=0;mx=0;trace=[];mtrace=[];});
+    cbtn("Start","green",()=>{run=true;});
+    cbtn("Pause","gray",()=>{run=false;});
+    cbtn("Reset","gray",()=>{run=false;t=0;x=0;trace=[];myst=false;mtrace=[];mx=0;});
+    cbtn("Mystery Runner","gold",()=>{run=false;myst=true;t=0;x=0;mx=0;trace=[];mtrace=[];});
     const gx=60,gy=380,gw=560,gh=180,tMax=20,xMax=100;
     function toGX(tt){return gx+tt/tMax*gw;}function toGY(xx){return gy-xx/xMax*gh;}
     const d4=20;
@@ -459,9 +497,10 @@ defLab("motion",{
       const rx=60+x/100*780;
       ctx.fillStyle="#38bdf8";rr(ctx,rx-16,52,32,20,5);ctx.fill();
       ctx.fillStyle="#0a1420";ctx.beginPath();ctx.arc(rx-8,74,5,0,7);ctx.arc(rx+8,74,5,0,7);ctx.fill();
-      label("🛰",rx-8,50,14);
-      // mystery runner on track
-      if(mtrace.length&&(myst||mtrace[mtrace.length-1][1]>0)){const mpx=60+Math.min(100,mtrace[mtrace.length-1][1])/100*780;label("🕵️",mpx-9,50,16);}
+      // mystery runner on track (gold marker)
+      if(mtrace.length&&(myst||mtrace[mtrace.length-1][1]>0)){const mpx=60+Math.min(100,mtrace[mtrace.length-1][1])/100*780;
+        ctx.fillStyle="#fbbf24";ctx.beginPath();ctx.arc(mpx,46,7,0,7);ctx.fill();
+        ctx.strokeStyle="#fbbf24";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(mpx,53);ctx.lineTo(mpx,64);ctx.stroke();ctx.lineWidth=1;}
       // graph
       label("POSITION-TIME GRAPH",gx,150,13);
       ctx.strokeStyle="#33507a";
@@ -483,7 +522,7 @@ defLab("motion",{
    LAB 3 — FORCE LAB (F = ma)
 ========================================================= */
 defLab("force",{
-  icon:"🛷",title:"Push It! Force Lab",blurb:"Push crates across frictionless ice and discover F = ma. Then find the mass of the Mystery Crate.",
+  icon:"force",title:"Push It! Force Lab",blurb:"Push crates across frictionless ice and discover F = ma. Then find the mass of the Mystery Crate.",
   std:["S8P3b","SPS8"],
   goal:"Pick a force and a mass, then <b>Push for 2 s</b>. Watch the acceleration meter. Newton's 2nd Law: <b>a = F ÷ m</b>. Finally, use it backwards to find the Mystery Crate's mass!",
   build(rng){
@@ -491,13 +530,13 @@ defLab("force",{
     const mx=pick(rng,[4,5,8,10,16]); // mystery mass
     slider("Force",5,50,5,20," N",x=>F=x);
     const ms=slider("Mass",1,20,1,5," kg",x=>{if(!mystery)m=x;});
-    cbtn("👊 Push for 2 s","green",()=>{pushing=2;v=0;px=100;});
-    cbtn("↺ Reset","gray",()=>{pushing=0;v=0;px=100;});
-    const mb=cbtn("🎁 Mystery Crate: OFF","gold",()=>{mystery=!mystery;mb.textContent=mystery?"🎁 Mystery Crate: ON":"🎁 Mystery Crate: OFF";pushing=0;v=0;px=100;});
+    cbtn("Push for 2 s","green",()=>{pushing=2;v=0;px=100;});
+    cbtn("Reset","gray",()=>{pushing=0;v=0;px=100;});
+    const mb=cbtn("Mystery Crate: OFF","gold",()=>{mystery=!mystery;mb.textContent=mystery?"Mystery Crate: ON":"Mystery Crate: OFF";pushing=0;v=0;px=100;});
     const nb=[
       {type:"num",q:"Set <b>F = 20 N</b> and <b>m = 5 kg</b>, then push. What acceleration do you measure?",a:4,tol:0.25,unit:" m/s²",hint:"a = F ÷ m = 20 ÷ 5"},
       {type:"num",q:"Keep F = 20 N but <b>double the mass to 10 kg</b>. New acceleration?",a:2,tol:0.25,unit:" m/s²",hint:"Twice the mass → half the acceleration"},
-      {type:"num",q:"Turn ON the <b>Mystery Crate</b> 🎁. Push it with any force, read the acceleration, and find its mass.",a:mx,tol:0.5,unit:" kg",hint:"m = F ÷ a — divide the force you used by the acceleration you measured"}
+      {type:"num",q:"Turn ON the <b>Mystery Crate</b>. Push it with any force, read the acceleration, and find its mass.",a:mx,tol:0.5,unit:" kg",hint:"m = F ÷ a — divide the force you used by the acceleration you measured"}
     ];
     const cf=pick(rng,[[30,6],[40,8],[24,4],[36,9]]);
     const ca=pick(rng,[[3,4],[5,2],[6,3],[2,7]]);
@@ -508,7 +547,7 @@ defLab("force",{
     ];
     return{nb,cp,tick(dt){
       clearCv("#0d2233");
-      label("FRICTIONLESS ICE RINK ❄️",20,28,15,"#eaf2fb");
+      label("FRICTIONLESS ICE RINK",20,28,15,"#eaf2fb");
       // ice
       const ig=ctx.createLinearGradient(0,220,0,320);ig.addColorStop(0,"#1c3a55");ig.addColorStop(1,"#132a41");
       ctx.fillStyle=ig;rr(ctx,20,240,860,80,12);ctx.fill();
@@ -521,7 +560,7 @@ defLab("force",{
       ctx.fillStyle=mystery?"#a78bfa":"#d9a066";rr(ctx,px-s/2,240-s,s,s,6);ctx.fill();
       ctx.strokeStyle="rgba(255,255,255,.4)";ctx.strokeRect(px-s/2,240-s,s,s);
       label(mystery?"?":em+" kg",px,240-s/2+5,14,"#08202f","center");
-      if(pushing>0){label("👊",px-s/2-26,240-s/2+8,24);
+      if(pushing>0){
         ctx.strokeStyle="#fbbf24";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(px-s/2-40,210-s/2);ctx.lineTo(px-s/2-6,210-s/2);ctx.stroke();
         ctx.beginPath();ctx.moveTo(px-s/2-6,210-s/2);ctx.lineTo(px-s/2-16,204-s/2);ctx.moveTo(px-s/2-6,210-s/2);ctx.lineTo(px-s/2-16,216-s/2);ctx.stroke();ctx.lineWidth=1;
         label(F+" N",px-s/2-30,196-s/2,13,"#fbbf24","center");}
@@ -530,7 +569,7 @@ defLab("force",{
       meter(390,60,180,"ACCELERATION (m/s²)",pushing>0?(F/em).toFixed(2):(v>0?acc.toFixed(2):"---"),"#34d399");
       meter(590,60,150,"SPEED (m/s)",v.toFixed(1));
       meter(760,60,120,"PUSH TIMER",pushing>0?pushing.toFixed(1):"0.0");
-      if(mystery)label("🎁 MYSTERY CRATE — the mass slider is disabled. Use a = F ÷ m backwards!",450,360,14,"#a78bfa","center");
+      if(mystery)label("MYSTERY CRATE — the mass slider is disabled. Use a = F ÷ m backwards!",450,360,14,"#a78bfa","center");
       else label("Bigger crates are drawn bigger. Ice = no friction, so a = F ÷ m exactly.",450,360,13,"#9fb4cc","center");
     }};
   }
@@ -540,7 +579,7 @@ defLab("force",{
    LAB 4 — WAVE WORKBENCH
 ========================================================= */
 defLab("waves",{
-  icon:"🌊",title:"Wave Workbench",blurb:"Shape a wave with sliders, then freeze the Mystery Wave and measure wavelength, frequency, and speed.",
+  icon:"waves",title:"Wave Workbench",blurb:"Shape a wave with sliders, then freeze the Mystery Wave and measure wavelength, frequency, and speed.",
   std:["S8P4","SPS9"],
   goal:"Play with amplitude & frequency, then press <b>Mystery Wave</b>. Use <b>Freeze</b> + the meter grid to measure wavelength (crest to crest), use the <b>crest counter</b> for frequency, and calculate <b>speed = frequency × wavelength</b>.",
   build(rng){
@@ -549,9 +588,9 @@ defLab("waves",{
     const sA=slider("Amplitude",20,90,5,60," px",v=>{if(!myst)A=v;});
     const sF=slider("Frequency",0.5,3,0.25,1," Hz",v=>{if(!myst)f=v;});
     const sL=slider("Wavelength",2,8,1,4," m",v=>{if(!myst)lam=v;});
-    cbtn("❄ Freeze","gray",()=>{frozen=!frozen;});
-    const mbn=cbtn("🕵️ Mystery Wave: OFF","gold",()=>{myst=!myst;mbn.textContent=myst?"🕵️ Mystery Wave: ON":"🕵️ Mystery Wave: OFF";frozen=false;crests=0;counting=false;});
-    cbtn("⏱ Count crests (10 s)","green",()=>{if(!counting){counting=true;ctime=0;crests=0;frozen=false;}});
+    cbtn("Freeze","gray",()=>{frozen=!frozen;});
+    const mbn=cbtn("Mystery Wave: OFF","gold",()=>{myst=!myst;mbn.textContent=myst?"Mystery Wave: ON":"Mystery Wave: OFF";frozen=false;crests=0;counting=false;});
+    cbtn("Count crests (10 s)","green",()=>{if(!counting){counting=true;ctime=0;crests=0;frozen=false;}});
     const PPM=60; // px per meter
     const nb=[
       {type:"num",q:"Turn ON the Mystery Wave and <b>freeze</b> it. Measure crest-to-crest on the grid: what is its <b>wavelength</b>?",a:mLam,tol:0.3,unit:" m",hint:"Each grid square = 1 m. Distance from one crest to the next."},
@@ -587,12 +626,13 @@ defLab("waves",{
       // flag + crest counting (count wave cycles passing flag)
       const flagX=450;
       ctx.strokeStyle="#f87171";ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(flagX,60);ctx.lineTo(flagX,340);ctx.stroke();ctx.setLineDash([]);
-      label("🚩 counting line",flagX+6,74,12,"#f87171");
+      ctx.fillStyle="#f87171";ctx.beginPath();ctx.moveTo(flagX,60);ctx.lineTo(flagX+12,65);ctx.lineTo(flagX,70);ctx.closePath();ctx.fill();
+      label("counting line",flagX+16,74,12,"#f87171");
       if(counting)crests=Math.floor(useF*ctime);
       meter(30,30,140,"CREST COUNT",counting||crests?String(crests):"---","#fbbf24");
       meter(190,30,140,"TIMER (s)",counting?ctime.toFixed(1):(crests?"10.0":"---"));
-      if(frozen)label("❄ FROZEN — measure with the grid",880,50,13,"#7dd3fc","right");
-      if(myst)label("🕵️ MYSTERY WAVE (sliders off)",880,30,13,"#fbbf24","right");
+      if(frozen)label("FROZEN — measure with the grid",880,50,13,"#7dd3fc","right");
+      if(myst)label("MYSTERY WAVE (sliders off)",880,30,13,"#fbbf24","right");
       if(counting)label("Counting crests passing the line…",450,50,13,"#34d399","center");
     }};
   }
@@ -602,7 +642,7 @@ defLab("waves",{
    LAB 5 — CIRCUIT SANDBOX
 ========================================================= */
 defLab("circuit",{
-  icon:"💡",title:"Circuit Sandbox",blurb:"Build series & parallel circuits, watch the bulbs glow, and use Ohm's Law to expose the Mystery Resistor.",
+  icon:"circuit",title:"Circuit Sandbox",blurb:"Build series & parallel circuits, watch the bulbs glow, and use Ohm's Law to expose the Mystery Resistor.",
   std:["S8P5","SPS10"],
   goal:"Add batteries and bulbs, flip between <b>series</b> and <b>parallel</b>, and read the meters. Each battery = 1.5 V, each bulb = 3 Ω. Ohm's Law: <b>V = I × R</b>. Then find the Mystery Resistor!",
   build(rng){
@@ -611,7 +651,7 @@ defLab("circuit",{
     slider("Batteries",1,3,1,2,"",v=>nBat=v);
     slider("Bulbs",1,3,1,1,"",v=>nBulb=v);
     const pb=cbtn("Layout: SERIES","gray",()=>{para=!para;pb.textContent=para?"Layout: PARALLEL":"Layout: SERIES";});
-    const mbn=cbtn("🎁 Mystery Resistor: OFF","gold",()=>{myst=!myst;mbn.textContent=myst?"🎁 Mystery Resistor: ON":"🎁 Mystery Resistor: OFF";});
+    const mbn=cbtn("Mystery Resistor: OFF","gold",()=>{myst=!myst;mbn.textContent=myst?"Mystery Resistor: ON":"Mystery Resistor: OFF";});
     function calc(){
       const V=nBat*1.5;
       if(myst)return{V,I:V/Rx,per:0};
@@ -621,7 +661,7 @@ defLab("circuit",{
     const nb=[
       {type:"num",q:"Build: <b>2 batteries, 1 bulb</b>. What current does the ammeter read?",a:1,tol:0.08,unit:" A",hint:"I = V ÷ R = 3.0 V ÷ 3 Ω"},
       {type:"num",q:"Build: <b>2 batteries, 3 bulbs in SERIES</b>. Current now?",a:1/3,tol:0.06,unit:" A",hint:"Resistances add in series: I = 3.0 ÷ 9"},
-      {type:"num",q:"Turn ON the 🎁 Mystery Resistor. Use the meters and Ohm's Law to find its resistance.",a:Rx,tol:0.4,unit:" Ω",hint:"R = V ÷ I — divide the voltmeter reading by the ammeter reading"}
+      {type:"num",q:"Turn ON the Mystery Resistor. Use the meters and Ohm's Law to find its resistance.",a:Rx,tol:0.4,unit:" Ω",hint:"R = V ÷ I — divide the voltmeter reading by the ammeter reading"}
     ];
     const ov=pick(rng,[[6,2],[9,3],[12,4],[6,3]]);
     const cp=[
@@ -692,7 +732,7 @@ defLab("circuit",{
    LAB 6 — HEAT & PHASE CHANGE
 ========================================================= */
 defLab("heat",{
-  icon:"🔥",title:"Melt & Boil: Phase Change Lab",blurb:"Heat a mystery substance, watch its particles dance, and read its melting & boiling points off the live graph.",
+  icon:"heat",title:"Melt & Boil: Phase Change Lab",blurb:"Heat a mystery substance, watch its particles dance, and read its melting & boiling points off the live graph.",
   std:["S8P1ab","SPS7"],
   goal:"Turn the burner ON and watch the thermometer, the <b>particle view</b>, and the live heating curve. The temperature <b>pauses</b> (flat spots) at the melting point and boiling point — read them off the graph!",
   build(rng){
@@ -700,8 +740,8 @@ defLab("heat",{
     let T=0,phase="solid",heat=false,time=0,trace=[],meltP=0,boilP=0;
     const parts=[];const prand=mulberry32(99);
     for(let i=0;i<36;i++)parts.push({hx:(i%6),hy:Math.floor(i/6),x:0,y:0,vx:(prand()-.5),vy:(prand()-.5)});
-    const hb=cbtn("🔥 Burner: OFF","green",()=>{heat=!heat;hb.textContent=heat?"🔥 Burner: ON":"🔥 Burner: OFF";});
-    cbtn("↺ Restart","gray",()=>{T=0;phase="solid";heat=false;hb.textContent="🔥 Burner: OFF";time=0;trace=[];meltP=0;boilP=0;});
+    const hb=cbtn("Burner: OFF","green",()=>{heat=!heat;hb.textContent=heat?"Burner: ON":"Burner: OFF";});
+    cbtn("Restart","gray",()=>{T=0;phase="solid";heat=false;hb.textContent="Burner: OFF";time=0;trace=[];meltP=0;boilP=0;});
     ctrlGroup('<label>Flat spots on the graph = phase changes. Energy breaks particle bonds instead of raising temperature.</label>');
     const nb=[
       {type:"num",q:"What is this substance's <b>melting point</b>? (read the first flat spot)",a:M,tol:2,unit:" °C",hint:"The temperature where the graph first goes flat"},
@@ -722,7 +762,7 @@ defLab("heat",{
         else if(phase==="melting"){meltP+=dt;if(meltP>3.5)phase="liquid";}
         else if(phase==="liquid"){T+=6*dt;if(T>=Bp){T=Bp;phase="boiling";}}
         else if(phase==="boiling"){boilP+=dt;if(boilP>4)phase="gas";}
-        else if(phase==="gas"){T+=6*dt;if(T>=Bp+18){T=Bp+18;heat=false;hb.textContent="🔥 Burner: OFF";}}
+        else if(phase==="gas"){T+=6*dt;if(T>=Bp+18){T=Bp+18;heat=false;hb.textContent="Burner: OFF";}}
         if(time<40)trace.push([time,T]);
       }
       clearCv();
@@ -774,7 +814,7 @@ defLab("heat",{
    LAB 7 — RAMP & ROLL (ENERGY)
 ========================================================= */
 defLab("energy",{
-  icon:"🎢",title:"Ramp & Roll: Energy Lab",blurb:"Release a ball down a ramp and watch potential energy transform into kinetic — live energy bars included.",
+  icon:"energy",title:"Ramp & Roll: Energy Lab",blurb:"Release a ball down a ramp and watch potential energy transform into kinetic — live energy bars included.",
   std:["S8P2","SPS7"],
   goal:"Set a drop height and mass, then <b>Release</b>. Watch the energy bars: <b>PE = m × 10 × h</b> trades into <b>KE</b> as the ball falls, and the total never changes. Then find the Mystery Ball's mass!",
   build(rng){
@@ -783,13 +823,13 @@ defLab("energy",{
     const g=10,PXM=22; // px per meter
     slider("Drop height",1,10,1,5," m",v=>{h=v;xb=-1;going=false;});
     const ms=slider("Mass",1,10,1,2," kg",v=>{if(!myst){m=v;xb=-1;going=false;}});
-    cbtn("🎢 Release","green",()=>{going=true;});
-    cbtn("↺ Reset","gray",()=>{going=false;xb=-1;});
-    const mbn=cbtn("🎁 Mystery Ball: OFF","gold",()=>{myst=!myst;mbn.textContent=myst?"🎁 Mystery Ball: ON":"🎁 Mystery Ball: OFF";going=false;xb=-1;});
+    cbtn("Release","green",()=>{going=true;});
+    cbtn("Reset","gray",()=>{going=false;xb=-1;});
+    const mbn=cbtn("Mystery Ball: OFF","gold",()=>{myst=!myst;mbn.textContent=myst?"Mystery Ball: ON":"Mystery Ball: OFF";going=false;xb=-1;});
     const nb=[
       {type:"num",q:"Set <b>h = 5 m</b> and <b>m = 2 kg</b>. What is the PE at the top of the ramp?",a:100,tol:2,unit:" J",hint:"PE = m × 10 × h = 2 × 10 × 5"},
       {type:"num",q:"Release from <b>h = 5 m</b> (any mass). What speed does the ball reach at the very bottom?",a:10,tol:0.5,unit:" m/s",hint:"Read the SPEED meter when the ball passes the bottom"},
-      {type:"num",q:"Turn ON the 🎁 Mystery Ball. Use the PE meter and your height to find its mass.",a:mx,tol:0.25,unit:" kg",hint:"m = PE ÷ (10 × h) — read PE at the top, divide by 10 × height"}
+      {type:"num",q:"Turn ON the Mystery Ball. Use the PE meter and your height to find its mass.",a:mx,tol:0.25,unit:" kg",hint:"m = PE ÷ (10 × h) — read PE at the top, divide by 10 × height"}
     ];
     const pe=pick(rng,[[3,4],[2,6],[5,2],[4,3]]);
     const cp=[
@@ -831,7 +871,7 @@ defLab("energy",{
       ctx.fillStyle="#38bdf8";ctx.fillRect(82,by2-peH,38,peH);
       ctx.fillStyle="#fb923c";ctx.fillRect(142,by2-keH,38,keH);
       label("PE",101,by2+13,11,"#38bdf8","center");label("KE",161,by2+13,11,"#fb923c","center");
-      if(myst)label("🎁 MYSTERY BALL — mass slider disabled. PE meter still works!",450,384,13,"#a78bfa","center");
+      if(myst)label("MYSTERY BALL — mass slider disabled. PE meter still works!",450,384,13,"#a78bfa","center");
     }};
   }
 });
@@ -840,7 +880,7 @@ defLab("energy",{
    LAB 8 — JUNKYARD ELECTROMAGNET
 ========================================================= */
 defLab("magnet",{
-  icon:"🧲",title:"Junkyard Electromagnet",blurb:"Wind coils, add batteries, and lift paperclips with your own electromagnet crane. More coils = more power!",
+  icon:"magnet",title:"Junkyard Electromagnet",blurb:"Wind coils, add batteries, and lift paperclips with your own electromagnet crane. More coils = more power!",
   std:["S8P5","SPS10"],
   goal:"An electromagnet gets stronger with more <b>coils</b> and more <b>current</b> (batteries). Power it ON and count the paperclips it lifts. Rule of the junkyard: clips lifted = coils × batteries ÷ 10.",
   build(rng){
@@ -848,7 +888,7 @@ defLab("magnet",{
     const X=pick(rng,[4,6,8]); // mystery clip target
     slider("Coils",5,50,5,20,"",v=>{coils=v;liftT=0;});
     slider("Batteries",1,3,1,1,"",v=>{bats=v;liftT=0;});
-    const pbn=cbtn("⚡ Power: OFF","green",()=>{on=!on;pbn.textContent=on?"⚡ Power: ON":"⚡ Power: OFF";liftT=0;});
+    const pbn=cbtn("Power: OFF","green",()=>{on=!on;pbn.textContent=on?"Power: ON":"Power: OFF";liftT=0;});
     function clips(){return Math.min(15,Math.floor(coils*bats/10));}
     const nb=[
       {type:"num",q:"Set <b>20 coils, 1 battery</b>, power ON. How many clips does it lift?",a:2,tol:0.1,unit:" clips",hint:"20 × 1 ÷ 10 = 2"},
@@ -880,8 +920,10 @@ defLab("magnet",{
       ctx.strokeStyle=on?"#fbbf24":"#6b7f99";ctx.beginPath();ctx.moveTo(nx-17,ny-24);ctx.lineTo(300,300);ctx.moveTo(nx+17,ny+42);ctx.lineTo(340,300);ctx.stroke();
       ctx.fillStyle="#0a1420";rr(ctx,270,300,110,58,8);ctx.fill();ctx.strokeStyle="#fbbf24";ctx.strokeRect(270,300,110,58);
       for(let i=0;i<bats;i++){ctx.fillStyle="#fbbf24";ctx.fillRect(282+i*34,314,26,30);label("1.5",295+i*34,332,9,"#3a2a00","center");}
-      // sparkle if on
-      if(on){label("⚡",nx+30,ny-30+8*Math.sin(performance.now()/150),18);}
+      // spark bolt if on
+      if(on){const sy=ny-38+8*Math.sin(performance.now()/150);
+        ctx.fillStyle="#fbbf24";ctx.beginPath();
+        ctx.moveTo(nx+34,sy);ctx.lineTo(nx+26,sy+11);ctx.lineTo(nx+32,sy+11);ctx.lineTo(nx+24,sy+22);ctx.lineTo(nx+36,sy+8);ctx.lineTo(nx+30,sy+8);ctx.closePath();ctx.fill();}
       // clip pile
       ctx.fillStyle="#152a44";rr(ctx,380,330,220,40,8);ctx.fill();
       label("paperclip pile",490,356,11,"#9fb4cc","center");
@@ -909,7 +951,7 @@ defLab("magnet",{
    LAB 9 — DECAY DETECTIVE (HALF-LIFE)
 ========================================================= */
 defLab("decay",{
-  icon:"☢️",title:"Decay Detective: Half-Life",blurb:"Watch 100 unstable atoms decay step by step, plot the curve, and date a mystery isotope.",
+  icon:"decay",title:"Decay Detective: Half-Life",blurb:"Watch 100 unstable atoms decay step by step, plot the curve, and date a mystery isotope.",
   std:["HS","SPS3"],
   goal:"Each press of <b>One half-life</b> lets HALF of the remaining unstable atoms (purple) decay into stable atoms (gray). Watch the counter and the curve — then use the mystery isotope's half-life to answer like a real geologist.",
   build(rng){
@@ -917,7 +959,7 @@ defLab("decay",{
     let rem=100,steps=0,flip=0;
     const atoms=Array.from({length:100},()=>true);
     const hist=[[0,100]];
-    cbtn("⏭ One half-life (= "+T+" years)","green",()=>{
+    cbtn("One half-life (= "+T+" years)","green",()=>{
       if(rem<=1)return;
       const target=Math.round(rem/2);let kill=rem-target;
       // decay random atoms
@@ -925,7 +967,7 @@ defLab("decay",{
       while(kill>0&&idx.length){const j=Math.floor(Math.random()*idx.length);atoms[idx[j]]=false;idx.splice(j,1);kill--;}
       rem=target;steps++;hist.push([steps,rem]);flip=1;
     });
-    cbtn("↺ Reset","gray",()=>{rem=100;steps=0;atoms.fill(true);hist.length=0;hist.push([0,100]);});
+    cbtn("Reset","gray",()=>{rem=100;steps=0;atoms.fill(true);hist.length=0;hist.push([0,100]);});
     const nb=[
       {type:"num",q:"Start fresh (Reset). After <b>2 half-lives</b>, how many unstable atoms remain out of 100?",a:25,tol:1,unit:" atoms",hint:"100 → 50 → 25"},
       {type:"num",q:"This isotope's half-life is <b>"+T+" years</b>. After 3 presses, how many YEARS have passed?",a:3*T,tol:0.5,unit:" years",hint:"3 half-lives × "+T+" years each"},
@@ -966,6 +1008,8 @@ defLab("decay",{
 });
 
 /* ============ boot ============ */
+$("logoTop").src=LOGO;
+$("logoFoot").src=LOGO;
 if(S.name)$("nameInput").value=S.name;
 renderHome();
 </script>
