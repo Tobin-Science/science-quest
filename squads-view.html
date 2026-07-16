@@ -44,8 +44,20 @@
   .sq.first{border-color:#f3ce6d;box-shadow:0 4px 18px rgba(245,158,11,.25)}
   .sq .pts{position:absolute;top:-13px;right:-9px;background:var(--green-grad);color:#fff;border-radius:999px;
            min-width:44px;padding:.32rem .55rem;font-weight:800;border:3px solid #fff;box-shadow:0 3px 9px rgba(0,0,0,.22)}
-  .sq .medal{position:absolute;top:-13px;left:-9px;font-size:1.45rem;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))}
-  .sq .flame{position:absolute;top:32px;right:8px;font-size:.9rem}
+  .ic{vertical-align:-3px;flex:none}
+  .rk{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:999px;font-weight:800;
+      color:#fff;font-size:.78rem;background:#a7b1c7}
+  .rk1{background:linear-gradient(160deg,#f7c948,#d99a06)}
+  .rk2{background:linear-gradient(160deg,#cfd8e3,#8fa0b8)}
+  .rk3{background:linear-gradient(160deg,#e6ac7c,#b06a35)}
+  .rkn{display:inline-grid;place-items:center;width:24px;height:24px;font-weight:700;color:var(--mut)}
+  .sq .rk{position:absolute;top:-12px;left:-8px;width:30px;height:30px;border:3px solid #fff;
+          box-shadow:0 2px 7px rgba(0,0,0,.22);font-size:.9rem}
+  .sq .flame{position:absolute;top:32px;right:6px;font-size:.7rem;font-weight:800;color:#b45309;
+             background:#fff3e2;border:1px solid #f7c990;border-radius:999px;padding:.14rem .48rem .14rem .28rem;
+             display:flex;align-items:center;gap:.1rem}
+  .bdgc{width:22px;height:22px;border-radius:999px;display:inline-grid;place-items:center;background:#eef0fa;
+        color:var(--brand2);border:1px solid var(--line);font-size:.48rem;font-weight:800;margin:0 .12rem}
   .sq .avatar{width:80px;height:80px;margin:0 auto .45rem;border-radius:15px;overflow:hidden;background:#f3f5fd;
               border:1px solid var(--line)}
   .sq .avatar svg,.sq .avatar img{width:100%;height:100%}
@@ -63,16 +75,17 @@
        padding:2.2rem 1.8rem;border:1px solid var(--line);box-shadow:var(--shadow)}
   footer{padding:1rem;text-align:center}
   footer a{color:var(--brand2);font-size:.85rem;text-decoration:none;background:#fff;border:1px solid var(--line);
-           border-radius:999px;padding:.42rem .95rem;display:inline-block;box-shadow:var(--shadow)}
+           border-radius:999px;padding:.38rem .95rem .38rem .5rem;display:inline-flex;align-items:center;gap:.5rem;box-shadow:var(--shadow)}
+  .flogo{width:22px;height:22px;border-radius:50%;display:block}
 </style>
 </head>
 <body>
 <header>
-  <h1><span class="logo">🏆</span> Squad Points</h1>
+  <h1><span class="logo" data-ic="trophy" data-ic-size="18"></span> Squad Points</h1>
   <div class="asof" id="asof"></div>
 </header>
 <main id="main"><p class="muted" style="text-align:center">Loading standings…</p></main>
-<footer><a href="https://tobinscience.com" target="_blank" rel="noopener">Find more great resources at TobinScience.com →</a></footer>
+<footer><a href="https://tobinscience.com" target="_blank" rel="noopener"><img class="flogo" src="/favicon.png" alt="Tobin Science logo">Find more great resources at TobinScience.com →</a></footer>
 
 <script>
 "use strict";
@@ -99,7 +112,31 @@ function avatarSVG(i){
   else s+=`<rect x="42" y="66" width="16" height="8" rx="2" fill="#fff" stroke="${dark}" stroke-width="2"/><line x1="50" y1="66" x2="50" y2="74" stroke="${dark}" stroke-width="1.5"/>`;
   return s+`</svg>`;
 }
-const BADGE_ICON = { first_points:"🌟", club100:"💯", club250:"🚀", club500:"👑", hot_streak:"🔥", daily_double:"⚡", comeback:"📈", record_breaker:"🏅" };
+// inline SVG icons — no emoji anywhere (matches the teacher app's icon set)
+const ICONS = {
+  trophy:  '<path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/>',
+  crown:   '<path d="M3 17l1-9 5 4 3-7 3 7 5-4 1 9H3zM4 21h16"/>',
+  medal:   '<circle cx="12" cy="9" r="5"/><path d="M9 13l-2 8 5-3 5 3-2-8"/>',
+  flame:   '<path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-4 2.7-5.6.6 1.4 1.6 2.1 2.3 2.4C12 8 11.5 5.5 12 3z"/>',
+  star:    '<path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6L3.2 9.4l6.1-.8L12 3z"/>',
+  bolt:    '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/>',
+  trend:   '<path d="M3 17l6-6 4 4 7-8M14 7h6v6"/>',
+  rocket:  '<path d="M14 4c3.5-.5 6 .5 6 .5s1 2.5.5 6c-.4 2.8-2.5 6-6.5 8.5L9 14c2.5-4 5.5-6.1 8.5-6.5z"/><circle cx="14.5" cy="9.5" r="1.6"/><path d="M9 14l-4 1 3-3M10 15l-1 4 3-3M6 20l-2 2"/>',
+  target:  '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>',
+  alert:   '<path d="M12 3 2 20h20L12 3zM12 10v4"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/>'
+};
+const ic = (name, size) => `<svg class="ic" width="${size||16}" height="${size||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]||""}</svg>`;
+const rk = n => n<=3 ? `<span class="rk rk${n}">${n}</span>` : `<span class="rkn">${n}</span>`;
+const BADGE_DEF = {
+  first_points:["star","First Points"], club100:["100","Century Club"], club250:["rocket","250 Club"],
+  club500:["crown","500 Club"], hot_streak:["flame","Hot Streak"], daily_double:["bolt","Daily Double"],
+  comeback:["trend","Comeback"], record_breaker:["medal","Record Breakers"]
+};
+const badgeChip = id => { const d=BADGE_DEF[id]; if(!d) return "";
+  return `<span class="bdgc" title="${d[1]}">${d[0]==="100"?"100":ic(d[0],12)}</span>`; };
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("[data-ic]").forEach(n => n.insertAdjacentHTML("afterbegin", ic(n.dataset.ic, +(n.dataset.icSize||16))));
+});
 const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 // ---- decode snapshot from URL hash ----
@@ -124,7 +161,7 @@ async function boot(){
   document.getElementById("asof").textContent = "Standings as of " + d.toLocaleString() + (snap.y?` · ${snap.y}`:"") + ` · ${snap.q||""}`;
   render();
 }
-function showErr(msg){ document.getElementById("main").innerHTML = `<div class="err"><h2>🔌 ${esc(msg)}</h2></div>`; }
+function showErr(msg){ document.getElementById("main").innerHTML = `<div class="err"><h2>${ic("alert",22)} ${esc(msg)}</h2></div>`; }
 
 function render(){
   const main = document.getElementById("main");
@@ -142,11 +179,11 @@ function render(){
 
 function cardHTML(sq, rank, key){
   const val = key==="t"?sq.t:key==="d"?sq.d:sq.w;
-  const medal = val>0 ? (rank===1?"🥇":rank===2?"🥈":rank===3?"🥉":"") : "";
-  const badges = (sq.b||[]).map(b=>BADGE_ICON[b]||"").join("");
+  const rankBadge = val>0 && rank<=3 ? rk(rank) : "";
+  const badges = (sq.b||[]).map(badgeChip).join("");
   return `<div class="sq ${rank===1&&val>0?'first':''}">
-    <div class="pts">${val}</div>${medal?`<div class="medal">${medal}</div>`:""}
-    ${sq.st>=3?`<div class="flame">🔥${sq.st}</div>`:""}
+    <div class="pts">${val}</div>${rankBadge}
+    ${sq.st>=3?`<div class="flame">${ic("flame",11)}${sq.st}</div>`:""}
     <div class="avatar">${avatarSVG(sq.av)}</div>
     <div class="nm" title="${esc(sq.n)}">${esc(sq.n)}</div>
     <div class="meta">Total ${sq.t} · Today ${sq.d} · Week ${sq.w}</div>
@@ -161,8 +198,8 @@ function renderClass(body){
     <button data-sub="d" class="${classSub==='d'?'on':''}">Today</button>
     <button data-sub="w" class="${classSub==='w'?'on':''}">This Week</button></div>`;
   const p = snap.p[curPeriod];
-  if(p.sow) html += `<div class="rec">👑 Squad of the Week: <b>${esc(p.sow)}</b></div>`;
-  if(p.g){ const pct=Math.min(100,Math.round(p.g.c/p.g.t*100)); html += `<div class="rec">🎯 Class goal: ${p.g.c} / ${p.g.t} pts (${pct}%)</div>`; }
+  if(p.sow) html += `<div class="rec">${ic("crown")} Squad of the Week: <b>${esc(p.sow)}</b></div>`;
+  if(p.g){ const pct=Math.min(100,Math.round(p.g.c/p.g.t*100)); html += `<div class="rec">${ic("target")} Class goal: ${p.g.c} / ${p.g.t} pts (${pct}%)</div>`; }
   const key = classSub;
   const rows = p.s.slice().sort((a,b)=> (b[key]-a[key]) || a.n.localeCompare(b.n));
   html += `<div class="grid">` + rows.map((sq,i)=>cardHTML(sq, 1+rows.filter(x=>x[key]>sq[key]).length, key)).join("") + `</div>`;
@@ -173,18 +210,18 @@ function renderClass(body){
 function renderChamp(body){
   const c = snap.champ||{};
   let html = "";
-  if(c.cur) html += `<div class="rec">👑 <b>Quarter Champion:</b> ${esc(c.cur.name)} — ${esc(c.cur.period)} — ${c.cur.total} pts</div>`;
-  html += `<h3>🏅 All-Time Records (highest quarter totals ever)</h3>`;
+  if(c.cur) html += `<div class="rec">${ic("crown")} <b>Quarter Champion:</b> ${esc(c.cur.name)} — ${esc(c.cur.period)} — ${c.cur.total} pts</div>`;
+  html += `<h3>${ic("medal",18)} All-Time Records (highest quarter totals ever)</h3>`;
   html += (c.top10&&c.top10.length) ? `<table class="lb"><tr><th></th><th>Squad</th><th>When</th><th style="text-align:right">Pts</th></tr>` +
-    c.top10.map((r,i)=>`<tr><td>${["🥇","🥈","🥉"][i]||(i+1)}</td><td>${esc(r.n)}</td><td class="muted">${esc(r.p)} · ${esc(r.q)}</td><td class="r">${r.t}</td></tr>`).join("") + `</table>`
+    c.top10.map((r,i)=>`<tr><td>${rk(i+1)}</td><td>${esc(r.n)}</td><td class="muted">${esc(r.p)} · ${esc(r.q)}</td><td class="r">${r.t}</td></tr>`).join("") + `</table>`
     : `<p class="muted">No records yet.</p>`;
   body.innerHTML = html;
 }
 function renderWeek(body){
   const w = (snap.champ&&snap.champ.week)||[];
-  let html = `<h3>🔥 This Week's Race (all classes)</h3><p class="muted" style="margin-top:-.3rem">Anyone can win a week!</p>`;
+  let html = `<h3>${ic("flame",18)} This Week's Race (all classes)</h3><p class="muted" style="margin-top:-.3rem">Anyone can win a week!</p>`;
   html += w.length ? `<table class="lb"><tr><th></th><th>Squad</th><th>Class</th><th style="text-align:right">Pts</th></tr>` +
-    w.map((r,i)=>`<tr><td>${["🥇","🥈","🥉"][i]||(i+1)}</td><td>${esc(r.n)}</td><td class="muted">${esc(r.p)}</td><td class="r">${r.w}</td></tr>`).join("") + `</table>`
+    w.map((r,i)=>`<tr><td>${rk(i+1)}</td><td>${esc(r.n)}</td><td class="muted">${esc(r.p)}</td><td class="r">${r.w}</td></tr>`).join("") + `</table>`
     : `<p class="muted">No points yet this week.</p>`;
   body.innerHTML = html;
 }
