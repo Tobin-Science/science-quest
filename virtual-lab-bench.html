@@ -52,7 +52,7 @@ input[type=range]{accent-color:var(--accent); width:170px; vertical-align:middle
 #progressBar{background:#0c1626; border-radius:999px; height:14px; overflow:hidden; margin:14px 0 4px;}
 #progressFill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--gold)); transition:width .5s;}
 #codeBox{margin-top:14px;}
-.codeChip{font-family:Consolas,monospace; font-size:1.15em; background:#0c1626; border:1px dashed var(--gold); color:var(--gold); padding:8px 14px; border-radius:10px; display:inline-block; letter-spacing:1px;}
+.codeChip{font-family:Consolas,monospace; font-size:1.15em; background:#0c1626; border:1px dashed var(--gold); color:var(--gold); padding:8px 14px; border-radius:10px; display:inline-block; letter-spacing:1px; word-break:break-all; max-width:100%; box-sizing:border-box;}
 details.teach{margin-top:22px;}
 details.teach summary{cursor:pointer; color:var(--dim); font-size:.9em;}
 /* ---------- lab view ---------- */
@@ -83,6 +83,23 @@ canvas{width:100%; border-radius:12px; display:block; background:#0a1420; touch-
 .big{font-size:1.5em;}
 #allDone{display:none; border:2px solid var(--gold); background:#241d05; text-align:center; padding:18px; border-radius:16px; margin-top:16px;}
 .readout{font-family:Consolas,monospace; background:#04121f; color:#7dd3fc; border-radius:8px; padding:4px 10px; font-size:1.05em; border:1px solid #1e3a5c;}
+/* ---------- assignment mode ---------- */
+#nameGate select{width:100%; margin:0 0 12px; text-align:center; font-size:1.05em; background:#0c1626; border:2px solid #2a4568; color:var(--ink); border-radius:8px; padding:9px 10px; font-family:inherit;}
+#nameGate select:focus{outline:none; border-color:var(--accent);}
+.pbar{background:#0c1626; border-radius:999px; height:14px; overflow:hidden; margin:14px 0 4px;}
+.pfill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--gold)); transition:width .5s;}
+#asgGrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,420px)); justify-content:center; gap:14px; margin-top:16px;}
+#asgDone{display:none; border:2px solid var(--gold); background:#241d05; color:var(--gold); font-weight:700; text-align:center; padding:12px; border-radius:12px; margin-top:12px;}
+#asgBar{display:none; align-items:center; gap:12px; flex-wrap:wrap; background:var(--panel); border:1px solid #2a4568; border-radius:12px; padding:10px 14px; margin-bottom:12px;}
+#asgBar .codeChip{font-size:.95em; padding:5px 10px;}
+.gradeTable{width:100%; border-collapse:collapse; margin-top:10px; font-size:.95em;}
+.gradeTable th,.gradeTable td{border:1px solid #2a4568; padding:6px 10px; text-align:left;}
+.gradeTable th{background:#0c1626; color:var(--accent);}
+.gradeTable td.pct{font-weight:700; font-variant-numeric:tabular-nums;}
+#gradeIn{width:100%; min-height:90px; background:#0c1626; border:2px solid #2a4568; color:var(--ink); border-radius:8px; padding:8px 10px; font-family:Consolas,monospace; font-size:.9em;}
+#gradeIn:focus{outline:none; border-color:var(--accent);}
+#asgLinkRow{display:none; margin-top:10px;}
+#asgLinkRow input{width:100%; font-family:Consolas,monospace; font-size:.9em; margin-bottom:8px;}
 /* ---------- icons & footer ---------- */
 .icn{width:1.15em; height:1.15em; vertical-align:-0.2em; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; display:inline-block;}
 h2 .icn{color:var(--accent);}
@@ -109,9 +126,42 @@ h2 .icn{color:var(--accent);}
 
   <div id="nameGate" class="card">
     <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 3h5M10.5 3v5.2L5 17.4A2.3 2.3 0 0 0 7.1 21h9.8a2.3 2.3 0 0 0 2.1-3.6L13.5 8.2V3M7.8 14.5h8.4"/></svg> Sign in to the lab</h2>
-    <div class="dim">First and last name (this is how your teacher gives you credit)</div>
+    <div id="asgGateInfo" class="dim" style="display:none; margin:6px 0 2px; color:var(--accent); font-weight:700;"></div>
+    <div class="dim" id="gateHint">First and last name (this is how your teacher gives you credit)</div>
     <input type="text" id="nameInput" maxlength="24" placeholder="e.g. Jordan Smith" autocomplete="off">
+    <div id="asgFields" style="display:none">
+      <input type="text" id="firstInput" maxlength="12" placeholder="First name" autocomplete="off">
+      <input type="text" id="lastInput" maxlength="14" placeholder="Last name" autocomplete="off">
+      <select id="periodSel">
+        <option value="">Class period…</option>
+        <option value="1">1st period</option><option value="2">2nd period</option>
+        <option value="3">3rd period</option><option value="4">4th period</option>
+        <option value="5">5th period</option><option value="6">6th period</option>
+        <option value="7">7th period</option><option value="8">8th period</option>
+      </select>
+    </div>
     <button class="btn" id="nameGo">Enter the Lab →</button>
+  </div>
+
+  <div id="asgHome" style="display:none">
+    <div class="card" style="border:2px solid var(--accent)">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <h2 style="flex:1"><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M9 2.5h6v3.5H9zM8 11h8M8 15h5"/></svg> Today's Assignment: <span id="asgLabTitle" style="color:var(--accent)"></span></h2>
+        <button class="btn gray small" id="asgSwitch">Switch user</button>
+      </div>
+      <div class="dim" style="margin-top:4px">Scientist: <b id="asgWho" style="color:var(--ink)"></b> — <span id="asgPeriodTxt"></span></div>
+      <div class="pbar"><div class="pfill" id="asgFill"></div></div>
+      <div class="dim" id="asgScoreText"></div>
+      <div style="margin-top:14px">
+        <span class="dim">Assignment code for your teacher: </span>
+        <span class="codeChip" id="asgCodeChip"></span>
+        <button class="btn small" id="asgCopy" style="margin-left:6px">Copy my code</button>
+      </div>
+      <div class="dim" style="margin-top:8px; font-size:.88em">Your code updates as you finish tasks — send it to your teacher (or paste it in your assignment page) any time.</div>
+      <div id="asgDone">ASSIGNMENT COMPLETE — 100%! Copy your code above and turn it in.</div>
+    </div>
+    <div id="asgGrid"></div>
+    <div class="dim" style="text-align:center; margin-top:16px; font-size:.9em"><a href="#" id="asgExit" style="color:var(--dim)">Not doing this assignment? Open the full Lab Bench</a></div>
   </div>
 
   <div id="homeMain" style="display:none">
@@ -138,7 +188,26 @@ h2 .icn{color:var(--accent);}
     <details class="teach">
       <summary><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.5" cy="15.5" r="4"/><path d="M10.5 12.5L20 3M16.5 6.5l3 3M13.5 9.5l2.5 2.5"/></svg> Teacher Tools</summary>
       <div class="card" style="margin-top:8px">
+        <b>Assign a lab</b>
+        <div class="dim" style="margin:4px 0 8px; font-size:.9em">Pick today's lab and share the link. Students sign in with name + period, see only that lab, and every notebook or checkpoint question counts as 1 task toward their score.</div>
+        <div style="margin:8px 0">
+          <select id="asgLabSel" style="background:#0c1626; border:2px solid #2a4568; color:var(--ink); border-radius:8px; padding:8px 10px; font-family:inherit; font-size:1em; min-width:240px"></select>
+          <button class="btn small" id="asgMakeBtn">Create assignment link</button>
+        </div>
+        <div id="asgLinkRow">
+          <input type="text" id="asgLinkIn" readonly>
+          <button class="btn small" id="asgLinkCopy">Copy link</button>
+          <span class="dim" id="asgLinkNote" style="margin-left:8px; font-size:.9em"></span>
+        </div>
+        <hr style="border-color:#2a4568; margin:14px 0">
+        <b>Grade assignment codes</b>
+        <div class="dim" style="margin:4px 0 8px; font-size:.9em">Paste all your students' assignment codes below — any format, one big mess is fine. You'll get a roster sorted by period, then last name.</div>
+        <textarea id="gradeIn" placeholder="Paste codes here (TVA-…)"></textarea>
+        <div style="margin-top:8px"><button class="btn small" id="gradeBtn">Grade codes</button> <button class="btn gray small" id="gradeCopy" style="display:none">Copy for gradebook</button></div>
+        <div id="gradeOut" style="margin-top:6px; overflow-x:auto"></div>
+        <hr style="border-color:#2a4568; margin:14px 0">
         <b>Verify a progress code</b>
+        <div class="dim" style="margin:4px 0 8px; font-size:.9em">For free-play progress codes (TVL-…) from the full Lab Bench.</div>
         <div style="margin:8px 0"><input type="text" id="verifyIn" placeholder="Paste student code" style="width:260px"> <button class="btn small" id="verifyBtn">Check</button></div>
         <div id="verifyOut" class="dim"></div>
         <hr style="border-color:#2a4568; margin:12px 0">
@@ -155,6 +224,11 @@ h2 .icn{color:var(--accent);}
     <button class="btn gray" id="backBtn">← Lab Bench</button>
     <h2 id="labTitle"></h2>
     <span id="labStd" class="pill"></span>
+  </div>
+  <div id="asgBar">
+    <span id="asgBarTxt"></span>
+    <span class="codeChip" id="asgBarCode"></span>
+    <button class="btn small" id="asgBarCopy">Copy my code</button>
   </div>
   <div class="card" id="simCard">
     <div class="dim" id="labGoal" style="padding:2px 6px 10px; line-height:1.4;"></div>
@@ -175,7 +249,7 @@ h2 .icn{color:var(--accent);}
   </div>
   <div id="doneBanner">
     <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12 2.6l2.9 5.8 6.4 1-4.6 4.6 1 6.4-5.7-3-5.7 3 1-6.4L2.7 9.4l6.4-1z"/></svg> LAB COMPLETE! <svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12 2.6l2.9 5.8 6.4 1-4.6 4.6 1 6.4-5.7-3-5.7 3 1-6.4L2.7 9.4l6.4-1z"/></svg></h2>
-    <div style="margin-top:6px">Great science! Your progress code has been updated on the Lab Bench.</div>
+    <div style="margin-top:6px" id="doneMsg">Great science! Your progress code has been updated on the Lab Bench.</div>
     <button class="btn gold" style="margin-top:10px" id="doneBack">← Back to the Lab Bench</button>
   </div>
 </div>
@@ -241,6 +315,10 @@ function fmt(n){return Math.abs(n-Math.round(n))<1e-9?String(Math.round(n)):Stri
 
 /* ============ state ============ */
 const LABIDS=["density","motion","force","waves","circuit","heat","energy","magnet","decay","gravity","light","atom","mass","calorim","ph"];
+/* fallback task totals (nb+cp questions) — update if a lab's question count changes */
+const TASKTOTALS={density:7,motion:6,force:6,waves:6,circuit:6,heat:6,energy:6,magnet:6,decay:6,gravity:6,light:6,atom:7,mass:6,calorim:6,ph:6};
+let ASG=null;
+try{const _p=(new URLSearchParams(location.search).get("assign")||"").toLowerCase();if(LABIDS.indexOf(_p)>=0)ASG=_p;}catch(e){}
 let S=null;
 function loadS(){try{S=JSON.parse(localStorage.getItem("tvl_state"))||null;}catch(e){S=null;}
   if(!S)S={name:"",users:{}};if(!S.users)S.users={};}
@@ -268,6 +346,57 @@ function decodeCode(code){
   }catch(e){return null;}
 }
 
+/* ============ assignment code (TVA) ============ */
+function rollEnc(s,prefix){
+  let k=7,out="",sum=0;
+  for(const ch of s){const c=ch.charCodeAt(0);sum+=c;out+=(c^k).toString(36).padStart(2,"0");k=(k*3+c)%29+1;}
+  return (prefix+"-"+out+"-"+(sum%1296).toString(36).padStart(2,"0")).toUpperCase();
+}
+function rollDec(body,check){
+  let k=7,s="",sum=0;
+  for(let i=0;i<body.length;i+=2){const v=parseInt(body.slice(i,i+2),36);const c=v^k;s+=String.fromCharCode(c);sum+=c;k=(k*3+c)%29+1;}
+  if((sum%1296).toString(36).padStart(2,"0").toUpperCase()!==check)return null;
+  return s;
+}
+function userMeta(){
+  if(!S.name)return{first:"",last:"",period:""};
+  const u=userLabs(),parts=S.name.trim().split(/\s+/);
+  return{first:u._first||(parts.length>1?parts.slice(0,-1).join(" "):parts[0]||""),
+         last:u._last||(parts.length>1?parts[parts.length-1]:""),
+         period:u._period||""};
+}
+function taskTotal(id){const st=S.name?userLabs()[id]:null;if(st&&st.nb&&(st.nb.length+st.cp.length)>0)return st.nb.length+st.cp.length;return TASKTOTALS[id]||6;}
+function asgScore(){
+  const st=(S.name?userLabs()[ASG]:null)||{nb:[],cp:[]};
+  const total=taskTotal(ASG);
+  const done=(st.nb||[]).filter(Boolean).length+((st.cp||[]).filter(Boolean).length);
+  return{done:done,total:total,pct:total?Math.round(done/total*100):0};
+}
+function encodeAsg(){
+  const u=userMeta(),sc=asgScore();
+  const d=new Date(),ds=String(d.getFullYear()%100).padStart(2,"0")+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+  const s=[u.last.toUpperCase().slice(0,14),u.first.toUpperCase().slice(0,12),u.period||"0",LABIDS.indexOf(ASG),sc.done,sc.total,ds].join("|");
+  return rollEnc(s,"TVA");
+}
+function decodeAsg(code){
+  try{
+    const m=code.trim().toUpperCase().match(/^TVA-([0-9A-Z]+)-([0-9A-Z]{2})$/);if(!m)return null;
+    const body=m[1].toLowerCase();if(body.length%2)return null;
+    const s=rollDec(body,m[2]);if(s===null)return null;
+    const p=s.split("|");if(p.length!==7)return null;
+    const li=parseInt(p[3],10),done=parseInt(p[4],10),total=parseInt(p[5],10);
+    if(!(li>=0&&li<LABIDS.length)||isNaN(done)||isNaN(total)||total<1||done<0||done>total)return null;
+    return{last:p[0],first:p[1],period:p[2],lab:LABIDS[li],done:done,total:total,date:p[6],pct:Math.round(done/total*100)};
+  }catch(e){return null;}
+}
+function periodLabel(p){const n=parseInt(p,10);if(!n)return"period ?";return n+(["","st","nd","rd"][n]||"th")+" period";}
+function tcase(s){return s.toLowerCase().replace(/(^|[\s'-])[a-z]/g,c=>c.toUpperCase());}
+function copyTxt(t,btn){
+  const ok=()=>{if(btn){const o=btn.textContent;btn.textContent="Copied!";setTimeout(()=>{btn.textContent=o;},1200);}};
+  const fb=()=>{const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let d=false;try{d=document.execCommand("copy");}catch(e){}ta.remove();if(d)ok();else prompt("Copy this:",t);};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb();
+}
+
 /* ============ lab registry ============ */
 const LABS={};
 function defLab(id,meta){LABS[id]=meta;}
@@ -278,8 +407,9 @@ function maskVal(){const L=userLabs();let m=0;LABIDS.forEach((id,i)=>{if(L[id]&&
 function renderHome(){
   $("home").style.display="block";$("labView").style.display="none";
   stopLoop();
-  if(!S.name){$("nameGate").style.display="block";$("homeMain").style.display="none";return;}
-  $("nameGate").style.display="none";$("homeMain").style.display="block";
+  if(!S.name||(ASG&&!userMeta().period)){$("nameGate").style.display="block";$("homeMain").style.display="none";$("asgHome").style.display="none";setupGate();return;}
+  if(ASG){renderAsgHome();return;}
+  $("nameGate").style.display="none";$("asgHome").style.display="none";$("homeMain").style.display="block";
   $("whoName").textContent=S.name;
   const n=doneCount();
   $("progressFill").style.width=(n/LABIDS.length*100)+"%";
@@ -298,8 +428,32 @@ function renderHome(){
     g.appendChild(b);
   });
 }
-$("nameGo").onclick=()=>{const v=$("nameInput").value.trim().replace(/[^A-Za-z .'-]/g,"");if(v.length<3){alert("Please type your first and last name.");return;}S.name=v;saveS();renderHome();};
+function cleanName(v){return v.trim().replace(/[^A-Za-z .'-]/g,"").replace(/\s+/g," ");}
+function setupGate(){
+  if(!ASG)return;
+  $("nameInput").style.display="none";$("asgFields").style.display="block";
+  $("asgGateInfo").style.display="block";
+  $("asgGateInfo").textContent="Today's assignment: "+(LABS[ASG]?LABS[ASG].title:"");
+  $("gateHint").textContent="Type your name and pick your class period so your teacher can give you credit.";
+  const u=userMeta();
+  if(u.first)$("firstInput").value=u.first;
+  if(u.last)$("lastInput").value=u.last;
+  if(u.period)$("periodSel").value=u.period;
+}
+$("nameGo").onclick=()=>{
+  if(ASG){
+    const f=cleanName($("firstInput").value),l=cleanName($("lastInput").value),p=$("periodSel").value;
+    if(f.length<2||l.length<2){alert("Please type your first AND last name.");return;}
+    if(!p){alert("Please pick your class period.");return;}
+    S.name=f+" "+l;saveS();
+    const u=userLabs();u._first=f;u._last=l;u._period=p;saveS();
+    openLab(ASG);
+    return;
+  }
+  const v=cleanName($("nameInput").value);if(v.length<3){alert("Please type your first and last name.");return;}S.name=v;saveS();renderHome();
+};
 $("nameInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("nameGo").click();});
+["firstInput","lastInput"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter")$("nameGo").click();}));
 $("switchUser").onclick=()=>{if(confirm("Switch user? Your progress is saved under your name.")){S.name="";saveS();renderHome();}};
 $("verifyBtn").onclick=()=>{
   const r=decodeCode($("verifyIn").value);
@@ -337,6 +491,21 @@ function openLab(id){
   const inst=L.build(rng);   // {tick, nb:[fields], cp:[questions]}
   cur=inst;lastT=performance.now();rafId=requestAnimationFrame(loop);
   buildQuestions(id,inst);
+  updateAsgBar(id);
+  if(ASG&&id===ASG){
+    $("doneMsg").textContent="Your assignment code now shows 100% — copy it and turn it in to your teacher!";
+    $("doneBack").textContent="← Back to my assignment";
+  }else{
+    $("doneMsg").textContent="Great science! Your progress code has been updated on the Lab Bench.";
+    $("doneBack").textContent="← Back to the Lab Bench";
+  }
+}
+function updateAsgBar(id){
+  if(!ASG||id!==ASG){$("asgBar").style.display="none";return;}
+  const sc=asgScore();
+  $("asgBar").style.display="flex";
+  $("asgBarTxt").innerHTML="<b>Assignment score:</b> "+sc.done+" of "+sc.total+" tasks — <b style='color:var(--accent)'>"+sc.pct+"%</b>";
+  $("asgBarCode").textContent=encodeAsg();
 }
 $("backBtn").onclick=renderHome;
 $("doneBack").onclick=renderHome;
@@ -389,6 +558,7 @@ function checkDone(id,inst){
   if(st.nb.every(Boolean)&&st.cp.every(Boolean)&&!st.done){
     st.done=true;saveS();$("doneBanner").style.display="block";$("doneBanner").scrollIntoView({behavior:"smooth"});
   }else if(st.done){$("doneBanner").style.display="block";}
+  updateAsgBar(id);
 }
 
 /* ---- shared canvas helpers ---- */
@@ -1422,6 +1592,81 @@ defLab("ph",{
     }};
   }
 });
+
+/* ============ assignment mode UI ============ */
+function renderAsgHome(){
+  $("nameGate").style.display="none";$("homeMain").style.display="none";$("asgHome").style.display="block";
+  const L=LABS[ASG],u=userMeta(),sc=asgScore();
+  $("asgLabTitle").textContent=L.title;
+  $("asgWho").textContent=S.name;
+  $("asgPeriodTxt").textContent=periodLabel(u.period);
+  $("asgFill").style.width=(sc.total?sc.done/sc.total*100:0)+"%";
+  $("asgScoreText").textContent=sc.done+" of "+sc.total+" tasks complete — "+sc.pct+"%";
+  $("asgCodeChip").textContent=encodeAsg();
+  $("asgDone").style.display=(sc.total>0&&sc.done===sc.total)?"block":"none";
+  const g=$("asgGrid");g.innerHTML="";
+  const fin=sc.total>0&&sc.done===sc.total;
+  const b=document.createElement("button");
+  b.className="labCard"+(fin?" complete":"");
+  b.innerHTML='<img class="art" src="'+TILEART[ASG]+'" alt="">'+(fin?'<span class="done">'+icn("star")+'</span>':'')+
+    '<h3>'+L.title+'</h3><div class="dim" style="font-size:.9em">'+L.blurb+'</div>'+
+    L.std.map(s=>'<span class="std">'+s+'</span>').join("")+
+    '<div style="margin-top:10px"><span class="btn small" style="pointer-events:none">'+(fin?"Review my lab":(sc.done>0?"Keep working →":"Start the lab →"))+'</span></div>';
+  b.onclick=()=>openLab(ASG);
+  g.appendChild(b);
+}
+$("asgSwitch").onclick=()=>{if(confirm("Switch user? Your progress is saved under your name.")){S.name="";saveS();renderHome();}};
+$("asgCopy").onclick=()=>copyTxt($("asgCodeChip").textContent,$("asgCopy"));
+$("asgBarCopy").onclick=()=>copyTxt($("asgBarCode").textContent,$("asgBarCopy"));
+$("asgExit").onclick=e=>{e.preventDefault();location.href=location.href.split("?")[0];};
+
+/* ---- teacher: create assignment ---- */
+$("asgLabSel").innerHTML='<option value="">Choose a lab…</option>'+LABIDS.map(id=>'<option value="'+id+'">'+LABS[id].title+' ('+(TASKTOTALS[id]||6)+' tasks)</option>').join("");
+$("asgMakeBtn").onclick=()=>{
+  const id=$("asgLabSel").value;
+  if(!id){alert("Pick a lab first.");return;}
+  const base=(location.protocol==="file:")?"https://www.tobinscience.com/virtual-lab-bench.html":location.origin+location.pathname;
+  $("asgLinkRow").style.display="block";
+  $("asgLinkIn").value=base+"?assign="+id;
+  $("asgLinkNote").textContent=LABS[id].title+" — "+(TASKTOTALS[id]||6)+" tasks, each worth 1 point.";
+};
+$("asgLinkCopy").onclick=()=>copyTxt($("asgLinkIn").value,$("asgLinkCopy"));
+
+/* ---- teacher: bulk grade assignment codes ---- */
+let gradeTSV="";
+$("gradeBtn").onclick=()=>{
+  const raw=$("gradeIn").value.toUpperCase();
+  const codes=raw.match(/TVA-[0-9A-Z]+-[0-9A-Z]{2}/g)||[];
+  const tvlCount=(raw.match(/TVL-[0-9A-Z]+-[0-9A-Z]{2}/g)||[]).length;
+  const out=$("gradeOut"),seen={},rows=[];let bad=0,dups=0;
+  codes.forEach(c=>{
+    const r=decodeAsg(c);if(!r){bad++;return;}
+    const k=(r.period+"|"+r.last+"|"+r.first+"|"+r.lab).toLowerCase();
+    if(seen[k]){dups++;if(r.done>seen[k].done){seen[k].done=r.done;seen[k].total=r.total;seen[k].pct=r.pct;seen[k].date=r.date;}return;}
+    seen[k]=r;rows.push(r);
+  });
+  rows.sort((a,b)=>(parseInt(a.period,10)||99)-(parseInt(b.period,10)||99)||a.last.localeCompare(b.last)||a.first.localeCompare(b.first));
+  if(!rows.length){
+    out.innerHTML='<span style="color:var(--red)">'+icn("xmark")+' No valid assignment codes found.'+(tvlCount?" Found "+tvlCount+" free-play code"+(tvlCount===1?"":"s")+" (TVL) — check those one at a time in the box below.":"")+'</span>';
+    $("gradeCopy").style.display="none";return;
+  }
+  let html='<table class="gradeTable"><tr><th>Period</th><th>Student</th><th>Lab</th><th>Tasks</th><th>Score</th><th>Date</th></tr>';
+  gradeTSV="Period\tLast\tFirst\tLab\tTasks\tScore\tDate\n";
+  rows.forEach(r=>{
+    const dt="20"+r.date.slice(0,2)+"-"+r.date.slice(2,4)+"-"+r.date.slice(4,6);
+    const col=r.pct===100?"var(--green)":(r.pct>=60?"var(--gold)":"var(--red)");
+    html+="<tr><td>"+(parseInt(r.period,10)||"?")+"</td><td>"+tcase(r.last)+", "+tcase(r.first)+"</td><td>"+LABS[r.lab].title+"</td><td>"+r.done+"/"+r.total+'</td><td class="pct" style="color:'+col+'">'+r.pct+"%</td><td>"+dt+"</td></tr>";
+    gradeTSV+=(parseInt(r.period,10)||"?")+"\t"+tcase(r.last)+"\t"+tcase(r.first)+"\t"+LABS[r.lab].title+"\t"+r.done+"/"+r.total+"\t"+r.pct+"%\t"+dt+"\n";
+  });
+  html+="</table>";
+  const notes=[rows.length+" student"+(rows.length===1?"":"s")];
+  if(dups)notes.push(dups+" duplicate code"+(dups===1?"":"s")+" merged — best score kept");
+  if(bad)notes.push('<span style="color:var(--red)">'+bad+" invalid or altered code"+(bad===1?"":"s")+" rejected</span>");
+  if(tvlCount)notes.push(tvlCount+" free-play TVL code"+(tvlCount===1?"":"s")+" skipped");
+  out.innerHTML=html+'<div class="dim" style="margin-top:6px">'+notes.join(" · ")+"</div>";
+  $("gradeCopy").style.display="inline-block";
+};
+$("gradeCopy").onclick=()=>copyTxt(gradeTSV,$("gradeCopy"));
 
 /* ============ boot ============ */
 $("logoTop").src=LOGO;
