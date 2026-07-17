@@ -189,7 +189,7 @@ h2 .icn{color:var(--accent);}
       <summary><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.5" cy="15.5" r="4"/><path d="M10.5 12.5L20 3M16.5 6.5l3 3M13.5 9.5l2.5 2.5"/></svg> Teacher Tools</summary>
       <div class="card" style="margin-top:8px">
         <b>Assign a lab</b>
-        <div class="dim" style="margin:4px 0 8px; font-size:.9em">Pick today's lab and share the link. Students sign in with name + period, see only that lab, and every notebook or checkpoint question counts as 1 task toward their score.</div>
+        <div class="dim" style="margin:4px 0 8px; font-size:.9em">Pick today's lab and share the link. Students sign in with name + period, see only that lab, and every notebook or checkpoint question counts as 1 point. Multiple-choice questions only earn their point if the FIRST answer picked is right — students can keep trying to finish the lab, but guessing costs them the point (plus an 8-second wait after every wrong click).</div>
         <div style="margin:8px 0">
           <select id="asgLabSel" style="background:#0c1626; border:2px solid #2a4568; color:var(--ink); border-radius:8px; padding:8px 10px; font-family:inherit; font-size:1em; min-width:240px"></select>
           <button class="btn small" id="asgMakeBtn">Create assignment link</button>
@@ -366,10 +366,13 @@ function userMeta(){
          period:u._period||""};
 }
 function taskTotal(id){const st=S.name?userLabs()[id]:null;if(st&&st.nb&&(st.nb.length+st.cp.length)>0)return st.nb.length+st.cp.length;return TASKTOTALS[id]||6;}
+/* question states: false/0 = untouched, true/1 = earned, 2 = answered right after a wrong guess (complete, no point), 3 = guessed wrong, not answered yet */
+function qDone(v){return v===true||v===1||v===2;}
+function qEarned(v){return v===true||v===1;}
 function asgScore(){
   const st=(S.name?userLabs()[ASG]:null)||{nb:[],cp:[]};
   const total=taskTotal(ASG);
-  const done=(st.nb||[]).filter(Boolean).length+((st.cp||[]).filter(Boolean).length);
+  const done=(st.nb||[]).filter(qEarned).length+((st.cp||[]).filter(qEarned).length);
   return{done:done,total:total,pct:total?Math.round(done/total*100):0};
 }
 function encodeAsg(){
@@ -492,8 +495,12 @@ function openLab(id){
   cur=inst;lastT=performance.now();rafId=requestAnimationFrame(loop);
   buildQuestions(id,inst);
   updateAsgBar(id);
+  setDoneMsg(id);
+}
+function setDoneMsg(id){
   if(ASG&&id===ASG){
-    $("doneMsg").textContent="Your assignment code now shows 100% — copy it and turn it in to your teacher!";
+    const sc=asgScore();
+    $("doneMsg").textContent=sc.pct===100?"Perfect lab — your assignment code shows 100%! Copy it and turn it in to your teacher.":"Lab finished — your assignment code shows "+sc.pct+"%. Copy it and turn it in to your teacher.";
     $("doneBack").textContent="← Back to my assignment";
   }else{
     $("doneMsg").textContent="Great science! Your progress code has been updated on the Lab Bench.";
@@ -504,7 +511,7 @@ function updateAsgBar(id){
   if(!ASG||id!==ASG){$("asgBar").style.display="none";return;}
   const sc=asgScore();
   $("asgBar").style.display="flex";
-  $("asgBarTxt").innerHTML="<b>Assignment score:</b> "+sc.done+" of "+sc.total+" tasks — <b style='color:var(--accent)'>"+sc.pct+"%</b>";
+  $("asgBarTxt").innerHTML="<b>Assignment score:</b> "+sc.done+" of "+sc.total+" points — <b style='color:var(--accent)'>"+sc.pct+"%</b>";
   $("asgBarCode").textContent=encodeAsg();
 }
 $("backBtn").onclick=renderHome;
@@ -519,13 +526,30 @@ function buildQuestions(id,inst){
   renderQ($("cpArea"),inst.cp,st.cp,id,"cp");
   checkDone(id,inst);
 }
+function creditNote(v){return (ASG&&v===2)?'<div style="color:var(--gold);font-size:.85em;margin-top:4px">Right answer found — but no point, because the first answer was wrong.</div>':"";}
+function lockRow(row){
+  const opts=[].slice.call(row.querySelectorAll(".mcopt")).filter(b=>!b.disabled);
+  if(!opts.length)return;
+  opts.forEach(b=>b.disabled=true);
+  let n=8;
+  const note=document.createElement("div");
+  note.style.cssText="color:var(--gold);font-size:.85em;margin-top:6px";
+  note.textContent="Think it over… you can answer again in "+n+"s";
+  row.appendChild(note);
+  const iv=setInterval(()=>{
+    n--;
+    if(!document.body.contains(row)||row.classList.contains("right")){clearInterval(iv);note.remove();return;}
+    if(n<=0){clearInterval(iv);note.remove();opts.forEach(b=>{if(!b.classList.contains("wrong"))b.disabled=false;});}
+    else{note.textContent="Think it over… you can answer again in "+n+"s";}
+  },1000);
+}
 function renderQ(area,qs,stArr,id,kind){
   area.innerHTML="";
   qs.forEach((q,i)=>{
-    const row=document.createElement("div");row.className="qrow"+(stArr[i]?" right":"");
+    const row=document.createElement("div");row.className="qrow"+(qDone(stArr[i])?" right":"");
     let inner='<div class="qtext">'+q.q+'</div>';
-    if(stArr[i]){
-      inner+='<div style="color:var(--green);font-weight:700">'+icn("check")+' '+(q.type==="num"?fmt(q.a)+(q.unit||""):q.opts[q.a])+'</div>';
+    if(qDone(stArr[i])){
+      inner+='<div style="color:var(--green);font-weight:700">'+icn("check")+' '+(q.type==="num"?fmt(q.a)+(q.unit||""):q.opts[q.a])+'</div>'+creditNote(stArr[i]);
       row.innerHTML=inner;area.appendChild(row);return;
     }
     if(q.type==="num"){
@@ -539,13 +563,19 @@ function renderQ(area,qs,stArr,id,kind){
         else{tries++;mark.innerHTML=icn("xmark")+" try again";mark.style.color="var(--red)";row.classList.remove("wrong");void row.offsetWidth;row.classList.add("wrong");if(tries>=2)row.querySelector(".hint").style.display="block";}
       };
       btn.onclick=go;inp.addEventListener("keydown",e=>{if(e.key==="Enter")go();});
-    }else{ // mc
+    }else{ // mc — first answer counts for assignment credit
+      if(ASG)inner+='<div class="faNote" style="color:'+(stArr[i]===3?"var(--red)":"var(--gold)")+';font-size:.82em;margin:-2px 0 6px">'+(stArr[i]===3?"No point for this one — but keep going and find the right answer to finish the lab.":"Careful — your FIRST answer is the one that counts for your score!")+'</div>';
       row.innerHTML=inner;
       q.opts.forEach((opt,oi)=>{
         const b=document.createElement("button");b.className="mcopt";b.textContent=opt;
         b.onclick=()=>{
-          if(oi===q.a){stArr[i]=true;saveS();b.classList.add("right");setTimeout(()=>{row.className="qrow right";row.innerHTML='<div class="qtext">'+q.q+'</div><div style="color:var(--green);font-weight:700">'+icn("check")+' '+q.opts[q.a]+'</div>';checkDone(id,cur);},350);}
-          else{b.classList.add("wrong");b.disabled=true;row.classList.remove("wrong");void row.offsetWidth;row.classList.add("wrong");}
+          if(oi===q.a){stArr[i]=(stArr[i]===3?2:1);saveS();b.classList.add("right");setTimeout(()=>{row.className="qrow right";row.innerHTML='<div class="qtext">'+q.q+'</div><div style="color:var(--green);font-weight:700">'+icn("check")+' '+q.opts[q.a]+'</div>'+creditNote(stArr[i]);checkDone(id,cur);},350);}
+          else{
+            if(stArr[i]!==3){stArr[i]=3;saveS();}
+            const fn=row.querySelector(".faNote");
+            if(fn){fn.style.color="var(--red)";fn.textContent="No point for this one — but keep going and find the right answer to finish the lab.";}
+            b.classList.add("wrong");b.disabled=true;row.classList.remove("wrong");void row.offsetWidth;row.classList.add("wrong");lockRow(row);
+          }
         };
         row.appendChild(b);
       });
@@ -555,8 +585,8 @@ function renderQ(area,qs,stArr,id,kind){
 }
 function checkDone(id,inst){
   const st=userLabs()[id];
-  if(st.nb.every(Boolean)&&st.cp.every(Boolean)&&!st.done){
-    st.done=true;saveS();$("doneBanner").style.display="block";$("doneBanner").scrollIntoView({behavior:"smooth"});
+  if(st.nb.every(qDone)&&st.cp.every(qDone)&&!st.done){
+    st.done=true;saveS();setDoneMsg(id);$("doneBanner").style.display="block";$("doneBanner").scrollIntoView({behavior:"smooth"});
   }else if(st.done){$("doneBanner").style.display="block";}
   updateAsgBar(id);
 }
@@ -1601,17 +1631,20 @@ function renderAsgHome(){
   $("asgWho").textContent=S.name;
   $("asgPeriodTxt").textContent=periodLabel(u.period);
   $("asgFill").style.width=(sc.total?sc.done/sc.total*100:0)+"%";
-  $("asgScoreText").textContent=sc.done+" of "+sc.total+" tasks complete — "+sc.pct+"%";
+  $("asgScoreText").textContent=sc.done+" of "+sc.total+" points — "+sc.pct+"%";
   $("asgCodeChip").textContent=encodeAsg();
-  $("asgDone").style.display=(sc.total>0&&sc.done===sc.total)?"block":"none";
+  const st=userLabs()[ASG];
+  const fin=!!(st&&st.done);
+  const started=!!(st&&st.nb&&(st.nb.some(qDone)||st.cp.some(qDone)));
+  $("asgDone").style.display=fin?"block":"none";
+  $("asgDone").textContent=sc.pct===100?"ASSIGNMENT COMPLETE — 100%! Copy your code above and turn it in.":"Lab finished — your score is "+sc.pct+"%. Copy your code above and turn it in.";
   const g=$("asgGrid");g.innerHTML="";
-  const fin=sc.total>0&&sc.done===sc.total;
   const b=document.createElement("button");
   b.className="labCard"+(fin?" complete":"");
   b.innerHTML='<img class="art" src="'+TILEART[ASG]+'" alt="">'+(fin?'<span class="done">'+icn("star")+'</span>':'')+
     '<h3>'+L.title+'</h3><div class="dim" style="font-size:.9em">'+L.blurb+'</div>'+
     L.std.map(s=>'<span class="std">'+s+'</span>').join("")+
-    '<div style="margin-top:10px"><span class="btn small" style="pointer-events:none">'+(fin?"Review my lab":(sc.done>0?"Keep working →":"Start the lab →"))+'</span></div>';
+    '<div style="margin-top:10px"><span class="btn small" style="pointer-events:none">'+(fin?"Review my lab":(started?"Keep working →":"Start the lab →"))+'</span></div>';
   b.onclick=()=>openLab(ASG);
   g.appendChild(b);
 }
