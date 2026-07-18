@@ -5,7 +5,7 @@
 // is the credential; the file is streamed from the private bucket and
 // never exposed as a public URL.
 // =====================================================================
-import { adminDb, QUEST_BUCKET, stripe, SITE_ORIGIN, verify1v1Pass } from './_shared.js';
+import { adminDb, QUEST_BUCKET, stripe, SITE_ORIGIN, verify1v1Pass, sign1v1Share, verify1v1Share } from './_shared.js';
 
 // ---- 1v1 Science: build a self-contained single-game download ----
 const ES_SHEETS = ['energy_sources','moon_phases','planets','rocks','sky_icons','space_objects'];
@@ -35,7 +35,16 @@ async function build1v1File(grade, game, std, name) {
   const filename = (name || 'game').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '') + '.html';
   return { body: html, filename };
 }
-async function deliver1v1(sid) {
+// The class share link a teacher distributes to students: a signed pointer
+// to one game, safe to post anywhere. Clicking it PLAYS the game in the
+// browser (served inline) instead of downloading a file.
+function shareLinkFor(meta) {
+  return (SITE_ORIGIN || '') + '/api/game?share=' + encodeURIComponent(sign1v1Share(meta));
+}
+function jsonRes(data) {
+  return new Response(JSON.stringify(data), { status: 200, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
+}
+async function deliver1v1(sid, wantLink) {
   let session;
   try { session = await stripe.checkout.sessions.retrieve(sid); }
   catch (e) { return note('We could not verify that purchase. If you were charged, re-send your link from <a href="/1v1/recover.html" style="color:#f4e4bc">tobinscience.com/1v1/recover.html</a>.'); }
@@ -43,6 +52,7 @@ async function deliver1v1(sid) {
     return note('That purchase is not complete yet. If you were charged, re-send your link from <a href="/1v1/recover.html" style="color:#f4e4bc">tobinscience.com/1v1/recover.html</a>.');
   }
   const { grade, game, std, name } = session.metadata;
+  if (wantLink) return jsonRes({ url: shareLinkFor({ grade, game, std, name }) });
   const file = await build1v1File(grade, game, std, name);
   if (!file) return note('Something went wrong building your download. Please try again in a few minutes, or re-send your link from <a href="/1v1/recover.html" style="color:#f4e4bc">tobinscience.com/1v1/recover.html</a>.');
   return new Response(file.body, {
@@ -70,9 +80,33 @@ export async function GET(request) {
   try {
     const url = new URL(request.url);
 
+    // 1v1 Science CLASS SHARE LINK: students click it and the game plays
+    // right in the browser (no download step). The token pins one game.
+    const share = url.searchParams.get('share');
+    if (share) {
+      const meta = verify1v1Share(share);
+      if (!meta || !['physical', 'life', 'earth'].includes(meta.grade)) {
+        return note('This class link is invalid or has expired. Ask your teacher for a fresh link, or visit <a href="/1v1/" style="color:#f4e4bc">tobinscience.com/1v1/</a>.');
+      }
+      const file = await build1v1File(meta.grade, meta.game, meta.std, meta.name);
+      if (!file) return note('Something went wrong loading the game. Please try again in a few minutes.');
+      return new Response(file.body, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          // Cacheable: the link is public-by-design and the content is static,
+          // so a whole class clicking at once is cheap.
+          'Cache-Control': 'public, max-age=3600'
+        }
+      });
+    }
+
+    // Teachers can ask for their class share link (&link=1) instead of the file.
+    const wantLink = url.searchParams.get('link') === '1';
+
     // 1v1 Science single-game download after a paid $2 checkout.
     const sid = url.searchParams.get('s');
-    if (sid) return await deliver1v1(sid);
+    if (sid) return await deliver1v1(sid, wantLink);
 
     // 1v1 Science free download with a verified Cherokee all-access pass.
     const pass = url.searchParams.get('pass');
@@ -86,6 +120,7 @@ export async function GET(request) {
       const std = (url.searchParams.get('std') || '').slice(0, 8);
       const name = (url.searchParams.get('name') || 'Game').slice(0, 60);
       if (!['physical', 'life', 'earth'].includes(grade) || !game) return note('That game could not be found.');
+      if (wantLink) return jsonRes({ url: shareLinkFor({ grade, game, std, name }) });
       const file = await build1v1File(grade, game, std, name);
       if (!file) return note('Something went wrong building your download. Please try again in a few minutes.');
       return new Response(file.body, {

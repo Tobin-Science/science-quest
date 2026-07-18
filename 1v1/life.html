@@ -2105,9 +2105,23 @@ function openBuy(gm){
         '<li>Works offline &mdash; host it anywhere, forever</li>'+
         '<li>Yours to keep</li></ul></div>'+
       '<div class="lm-note">&#10003; Cherokee County pass active on this device.</div>'+
+      '<div class="lm-note" style="text-align:left"><b>Class share link</b> &mdash; paste into Google Classroom or Canvas. When a student clicks it, the game opens right in their browser:'+
+        '<span style="display:flex;gap:6px;margin-top:6px"><input id="lmShare" readonly value="Getting your class link&hellip;" style="flex:1;min-width:0;padding:8px 10px;border:1px solid #c9d2dc;border-radius:8px;font-size:12px;color:inherit;background:#fff">'+
+        '<button class="btn" id="lmShareCopy" type="button">Copy</button></span></div>'+
       '<div class="lm-actions"><button class="btn" id="lmClose">Close</button> <a class="btn btn-accent" style="display:inline-block;text-decoration:none" href="'+dl+'" download>&#11015; Download free</a></div>'+
     '</div>';
     m.classList.add('on');
+    fetch(dl+'&link=1').then(r=>r.json()).then(d=>{
+      const inp=m.querySelector('#lmShare');
+      if(inp) inp.value=(d&&d.url)?d.url:'Link unavailable — please try again shortly.';
+    }).catch(()=>{ const inp=m.querySelector('#lmShare'); if(inp) inp.value='Link unavailable — please try again shortly.'; });
+    m.querySelector('#lmShareCopy').onclick=function(){
+      const inp=m.querySelector('#lmShare'), btn=this;
+      inp.focus(); inp.select();
+      let ok=false; try{ ok=document.execCommand('copy'); }catch(e){}
+      if(!ok && navigator.clipboard) navigator.clipboard.writeText(inp.value);
+      btn.textContent='Copied!'; setTimeout(()=>{ btn.textContent='Copy'; },1500);
+    };
     m.querySelector('#lmClose').onclick=()=>m.classList.remove('on');
     m.onclick=(e)=>{ if(e.target===m) m.classList.remove('on'); };
     return;
@@ -2118,6 +2132,7 @@ function openBuy(gm){
     '<div class="buy-box"><div class="buy-price">'+GAME_PRICE+'</div>'+
       '<ul class="buy-list"><li>Download a single file of this game</li>'+
       '<li>Works offline &mdash; host it anywhere, forever</li>'+
+      '<li>Class share link for Google Classroom / Canvas</li>'+
       '<li>No subscription, no account needed</li></ul></div>'+
     '<div class="lm-note" id="buyMsg">Secure checkout by Stripe &middot; you get the download the moment you pay.</div>'+
     '<div class="lm-note">Cherokee County teacher? <a href="/1v1/cherokee.html" style="color:var(--navy);font-weight:700">Every download is free &rarr;</a></div>'+

@@ -250,6 +250,28 @@ export function verify1v1Pass(token) {
   return data.e;
 }
 
+// 1v1 Science CLASS SHARE LINK — a signed pointer to ONE game that a teacher
+// can hand to students (Google Classroom, Canvas, email). Contains no pass
+// and no purchase info, so it's safe to distribute; it only ever serves that
+// single game. ~10 years, matching "yours forever".
+export function sign1v1Share({ grade, game, std, name }) {
+  const payload = Buffer.from(JSON.stringify({ k: '1v1share', g: grade, i: game, s: std || '', n: name || '', x: Date.now() + 1000 * 60 * 60 * 24 * 3650 })).toString('base64url');
+  const sig = crypto.createHmac('sha256', _districtKey()).update(payload).digest('base64url');
+  return payload + '.' + sig;
+}
+export function verify1v1Share(token) {
+  const parts = String(token || '').split('.');
+  if (parts.length !== 2) return null;
+  const [payload, sig] = parts;
+  const expect = crypto.createHmac('sha256', _districtKey()).update(payload).digest('base64url');
+  if (sig.length !== expect.length) return null;
+  try { if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expect))) return null; } catch (e) { return null; }
+  let data;
+  try { data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')); } catch (e) { return null; }
+  if (!data || data.k !== '1v1share' || !data.g || !data.i || !data.x || Date.now() > data.x) return null;
+  return { grade: data.g, game: data.i, std: data.s || '', name: data.n || '' };
+}
+
 // Free-trial email-verification token. Same HMAC scheme as the district
 // token, but marked k:'trial' so the two can't be swapped.
 export function signTrialToken(email) {

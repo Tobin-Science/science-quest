@@ -26,7 +26,15 @@
     <h1>Thank you! <span class="r">1</span>v<span class="b">1</span></h1>
     <p id="msg">Your game is downloading now…</p>
     <a id="dl" class="btn">Download my game</a>
-    <p class="note">Save the file somewhere safe — it's yours forever and works offline on any computer. To use it in class, just open it (or upload it to your site / Google&nbsp;Drive / Canvas). <b>We've also emailed you this download link</b>, so you can always get it back.</p>
+    <p class="note">Save the file somewhere safe — it's yours forever and works offline on any computer. <b>We've also emailed you this download link</b>, so you can always get it back.</p>
+    <div id="shareBox" style="display:none;text-align:left;background:#eef5ee;border:1px solid #cfe3cf;border-radius:12px;padding:14px 16px;margin-top:14px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px;color:var(--green)">Share with your class</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Paste this link into Google Classroom or Canvas. When a student clicks it, the game opens right in their browser — nothing to download.</div>
+      <div style="display:flex;gap:6px">
+        <input id="shareUrl" readonly style="flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--ink)">
+        <button id="shareCopy" style="padding:8px 14px;border:none;border-radius:8px;background:var(--green);color:#fff;font-weight:700;cursor:pointer">Copy</button>
+      </div>
+    </div>
     <p class="note">Didn't download, or lost it? <a href="/1v1/recover.html" style="color:var(--blue);font-weight:600">Get your link by email →</a></p>
     <a class="back" href="/1v1/">← Back to 1v1 Science</a>
   </div>
@@ -46,6 +54,23 @@
     var a = document.createElement('a');
     a.href = url; a.setAttribute('download','');
     document.body.appendChild(a); a.click(); a.remove();
+
+    // Fetch the class share link (students click it -> game plays in browser).
+    fetch(url + '&link=1').then(function(r){ return r.json(); }).then(function(d){
+      if (d && d.url) {
+        document.getElementById('shareUrl').value = d.url;
+        document.getElementById('shareBox').style.display = 'block';
+      }
+    }).catch(function(){});
+    document.getElementById('shareCopy').onclick = function(){
+      var inp = document.getElementById('shareUrl'), btn = this;
+      inp.focus(); inp.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch(e){}
+      if (!ok && navigator.clipboard) { navigator.clipboard.writeText(inp.value); }
+      btn.textContent = 'Copied!';
+      setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+    };
   })();
 </script>
 </body>
