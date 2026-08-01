@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<title>Periodic Table Explorer — free interactive periodic table for 8th grade &amp; High School | Tobin Science</title>
+<meta name="description" content="A free interactive periodic table built for 8th grade and High School Physical Science. Color the table by family, metal type, state, valence electrons, or reactivity. See a Bohr model for any element, map the atomic radius, ionization energy, and electronegativity trends, run name-seeded practice with a teacher-verifiable code, and print blank tables and worksheets. Works offline on any Chromebook.">
+<meta property="og:title" content="Periodic Table Explorer — free interactive periodic table">
+<meta property="og:description" content="Color the table by family, valence electrons, or reactivity. Bohr models, HS trend heat maps, name-seeded practice with progress codes, and printable worksheets. Free for any teacher.">
+<meta property="og:image" content="https://tobinscience.com/periodic-table-cover.jpg">
+<meta property="og:url" content="https://tobinscience.com/periodic-table.html">
+<meta property="og:type" content="website">
+<style>
+:root{
+  --bg:#0e1a2b; --panel:#16283f; --panel2:#1d3350; --ink:#eaf2fb; --dim:#9fb4cc;
+  --accent:#38bdf8; --gold:#fbbf24; --green:#34d399; --red:#f87171; --purple:#a78bfa;
+  --line:#2a4568; --tile-ink:#0b1a2a;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{background:var(--bg); color:var(--ink); font-family:"Segoe UI",system-ui,Arial,sans-serif; min-height:100vh;}
+.wrap{max-width:1180px; margin:0 auto; padding:16px;}
+h1{font-size:1.7em; letter-spacing:.5px;}
+h2{font-size:1.25em;}
+h3{font-size:1.05em;}
+.dim{color:var(--dim);}
+a{color:var(--accent);}
+button{font-family:inherit; cursor:pointer; border:none; border-radius:10px; font-size:1em;}
+.btn{background:var(--accent); color:#082033; font-weight:700; padding:10px 18px; transition:transform .1s;}
+.btn:hover{transform:translateY(-2px);}
+.btn.gray{background:#33507a; color:var(--ink);}
+.btn.gold{background:var(--gold); color:#3a2a00;}
+.btn.green{background:var(--green); color:#03301f;}
+.btn.small{padding:6px 12px; font-size:.9em;}
+.btn:disabled{opacity:.45; cursor:default; transform:none;}
+.card{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px;}
+.card+.card{margin-top:14px;}
+input[type=text],input[type=number],select,textarea{background:#0c1626; border:2px solid var(--line); color:var(--ink); border-radius:8px; padding:8px 10px; font-size:1em; font-family:inherit;}
+input:focus,select:focus,textarea:focus{outline:none; border-color:var(--accent);}
+hr{border:none; border-top:1px solid var(--line); margin:14px 0;}
+.icn{width:1.15em; height:1.15em; vertical-align:-0.2em; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; display:inline-block;}
+h2 .icn{color:var(--accent);}
+.pill{display:inline-block; background:#0c1626; border-radius:999px; padding:3px 12px; font-size:.8em; color:var(--dim); margin:2px;}
+.codeChip{font-family:Consolas,monospace; font-size:1.1em; background:#0c1626; border:1px dashed var(--gold); color:var(--gold); padding:8px 14px; border-radius:10px; display:inline-block; letter-spacing:1px; word-break:break-all; max-width:100%;}
+
+/* ---------- header + tabs ---------- */
+#head{text-align:center; padding:18px 10px 6px;}
+#head img{width:72px; height:72px; border-radius:50%; margin-bottom:6px;}
+#tabs{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:16px 0 14px;}
+#tabs button{background:var(--panel); color:var(--dim); border:2px solid var(--line); padding:9px 18px; font-weight:700;}
+#tabs button:hover{border-color:var(--accent); color:var(--ink);}
+#tabs button.on{background:var(--accent); color:#082033; border-color:var(--accent);}
+.view{display:none;}
+.view.on{display:block;}
+
+/* ---------- toolbar ---------- */
+.tools{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px;}
+.tools .grp{background:var(--panel2); border-radius:10px; padding:7px 12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.tools label{font-size:.9em; color:var(--dim); font-weight:600;}
+.tools select{padding:6px 8px;}
+.tools input[type=text]{padding:6px 10px; width:180px;}
+.seg{display:flex; gap:0; border-radius:10px; overflow:hidden; border:2px solid var(--line);}
+.seg button{border-radius:0; background:#0c1626; color:var(--dim); padding:7px 14px; font-weight:700; font-size:.92em;}
+.seg button.on{background:var(--accent); color:#082033;}
+.seg button+button{border-left:1px solid var(--line);}
+
+/* ---------- periodic table ---------- */
+.ptScroll{overflow-x:auto; padding-bottom:6px;}
+.pt{display:grid; grid-template-columns:24px repeat(18, minmax(0,1fr)); gap:3px; min-width:940px;}
+.ghdr,.phdr{color:var(--dim); font-size:.72em; font-weight:700; display:flex; align-items:center; justify-content:center;}
+.el{position:relative; border:none; border-radius:5px; padding:2px 1px 3px; text-align:center; line-height:1.05;
+    color:var(--tile-ink); background:#33507a; overflow:hidden; aspect-ratio:1/1; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; transition:transform .08s, box-shadow .08s; font-family:inherit;}
+.el:hover{transform:scale(1.13); z-index:5; box-shadow:0 4px 14px rgba(0,0,0,.6);}
+.el .z{position:absolute; top:2px; left:4px; font-size:.52em; font-weight:600; opacity:.8;}
+.el .sym{font-size:1.02em; font-weight:800; letter-spacing:.3px;}
+.el .nm{font-size:.44em; font-weight:600; opacity:.85; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0 2px;}
+.el .ms{font-size:.44em; opacity:.7;}
+.el .val{position:absolute; top:2px; right:4px; font-size:.52em; font-weight:700; opacity:.85;}
+.el.faded{opacity:.16;}
+.el.hit{outline:3px solid var(--ink); outline-offset:-3px;}
+.el.nodata{background:#24384f; color:#7f9ab8;}
+.ph{border:1px dashed var(--line); border-radius:5px; color:var(--dim); font-size:.6em; display:flex; align-items:center; justify-content:center; aspect-ratio:1/1;}
+.fspace{height:8px; grid-column:1/-1;}
+body.big .pt{min-width:1080px;}
+body.big .el .sym{font-size:1.5em;}
+body.big .el .nm,body.big .el .ms{font-size:.55em;}
+body.big .el .z,body.big .el .val{font-size:.65em;}
+body.big .ghdr,body.big .phdr{font-size:.9em;}
+
+/* ---------- legend ---------- */
+#legend,#trLegend{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+.lg{display:inline-flex; align-items:center; gap:7px; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:4px 13px 4px 5px; font-size:.85em; cursor:pointer;}
+.lg:hover{border-color:var(--accent);}
+.lg.off{opacity:.4;}
+.lg i{width:15px; height:15px; border-radius:4px; display:inline-block;}
+.scale{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px;}
+.scaleBar{height:15px; width:220px; border-radius:999px; border:1px solid var(--line);}
+
+/* ---------- element detail ---------- */
+#shade{display:none; position:fixed; inset:0; background:rgba(4,10,20,.78); z-index:40; align-items:center; justify-content:center; padding:14px;}
+#shade.on{display:flex;}
+#detail{background:var(--panel); border:2px solid var(--line); border-radius:18px; max-width:760px; width:100%; max-height:92vh; overflow-y:auto; padding:18px;}
+#dTop{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start;}
+#dTile{width:118px; height:118px; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--tile-ink); flex:none; position:relative;}
+#dTile .z{position:absolute; top:6px; left:9px; font-size:.85em; font-weight:700;}
+#dTile .sym{font-size:2.7em; font-weight:800; line-height:1;}
+#dTile .ms{font-size:.8em; opacity:.8; margin-top:2px;}
+#dInfo{flex:1; min-width:230px;}
+#dInfo h2{font-size:1.6em;}
+#dFact{margin-top:8px; color:var(--gold); line-height:1.4; font-size:.98em;}
+.dGrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:8px; margin-top:14px;}
+.dCell{background:var(--panel2); border-radius:10px; padding:8px 11px;}
+.dCell .k{font-size:.74em; color:var(--dim); text-transform:uppercase; letter-spacing:.5px;}
+.dCell .v{font-weight:700; font-size:1.05em; margin-top:2px;}
+.dCell .v small{font-weight:400; color:var(--dim); font-size:.75em;}
+#dBohrWrap{margin-top:14px; background:#0a1420; border-radius:12px; padding:8px; text-align:center;}
+#dBohrWrap svg{width:100%; max-width:420px; height:auto;}
+#dNav{display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; align-items:center;}
+#dNav .sp{flex:1;}
+
+/* ---------- trends ---------- */
+.arrowNote{display:flex; gap:14px; flex-wrap:wrap; margin-top:10px;}
+.arrowNote div{flex:1; min-width:220px; background:var(--panel2); border-radius:10px; padding:10px 13px; font-size:.93em; line-height:1.4;}
+.arrowNote b{color:var(--accent);}
+#cmpRow{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px;}
+#cmpOut{margin-top:12px; line-height:1.5;}
+#cmpOut .win{color:var(--green); font-weight:700;}
+
+/* ---------- practice ---------- */
+#pGate{max-width:430px; margin:22px auto; text-align:center;}
+#pGate input,#pGate select{width:100%; margin:8px 0; text-align:center; font-size:1.05em;}
+.qrow{margin:12px 0; padding:12px; background:var(--panel2); border-radius:10px; border-left:4px solid var(--line);}
+.qrow.right{border-left-color:var(--green);}
+.qrow.wrong{animation:shake .3s;}
+.qrow .qtext{margin-bottom:9px; line-height:1.4;}
+.qrow .qn{color:var(--accent); font-weight:800; margin-right:6px;}
+.qrow .mark{font-weight:800; margin-left:8px;}
+.qrow .why{color:var(--gold); font-size:.87em; margin-top:8px; display:none; line-height:1.4;}
+.mcopt{display:block; width:100%; text-align:left; margin:5px 0; padding:9px 13px; border-radius:8px; background:#0c1626; color:var(--ink); border:2px solid var(--line); font-size:.97em;}
+.mcopt:hover{border-color:var(--accent);}
+.mcopt.right{border-color:var(--green); background:#0d2e22;}
+.mcopt.wrong{border-color:var(--red); background:#331416;}
+.mcopt:disabled{cursor:default;}
+.numrow{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+.numrow input{width:110px; text-align:center; font-size:1.05em;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pbar{background:#0c1626; border-radius:999px; height:14px; overflow:hidden; margin:12px 0 4px;}
+.pfill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--gold)); transition:width .5s;}
+#pDone{display:none; border:2px solid var(--gold); background:#241d05; text-align:center; padding:16px; border-radius:16px; margin-top:14px;}
+#pDone h2{color:var(--gold);}
+.qBohr{background:#0a1420; border-radius:10px; padding:6px; text-align:center; margin-bottom:9px;}
+.qBohr svg{width:100%; max-width:300px; height:auto;}
+.qTile{display:inline-flex; flex-direction:column; align-items:center; justify-content:center; width:96px; height:96px; border-radius:10px; color:var(--tile-ink); margin:4px 0 9px; position:relative;}
+.qTile .z{position:absolute; top:4px; left:7px; font-size:.72em; font-weight:700;}
+.qTile .sym{font-size:2em; font-weight:800; line-height:1;}
+.qTile .ms{font-size:.72em; opacity:.8;}
+
+/* ---------- print sheet picker ---------- */
+#sheetGrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(275px,1fr)); gap:14px; margin-top:14px;}
+.sheet{background:var(--panel); border:2px solid var(--line); border-radius:14px; padding:14px; text-align:left;}
+.sheet h3{margin-bottom:5px;}
+.sheet p{color:var(--dim); font-size:.9em; line-height:1.4; margin-bottom:10px;}
+.sheet .row{display:flex; gap:8px; flex-wrap:wrap;}
+
+/* ---------- teacher ---------- */
+.gradeTable{width:100%; border-collapse:collapse; margin-top:10px; font-size:.95em;}
+.gradeTable th,.gradeTable td{border:1px solid var(--line); padding:6px 10px; text-align:left;}
+.gradeTable th{background:#0c1626; color:var(--accent);}
+.gradeTable td.pct{font-weight:700; font-variant-numeric:tabular-nums;}
+#gradeIn{width:100%; min-height:90px; font-family:Consolas,monospace; font-size:.9em;}
+#asgLinkRow{display:none; margin-top:10px;}
+#asgLinkRow input{width:100%; font-family:Consolas,monospace; font-size:.9em; margin-bottom:8px;}
+
+/* ---------- footer ---------- */
+#tsFoot{text-align:center; margin:30px 0 14px;}
+.tsBtn{display:inline-flex; align-items:center; gap:13px; background:var(--panel); border:2px solid var(--line); border-radius:16px; padding:10px 22px 10px 12px; color:var(--ink); text-decoration:none; font-weight:700; font-size:1.02em; text-align:left; transition:transform .12s,border-color .12s;}
+.tsBtn:hover{transform:translateY(-2px); border-color:var(--accent);}
+.tsBtn img{width:46px; height:46px; border-radius:50%;}
+
+@media(max-width:620px){
+  .wrap{padding:10px;}
+  #dTile{width:92px; height:92px;}
+  #dTile .sym{font-size:2.1em;}
+}
+
+/* ---------- print ---------- */
+#printArea{display:none;}
+@media print{
+  @page{margin:0.5in;}
+  #app{display:none !important;}
+  #printArea{display:block; background:#fff; color:#000;}
+  body{background:#fff; color:#000;}
+  .psheet{page-break-after:always; font-family:"Segoe UI",Arial,sans-serif;}
+  .psheet:last-child{page-break-after:auto;}
+}
+#printArea{background:#fff; color:#000;}
+.psheet{font-family:"Segoe UI",Arial,sans-serif; color:#000; padding:0 0 10px;}
+.psheet h1{font-size:17pt; margin-bottom:2px;}
+.psheet .sub{font-size:9.5pt; color:#333; margin-bottom:6px;}
+.psheet .nameline{font-size:10pt; margin:6px 0 10px; border-bottom:1px solid #000; padding-bottom:3px;}
+.psheet .ptp{display:grid; grid-template-columns:16px repeat(18,1fr); gap:2px;}
+.psheet .ptp .c{border:1px solid #000; aspect-ratio:1/1; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:6.5pt; line-height:1.05; overflow:hidden;}
+.psheet .ptp .c b{font-size:8.5pt;}
+.psheet .ptp .c .zz{font-size:5.5pt;}
+.psheet .ptp .c.blank{background:#fff;}
+.psheet .ptp .hd{font-size:5.5pt; text-align:center; color:#444;}
+.psheet .ptp .sp{grid-column:1/-1; height:5px;}
+.psheet ol{margin:6px 0 0 20px; font-size:10pt;}
+.psheet ol li{margin-bottom:9px; line-height:1.5;}
+.psheet .wl{display:inline-block; border-bottom:1px solid #000; min-width:80px;}
+.psheet table{width:100%; border-collapse:collapse; font-size:9.5pt; margin-top:6px;}
+.psheet table th,.psheet table td{border:1px solid #000; padding:4px 6px; text-align:left;}
+.psheet table th{background:#eee;}
+.psheet .bohrbox{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;}
+.psheet .bohrbox .bb{border:1px solid #000; padding:6px; text-align:center;}
+.psheet .bohrbox .bb .cap{font-size:9pt; margin-top:3px;}
+.psheet .bohrbox svg{width:100%; max-width:200px; height:auto;}
+.psheet .keytag{display:inline-block; border:2px solid #000; padding:2px 10px; font-weight:700; font-size:10pt; margin-bottom:6px;}
+.psheet .foot{text-align:center; font-size:8.5pt; color:#444; margin-top:10px;}
+.psheet .lgp{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; font-size:8pt;}
+.psheet .lgp span{border:1px solid #000; padding:1px 7px;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+
+<div id="head">
+  <img id="logoTop" alt="Tobin Science">
+  <h1>Tobin Science — Periodic Table Explorer</h1>
+  <div class="dim">Click any element. Color the whole table any way you need. Built for 8th grade and High School Physical Science.</div>
+</div>
+
+<div id="tabs">
+  <button data-v="table" class="on">Periodic Table</button>
+  <button data-v="trends">Trends</button>
+  <button data-v="practice">Practice</button>
+  <button data-v="print">Print</button>
+  <button data-v="teacher">Teacher Tools</button>
+</div>
+
+<!-- ================= TABLE ================= -->
+<div class="view on" id="vtable">
+  <div class="tools">
+    <div class="grp">
+      <label for="colorBy">Color by</label>
+      <select id="colorBy">
+        <option value="fam">Family / group</option>
+        <option value="mnm">Metal · Nonmetal · Metalloid</option>
+        <option value="state">State at room temperature</option>
+        <option value="val">Valence electrons</option>
+        <option value="react">Reactivity</option>
+        <option value="plain">Plain (no color)</option>
+      </select>
+    </div>
+    <div class="grp">
+      <label for="findIn">Find</label>
+      <input type="text" id="findIn" placeholder="name, symbol, or number" autocomplete="off">
+      <button class="btn gray small" id="findClear">Clear</button>
+    </div>
+    <div class="grp">
+      <label for="bigTog" style="cursor:pointer">Projector text</label>
+      <input type="checkbox" id="bigTog" style="width:18px;height:18px;accent-color:#38bdf8;cursor:pointer">
+    </div>
+  </div>
+
+  <div class="ptScroll"><div class="pt" id="ptGrid"></div></div>
+  <div id="legend"></div>
+  <div class="dim" style="margin-top:12px; font-size:.9em" id="modeNote"></div>
+</div>
+
+<!-- ================= TRENDS ================= -->
+<div class="view" id="vtrends">
+  <div class="tools">
+    <div class="seg" id="trSeg">
+      <button data-t="rad" class="on">Atomic radius</button>
+      <button data-t="ie">Ionization energy</button>
+      <button data-t="en">Electronegativity</button>
+    </div>
+    <div class="grp">
+      <label for="bigTog2" style="cursor:pointer">Projector text</label>
+      <input type="checkbox" id="bigTog2" style="width:18px;height:18px;accent-color:#38bdf8;cursor:pointer">
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <h2 id="trTitle"></h2>
+    <div class="dim" id="trWhat" style="margin-top:5px; line-height:1.45"></div>
+    <div class="arrowNote">
+      <div id="trAcross"></div>
+      <div id="trDown"></div>
+    </div>
+    <div class="dim" id="trWhy" style="margin-top:10px; line-height:1.45; font-size:.93em"></div>
+  </div>
+
+  <div class="ptScroll"><div class="pt" id="trGrid"></div></div>
+  <div class="scale">
+    <span class="dim" id="scaleLo"></span>
+    <div class="scaleBar" id="scaleBar"></div>
+    <span class="dim" id="scaleHi"></span>
+    <span class="pill" style="margin-left:8px"><i style="display:inline-block;width:11px;height:11px;border-radius:3px;background:#24384f;vertical-align:-1px;margin-right:5px"></i>no reliable data</span>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h7M3 18h7M6.5 3v6M6.5 15v6M14 8.5h7M14 15.5h7"/></svg> Compare two elements</h2>
+    <div class="dim" style="margin-top:4px; font-size:.92em">Pick any two and find out which one wins — and why.</div>
+    <div id="cmpRow">
+      <select id="cmpA"></select>
+      <span class="dim">vs.</span>
+      <select id="cmpB"></select>
+      <button class="btn small" id="cmpGo">Compare</button>
+    </div>
+    <div id="cmpOut" class="dim"></div>
+  </div>
+</div>
+
+<!-- ================= PRACTICE ================= -->
+<div class="view" id="vpractice">
+  <div id="pGate" class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5"/><path d="M4.5 20.5c1.4-3.6 4.2-5.5 7.5-5.5s6.1 1.9 7.5 5.5"/></svg> Sign in to practice</h2>
+    <div id="pAsgInfo" class="dim" style="display:none; margin:6px 0 2px; color:var(--accent); font-weight:700;"></div>
+    <div class="dim" id="pGateHint" style="margin-top:4px">First and last name — this is how your teacher gives you credit.</div>
+    <input type="text" id="pName" maxlength="24" placeholder="e.g. Jordan Smith" autocomplete="off">
+    <div id="pAsgFields" style="display:none">
+      <input type="text" id="pFirst" maxlength="12" placeholder="First name" autocomplete="off">
+      <input type="text" id="pLast" maxlength="14" placeholder="Last name" autocomplete="off">
+      <select id="pPeriod">
+        <option value="">Class period…</option>
+        <option value="1">1st period</option><option value="2">2nd period</option>
+        <option value="3">3rd period</option><option value="4">4th period</option>
+        <option value="5">5th period</option><option value="6">6th period</option>
+        <option value="7">7th period</option><option value="8">8th period</option>
+      </select>
+    </div>
+    <div id="pLevelPick" style="margin:10px 0 4px">
+      <div class="dim" style="margin-bottom:6px">Which set?</div>
+      <div class="seg" id="pLevelSeg" style="display:inline-flex">
+        <button data-l="ms" class="on">8th Grade</button>
+        <button data-l="hs">High School</button>
+      </div>
+    </div>
+    <button class="btn" id="pGo" style="margin-top:10px">Start practice →</button>
+  </div>
+
+  <div id="pMain" style="display:none">
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <h2 style="flex:1">Scientist: <span id="pWho" style="color:var(--accent)"></span></h2>
+        <button class="btn gray small" id="pSwitch">Switch user</button>
+      </div>
+      <div class="dim" id="pSetTxt" style="margin-top:3px"></div>
+      <div class="pbar"><div class="pfill" id="pFill"></div></div>
+      <div class="dim" id="pScoreTxt"></div>
+      <div style="margin-top:12px">
+        <span class="dim">Code for your teacher: </span>
+        <span class="codeChip" id="pCode"></span>
+        <button class="btn small" id="pCopy" style="margin-left:6px">Copy my code</button>
+      </div>
+      <div class="dim" style="margin-top:7px; font-size:.87em">Your code updates as you answer. Every student gets different elements, so the answers can't be copied.</div>
+      <div id="pDone">
+        <h2>ALL QUESTIONS ANSWERED</h2>
+        <div style="margin-top:5px" id="pDoneMsg"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.4l2.7 2.7 5.3-5.6"/></svg> Your questions</h2>
+      <div class="dim" style="margin:4px 0 6px; font-size:.92em">Multiple choice counts your <b>first</b> answer only — read before you click.</div>
+      <div id="qArea"></div>
+    </div>
+    <div style="text-align:center; margin-top:14px">
+      <button class="btn gray small" id="pNewSet">Give me a fresh set of questions</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= PRINT ================= -->
+<div class="view" id="vprint">
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9V3.5h11V9M6.5 18H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1.5M6.5 14.5h11v6h-11z"/></svg> Printable sheets</h2>
+    <div class="dim" style="margin-top:4px; line-height:1.45">Black and white, no color ink needed. Each one opens your printer dialog — choose <b>Save as PDF</b> if you'd rather keep a copy. Answer keys print as their own page.</div>
+  </div>
+  <div id="sheetGrid"></div>
+</div>
+
+<!-- ================= TEACHER ================= -->
+<div class="view" id="vteacher">
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M9 2.5h6v3.5H9zM8 11h8M8 15h5"/></svg> Assign a practice set</h2>
+    <div class="dim" style="margin:4px 0 8px; font-size:.92em">Pick a level and share the link. Students sign in with name + period, answer 12 questions built from their own name, and hand you a code. Multiple choice only earns its point if the <b>first</b> answer is right.</div>
+    <div style="margin:8px 0; display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+      <select id="asgLevel">
+        <option value="ms">8th Grade — atoms &amp; the periodic table</option>
+        <option value="hs">High School — atomic structure &amp; trends</option>
+      </select>
+      <button class="btn small" id="asgMake">Create assignment link</button>
+    </div>
+    <div id="asgLinkRow">
+      <input type="text" id="asgLinkIn" readonly>
+      <button class="btn small" id="asgLinkCopy">Copy link</button>
+      <span class="dim" id="asgLinkNote" style="margin-left:8px; font-size:.9em"></span>
+    </div>
+    <hr>
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h9"/></svg> Grade assignment codes</h2>
+    <div class="dim" style="margin:4px 0 8px; font-size:.92em">Paste every student code below — one big mess is fine. You get a roster sorted by period, then last name.</div>
+    <textarea id="gradeIn" placeholder="Paste codes here (PTA-…)"></textarea>
+    <div style="margin-top:8px"><button class="btn small" id="gradeBtn">Grade codes</button> <button class="btn gray small" id="gradeCopy" style="display:none">Copy for gradebook</button></div>
+    <div id="gradeOut" style="margin-top:6px; overflow-x:auto"></div>
+    <hr>
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8L21 21"/></svg> Check one practice code</h2>
+    <div class="dim" style="margin:4px 0 8px; font-size:.92em">For free-practice codes (PTE-…) students earn outside an assignment.</div>
+    <div style="margin:8px 0"><input type="text" id="verifyIn" placeholder="Paste student code" style="width:280px"> <button class="btn small" id="verifyBtn">Check</button></div>
+    <div id="verifyOut" class="dim"></div>
+    <hr>
+    <div class="dim" style="line-height:1.5">Codes carry the student's name, level, score, and the date, so they can't be swapped between students. Nothing is uploaded — everything runs on the device, and the page works with the wifi off.</div>
+    <div style="margin-top:10px"><button class="btn gray small" id="resetDevice">Reset all data on this device</button></div>
+  </div>
+
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 16l9 5 9-5"/></svg> Standards this covers</h2>
+    <div class="dim" style="margin-top:6px; line-height:1.6">
+      <b style="color:var(--ink)">8th Grade — S8P1</b><br>
+      Structure of the atom (protons, neutrons, electrons), reading a periodic table square, families and groups, metals vs. nonmetals vs. metalloids, and using position to predict properties.
+      <div style="margin-top:10px"></div>
+      <b style="color:var(--ink)">High School — SPS1, SPS2</b><br>
+      Electron arrangement and energy levels, valence electrons, periodic trends in atomic radius, ionization energy and electronegativity, predicting ion charge, and predicting ionic vs. covalent bonding from position.
+    </div>
+  </div>
+</div>
+
+<div id="tsFoot">
+  <a class="tsBtn" href="https://www.tobinscience.com" target="_blank" rel="noopener">
+    <img id="logoFoot" alt="Tobin Science logo">
+    <span>Find more great resources at<br><span style="color:var(--accent)">TobinScience.com</span></span>
+  </a>
+</div>
+
+</div><!-- /app -->
+
+<div id="shade"><div id="detail"></div></div>
+<div id="printArea"></div>
+
+<script>
+"use strict";
+const LOGO="data:image/png;base64,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";
+
+/* ============ element data ============
+   [Z, symbol, name, mass, category, group, period, state, shells,
+    electronegativity(Pauling), atomic radius pm (calculated), 1st ionization energy kJ/mol, fact]
+   category: am alkali · ae alkaline earth · tm transition · ptm post-transition
+             md metalloid · nm nonmetal · hal halogen · ng noble gas · ln lanthanide · an actinide
+   group 0 = f-block (lanthanide/actinide row)
+   state: s solid · l liquid · g gas · u unknown (at room temperature, 25 C)         */
+const RAW=[
+[1,"H","Hydrogen","1.008","nm",1,1,"g","1",2.20,53,1312,"Lightest element in the universe — about 90% of all atoms are hydrogen."],
+[2,"He","Helium","4.003","ng",18,1,"g","2",null,31,2372,"The only element found in the Sun before it was found on Earth."],
+[3,"Li","Lithium","6.94","am",1,2,"s","2-1",0.98,167,520,"Powers phone and electric-car batteries. Soft enough to cut with a knife."],
+[4,"Be","Beryllium","9.012","ae",2,2,"s","2-2",1.57,112,899,"Stiff, feather-light metal used for satellite and telescope mirrors."],
+[5,"B","Boron","10.81","md",13,2,"s","2-3",2.04,87,801,"Makes heat-proof Pyrex glass and is the boron in borax laundry booster."],
+[6,"C","Carbon","12.011","nm",14,2,"s","2-4",2.55,67,1086,"The backbone of every living thing. Same element in pencil lead and diamond."],
+[7,"N","Nitrogen","14.007","nm",15,2,"g","2-5",3.04,56,1402,"78% of the air you breathe. Fertilizer feeds crops with it."],
+[8,"O","Oxygen","15.999","nm",16,2,"g","2-6",3.44,48,1314,"Most abundant element in Earth's crust — and in your body by mass."],
+[9,"F","Fluorine","18.998","hal",17,2,"g","2-7",3.98,42,1681,"The most reactive element there is. In your toothpaste as fluoride."],
+[10,"Ne","Neon","20.180","ng",18,2,"g","2-8",null,38,2081,"Glows orange-red in signs. So unreactive it forms almost no compounds."],
+[11,"Na","Sodium","22.990","am",1,3,"s","2-8-1",0.93,190,496,"Explodes in water all by itself — yet it's half of ordinary table salt."],
+[12,"Mg","Magnesium","24.305","ae",2,3,"s","2-8-2",1.31,145,738,"Burns with a blinding white flame. Sits at the center of every chlorophyll molecule."],
+[13,"Al","Aluminum","26.982","ptm",13,3,"s","2-8-3",1.61,118,578,"Most common metal in Earth's crust. Cans, foil, and airplane bodies."],
+[14,"Si","Silicon","28.085","md",14,3,"s","2-8-4",1.90,111,787,"Sand and glass — and the chip inside every computer and phone."],
+[15,"P","Phosphorus","30.974","nm",15,3,"s","2-8-5",2.19,98,1012,"In match heads, fertilizer, and the DNA inside your cells."],
+[16,"S","Sulfur","32.06","nm",16,3,"s","2-8-6",2.58,88,1000,"Yellow rock that reeks like rotten eggs. Used to toughen rubber tires."],
+[17,"Cl","Chlorine","35.45","hal",17,3,"g","2-8-7",3.16,79,1251,"A green poison gas on its own — but the other half of table salt."],
+[18,"Ar","Argon","39.95","ng",18,3,"g","2-8-8",null,71,1521,"About 1% of the air. Fills light bulbs so the filament won't burn up."],
+[19,"K","Potassium","39.098","am",1,4,"s","2-8-8-1",0.82,243,419,"Bananas are famous for it. Your nerves can't fire a signal without it."],
+[20,"Ca","Calcium","40.078","ae",2,4,"s","2-8-8-2",1.00,194,590,"Builds your bones and teeth. Also chalk, limestone, and seashells."],
+[21,"Sc","Scandium","44.956","tm",3,4,"s","2-8-9-2",1.36,184,633,"Added to aluminum for ultra-light bike frames and baseball bats."],
+[22,"Ti","Titanium","47.867","tm",4,4,"s","2-8-10-2",1.54,176,659,"As strong as steel but far lighter. Used for hip replacements and jets."],
+[23,"V","Vanadium","50.942","tm",5,4,"s","2-8-11-2",1.63,171,651,"Toughens steel for wrenches and tools. Its compounds are wildly colorful."],
+[24,"Cr","Chromium","51.996","tm",6,4,"s","2-8-13-1",1.66,166,653,"Gives chrome its shine and stainless steel its rust resistance."],
+[25,"Mn","Manganese","54.938","tm",7,4,"s","2-8-13-2",1.55,161,717,"Hardens steel for railroad tracks. Also inside alkaline batteries."],
+[26,"Fe","Iron","55.845","tm",8,4,"s","2-8-14-2",1.83,156,762,"Earth's core is mostly iron — and iron carries the oxygen in your blood."],
+[27,"Co","Cobalt","58.933","tm",9,4,"s","2-8-15-2",1.88,152,760,"Miners named it after goblins. Makes deep blue glass and battery parts."],
+[28,"Ni","Nickel","58.693","tm",10,4,"s","2-8-16-2",1.91,149,737,"In coins, stainless steel, and rechargeable batteries. Magnetic."],
+[29,"Cu","Copper","63.546","tm",11,4,"s","2-8-18-1",1.90,145,745,"The wires in your walls. Weathers to the green of the Statue of Liberty."],
+[30,"Zn","Zinc","65.38","tm",12,4,"s","2-8-18-2",1.65,142,906,"Coats steel to stop rust. Also the hidden core of a US penny."],
+[31,"Ga","Gallium","69.723","ptm",13,4,"s","2-8-18-3",1.81,136,579,"Melts in your hand at 86°F. Runs LEDs and fast computer chips."],
+[32,"Ge","Germanium","72.630","md",14,4,"s","2-8-18-4",2.01,125,762,"Made the very first transistors. Now used in fiber-optic cable."],
+[33,"As","Arsenic","74.922","md",15,4,"s","2-8-18-5",2.18,114,947,"Famous poison — and a key ingredient in semiconductors."],
+[34,"Se","Selenium","78.971","nm",16,4,"s","2-8-18-6",2.55,103,941,"In anti-dandruff shampoo. Conducts electricity better when light hits it."],
+[35,"Br","Bromine","79.904","hal",17,4,"l","2-8-18-7",2.96,94,1140,"One of only two elements that is a liquid at room temperature. Red-brown."],
+[36,"Kr","Krypton","83.798","ng",18,4,"g","2-8-18-8",3.00,88,1351,"Not just Superman — it makes high-speed camera flashes and bright lamps."],
+[37,"Rb","Rubidium","85.468","am",1,5,"s","2-8-18-8-1",0.82,265,403,"So reactive it can ignite in air. Used in ultra-precise atomic clocks."],
+[38,"Sr","Strontium","87.62","ae",2,5,"s","2-8-18-8-2",0.95,219,549,"Burns bright red — the red in fireworks and emergency flares."],
+[39,"Y","Yttrium","88.906","tm",3,5,"s","2-8-18-9-2",1.22,212,600,"Made the red glow in old TV screens. Also tough ceramic engine parts."],
+[40,"Zr","Zirconium","91.224","tm",4,5,"s","2-8-18-10-2",1.33,206,640,"Cubic zirconia fakes diamonds. Also lines nuclear reactor fuel rods."],
+[41,"Nb","Niobium","92.906","tm",5,5,"s","2-8-18-12-1",1.60,198,652,"Superconducts when very cold — it makes MRI machine magnets work."],
+[42,"Mo","Molybdenum","95.95","tm",6,5,"s","2-8-18-13-1",2.16,190,684,"Keeps steel strong when it's red hot, so it goes in engines and rockets."],
+[43,"Tc","Technetium","98","tm",7,5,"s","2-8-18-13-2",1.90,183,702,"The first element ever made by humans. Its tracers light up medical scans."],
+[44,"Ru","Ruthenium","101.07","tm",8,5,"s","2-8-18-15-1",2.20,178,710,"A hard coating for electrical contacts and fountain pen tips."],
+[45,"Rh","Rhodium","102.91","tm",9,5,"s","2-8-18-16-1",2.28,173,720,"One of the rarest, priciest metals — the heart of a catalytic converter."],
+[46,"Pd","Palladium","106.42","tm",10,5,"s","2-8-18-18",2.20,169,804,"Soaks up hydrogen gas like a sponge. Also cleans up car exhaust."],
+[47,"Ag","Silver","107.87","tm",11,5,"s","2-8-18-18-1",1.93,165,731,"The best electrical conductor of any element. Also kills bacteria."],
+[48,"Cd","Cadmium","112.41","tm",12,5,"s","2-8-18-18-2",1.69,161,868,"Bright yellow paint pigment — but toxic, so it's being phased out."],
+[49,"In","Indium","114.82","ptm",13,5,"s","2-8-18-18-3",1.78,156,558,"The clear conducting layer that makes a touchscreen sense your finger."],
+[50,"Sn","Tin","118.71","ptm",14,5,"s","2-8-18-18-4",1.96,145,709,"Mixed with copper it makes bronze — the metal that named an age."],
+[51,"Sb","Antimony","121.76","md",15,5,"s","2-8-18-18-5",2.05,133,834,"Ancient eyeliner. Today it makes plastics and fabric flame-resistant."],
+[52,"Te","Tellurium","127.60","md",16,5,"s","2-8-18-18-6",2.10,123,869,"Rarer than gold in Earth's crust. Used in solar panels and rewritable discs."],
+[53,"I","Iodine","126.90","hal",17,5,"s","2-8-18-18-7",2.66,115,1008,"Turns straight to purple vapor. Your thyroid gland can't work without it."],
+[54,"Xe","Xenon","131.29","ng",18,5,"g","2-8-18-18-8",2.60,108,1170,"Powers ion engines on spacecraft and blinding bright headlights."],
+[55,"Cs","Cesium","132.91","am",1,6,"s","2-8-18-18-8-1",0.79,298,376,"Explodes on contact with water. Its atoms define how long a second is."],
+[56,"Ba","Barium","137.33","ae",2,6,"s","2-8-18-18-8-2",0.89,253,503,"Patients drink a barium 'milkshake' so their gut shows up on an X-ray."],
+[57,"La","Lanthanum","138.91","ln",0,6,"s","2-8-18-18-9-2",1.10,226,538,"Makes camera and telescope lenses bend light without distorting it."],
+[58,"Ce","Cerium","140.12","ln",0,6,"s","2-8-18-19-9-2",1.12,210,534,"Most common rare earth. The spark from a lighter flint is a cerium alloy."],
+[59,"Pr","Praseodymium","140.91","ln",0,6,"s","2-8-18-21-8-2",1.13,247,527,"Tints welder's goggles yellow-green to block the blinding glare."],
+[60,"Nd","Neodymium","144.24","ln",0,6,"s","2-8-18-22-8-2",1.14,206,533,"Makes the strongest magnets on Earth — headphones and wind turbines."],
+[61,"Pm","Promethium","145","ln",0,6,"s","2-8-18-23-8-2",1.13,205,540,"Every atom of it is radioactive. Once painted on glow-in-the-dark watch dials."],
+[62,"Sm","Samarium","150.36","ln",0,6,"s","2-8-18-24-8-2",1.17,238,545,"Magnets that keep working when red hot, so they go inside jet engines."],
+[63,"Eu","Europium","151.96","ln",0,6,"s","2-8-18-25-8-2",1.20,231,547,"Glows under UV light — it's the anti-counterfeit ink in euro banknotes."],
+[64,"Gd","Gadolinium","157.25","ln",0,6,"s","2-8-18-25-9-2",1.20,233,593,"Injected as a contrast dye to make MRI images much sharper."],
+[65,"Tb","Terbium","158.93","ln",0,6,"s","2-8-18-27-8-2",1.10,225,566,"Changes shape in a magnetic field — used in sonar and tiny speakers."],
+[66,"Dy","Dysprosium","162.50","ln",0,6,"s","2-8-18-28-8-2",1.22,228,573,"Added to magnets so electric-car motors don't weaken as they heat up."],
+[67,"Ho","Holmium","164.93","ln",0,6,"s","2-8-18-29-8-2",1.23,226,581,"The strongest magnetic pull of any element. Used in surgical lasers."],
+[68,"Er","Erbium","167.26","ln",0,6,"s","2-8-18-30-8-2",1.24,226,589,"Amplifies light inside undersea fiber-optic cables — it runs the internet."],
+[69,"Tm","Thulium","168.93","ln",0,6,"s","2-8-18-31-8-2",1.25,222,597,"Rarest of the stable rare earths. Powers portable X-ray machines."],
+[70,"Yb","Ytterbium","173.05","ln",0,6,"s","2-8-18-32-8-2",1.10,222,603,"Its atoms keep time inside the most accurate clocks ever built."],
+[71,"Lu","Lutetium","174.97","ln",0,6,"s","2-8-18-32-9-2",1.27,217,524,"Crystals of it catch gamma rays inside PET cancer scanners."],
+[72,"Hf","Hafnium","178.49","tm",4,6,"s","2-8-18-32-10-2",1.30,208,659,"Soaks up stray neutrons, so it makes nuclear reactor control rods."],
+[73,"Ta","Tantalum","180.95","tm",5,6,"s","2-8-18-32-11-2",1.50,200,761,"Tiny tantalum capacitors store charge inside nearly every phone."],
+[74,"W","Tungsten","183.84","tm",6,6,"s","2-8-18-32-12-2",2.36,193,770,"Highest melting point of any metal — 6,192°F. The old light bulb filament."],
+[75,"Re","Rhenium","186.21","tm",7,6,"s","2-8-18-32-13-2",1.90,188,760,"One of the rarest elements. Jet engine turbine blades depend on it."],
+[76,"Os","Osmium","190.23","tm",8,6,"s","2-8-18-32-14-2",2.20,185,840,"The densest natural element — a soda can of it would weigh 17 pounds."],
+[77,"Ir","Iridium","192.22","tm",9,6,"s","2-8-18-32-15-2",2.20,180,880,"A worldwide iridium layer in the rock marks the asteroid that ended the dinosaurs."],
+[78,"Pt","Platinum","195.08","tm",10,6,"s","2-8-18-32-17-1",2.28,177,870,"Won't corrode or tarnish. Jewelry, lab dishes, and catalytic converters."],
+[79,"Au","Gold","196.97","tm",11,6,"s","2-8-18-32-18-1",2.54,174,890,"So unreactive it stays shiny forever. A thin layer coats astronaut visors."],
+[80,"Hg","Mercury","200.59","tm",12,6,"l","2-8-18-32-18-2",2.00,171,1007,"The only metal that is liquid at room temperature. Toxic to touch or breathe."],
+[81,"Tl","Thallium","204.38","ptm",13,6,"s","2-8-18-32-18-3",1.62,156,589,"Odorless and deadly — once sold as rat poison, now banned almost everywhere."],
+[82,"Pb","Lead","207.2","ptm",14,6,"s","2-8-18-32-18-4",2.33,154,716,"Blocks X-rays — that's why the dentist drapes a lead apron over you."],
+[83,"Bi","Bismuth","208.98","ptm",15,6,"s","2-8-18-32-18-5",2.02,143,703,"Grows rainbow staircase crystals. The 'bismuth' in Pepto-Bismol."],
+[84,"Po","Polonium","209","md",16,6,"s","2-8-18-32-18-6",2.00,135,812,"Marie Curie discovered it and named it for Poland, her homeland."],
+[85,"At","Astatine","210","hal",17,6,"s","2-8-18-32-18-7",2.20,127,890,"The rarest natural element — less than an ounce exists in all of Earth's crust."],
+[86,"Rn","Radon","222","ng",18,6,"g","2-8-18-32-18-8",null,120,1037,"Radioactive gas that seeps into basements — the #2 cause of lung cancer."],
+[87,"Fr","Francium","223","am",1,7,"s","2-8-18-32-18-8-1",0.79,348,380,"The most reactive metal known. Less than an ounce exists on Earth at any moment."],
+[88,"Ra","Radium","226","ae",2,7,"s","2-8-18-32-18-8-2",0.90,215,509,"Glows in the dark. Painted on watch dials until it made the painters sick."],
+[89,"Ac","Actinium","227","an",0,7,"s","2-8-18-32-18-9-2",1.10,195,499,"Glows pale blue in the dark. Being tested to hunt down cancer cells."],
+[90,"Th","Thorium","232.04","an",0,7,"s","2-8-18-32-18-10-2",1.30,180,587,"More common than uranium. A possible fuel for safer nuclear reactors."],
+[91,"Pa","Protactinium","231.04","an",0,7,"s","2-8-18-32-20-9-2",1.50,180,568,"One of the rarest and most expensive naturally occurring elements."],
+[92,"U","Uranium","238.03","an",0,7,"s","2-8-18-32-21-9-2",1.38,175,598,"Fuels nuclear power plants. The heaviest element found in bulk in nature."],
+[93,"Np","Neptunium","237","an",0,7,"s","2-8-18-32-22-9-2",1.36,175,605,"The first element past uranium ever made — named for the planet after Uranus."],
+[94,"Pu","Plutonium","244","an",0,7,"s","2-8-18-32-24-8-2",1.28,175,585,"Powers spacecraft that travel too far from the Sun for solar panels."],
+[95,"Am","Americium","243","an",0,7,"s","2-8-18-32-25-8-2",1.13,175,578,"A speck of it sits inside most household smoke detectors."],
+[96,"Cm","Curium","247","an",0,7,"s","2-8-18-32-25-9-2",1.28,174,581,"Named for Marie and Pierre Curie. Powered rock analyzers on Mars rovers."],
+[97,"Bk","Berkelium","247","an",0,7,"s","2-8-18-32-27-8-2",1.30,170,601,"Named for Berkeley, California, where it was first made in 1949."],
+[98,"Cf","Californium","251","an",0,7,"s","2-8-18-32-28-8-2",1.30,186,608,"Shoots out neutrons — used to start nuclear reactors and to prospect for gold."],
+[99,"Es","Einsteinium","252","an",0,7,"s","2-8-18-32-29-8-2",1.30,186,619,"Discovered in the fallout of the first hydrogen bomb test."],
+[100,"Fm","Fermium","257","an",0,7,"s","2-8-18-32-30-8-2",1.30,null,627,"Named for Enrico Fermi. Only ever made in amounts too small to see."],
+[101,"Md","Mendelevium","258","an",0,7,"s","2-8-18-32-31-8-2",1.30,null,635,"Named for Mendeleev, the chemist who invented the periodic table."],
+[102,"No","Nobelium","259","an",0,7,"s","2-8-18-32-32-8-2",1.30,null,642,"Named for Alfred Nobel. Its atoms last only minutes before decaying."],
+[103,"Lr","Lawrencium","266","an",0,7,"s","2-8-18-32-32-8-3",1.30,null,470,"Last of the actinides. Only a few atoms have ever existed at one time."],
+[104,"Rf","Rutherfordium","267","tm",4,7,"u","2-8-18-32-32-10-2",null,null,null,"Made one atom at a time in a particle accelerator, then gone in seconds."],
+[105,"Db","Dubnium","268","tm",5,7,"u","2-8-18-32-32-11-2",null,null,null,"Named for Dubna, Russia, where it was first created."],
+[106,"Sg","Seaborgium","269","tm",6,7,"u","2-8-18-32-32-12-2",null,null,null,"Glenn Seaborg was the first person named on the periodic table while still alive."],
+[107,"Bh","Bohrium","270","tm",7,7,"u","2-8-18-32-32-13-2",null,null,null,"Named for Niels Bohr, who gave us the shell model of the atom."],
+[108,"Hs","Hassium","269","tm",8,7,"u","2-8-18-32-32-14-2",null,null,null,"Named for the German state of Hesse. Only a few atoms have ever been made."],
+[109,"Mt","Meitnerium","278","tm",9,7,"u","2-8-18-32-32-15-2",null,null,null,"Named for Lise Meitner, the physicist who explained nuclear fission."],
+[110,"Ds","Darmstadtium","281","tm",10,7,"u","2-8-18-32-32-16-2",null,null,null,"Named for Darmstadt, Germany. Its half-life is measured in seconds."],
+[111,"Rg","Roentgenium","282","tm",11,7,"u","2-8-18-32-32-17-2",null,null,null,"Named for Wilhelm Röntgen, who discovered X-rays."],
+[112,"Cn","Copernicium","285","tm",12,7,"u","2-8-18-32-32-18-2",null,null,null,"Named for Copernicus. Scientists predict this metal is actually a gas."],
+[113,"Nh","Nihonium","286","ptm",13,7,"u","2-8-18-32-32-18-3",null,null,null,"The first element discovered in Japan — 'Nihon' means Japan."],
+[114,"Fl","Flerovium","289","ptm",14,7,"u","2-8-18-32-32-18-4",null,null,null,"Named for Georgy Flerov, the Russian physicist."],
+[115,"Mc","Moscovium","290","ptm",15,7,"u","2-8-18-32-32-18-5",null,null,null,"Named for the Moscow region. Its discovery was only confirmed in 2015."],
+[116,"Lv","Livermorium","293","ptm",16,7,"u","2-8-18-32-32-18-6",null,null,null,"Named for Lawrence Livermore National Laboratory in California."],
+[117,"Ts","Tennessine","294","hal",17,7,"u","2-8-18-32-32-18-7",null,null,null,"Named for Tennessee. Only about 20 atoms have ever been made."],
+[118,"Og","Oganesson","294","ng",18,7,"u","2-8-18-32-32-18-8",null,null,null,"The heaviest element known. Named for Yuri Oganessian, still alive today."]
+];
+
+/* ============ derived element model ============ */
+const CATS={
+  am :{n:"Alkali metal",        c:"#f87171"},
+  ae :{n:"Alkaline earth metal",c:"#fb923c"},
+  tm :{n:"Transition metal",    c:"#fbbf24"},
+  ptm:{n:"Post-transition metal",c:"#a3e635"},
+  md :{n:"Metalloid",           c:"#34d399"},
+  nm :{n:"Nonmetal",            c:"#38bdf8"},
+  hal:{n:"Halogen",             c:"#818cf8"},
+  ng :{n:"Noble gas",           c:"#c084fc"},
+  ln :{n:"Lanthanide",          c:"#f472b6"},
+  an :{n:"Actinide",            c:"#fda4af"}
+};
+const CATORDER=["am","ae","tm","ptm","md","nm","hal","ng","ln","an"];
+const MNM={metal:{n:"Metal",c:"#fbbf24"},metalloid:{n:"Metalloid",c:"#34d399"},nonmetal:{n:"Nonmetal",c:"#38bdf8"}};
+const STATES={s:{n:"Solid",c:"#94a3b8"},l:{n:"Liquid",c:"#38bdf8"},g:{n:"Gas",c:"#fbbf24"},u:{n:"Unknown — made in a lab",c:"#475569"}};
+const VALC=["#475569","#f87171","#fb923c","#fbbf24","#a3e635","#34d399","#38bdf8","#818cf8","#c084fc"];
+const REACT=[{n:"Almost none — inert",c:"#64748b"},{n:"Low to moderate",c:"#a3e635"},{n:"Moderate",c:"#fbbf24"},{n:"High",c:"#fb923c"},{n:"Very high",c:"#f87171"}];
+
+function typeOf(cat){ if(cat==="md")return "metalloid"; if(cat==="nm"||cat==="hal"||cat==="ng")return "nonmetal"; return "metal"; }
+function valenceOf(g,shells,z){
+  if(z===2)return 2;                       // helium: full shell of 2
+  if(g>=1&&g<=2)return g;
+  if(g>=13&&g<=18)return g-10;
+  return null;                             // transition metals and f-block vary
+}
+function reactOf(e){
+  if(e.cat==="ng")return 0;
+  if(e.cat==="am"||e.cat==="hal")return 4;
+  if(e.cat==="ae")return 3;
+  if(e.cat==="nm"||e.cat==="ln"||e.cat==="an")return 2;
+  return 1;
+}
+function chargeOf(e){
+  if(e.cat==="ng")return 0;
+  if(e.group===1)return 1; if(e.group===2)return 2; if(e.group===13)return 3;
+  if(e.group===14)return null; if(e.group===15)return -3; if(e.group===16)return -2; if(e.group===17)return -1;
+  return null;
+}
+const EL=RAW.map(function(r){
+  const sh=r[8].split("-").map(Number);
+  const e={z:r[0],sym:r[1],name:r[2],mass:r[3],cat:r[4],group:r[5],period:r[6],state:r[7],
+           shells:sh,en:r[9],rad:r[10],ie:r[11],fact:r[12]};
+  e.val=valenceOf(e.group,sh,e.z);
+  e.type=typeOf(e.cat);
+  e.react=reactOf(e);
+  e.charge=chargeOf(e);
+  e.massNum=Math.round(parseFloat(e.mass));
+  e.outer=sh[sh.length-1];
+  return e;
+});
+const BYZ={}; EL.forEach(function(e){BYZ[e.z]=e;});
+function byz(z){return BYZ[z];}
+function elsWhere(f){return EL.filter(f);}
+
+/* ============ small helpers ============ */
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(rng,arr){return arr[Math.floor(rng()*arr.length)];}
+function shuffle(rng,arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function tcase(s){return String(s).toLowerCase().replace(/(^|[\s'-])[a-z]/g,function(c){return c.toUpperCase();});}
+function periodLabel(p){const n=parseInt(p,10);if(!n)return"period ?";return n+(["","st","nd","rd"][n]||"th")+" period";}
+function $(id){return document.getElementById(id);}
+function ordinal(n){return n+(["th","st","nd","rd"][(n%100-n%10!=10)*(n%10)]||"th");}
+function stampToday(){const d=new Date();return String(d.getFullYear()%100).padStart(2,"0")+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");}
+function prettyStamp(ds){ if(!/^\d{6}$/.test(ds))return ds; return ds.slice(2,4).replace(/^0/,"")+"/"+ds.slice(4,6)+"/20"+ds.slice(0,2); }
+
+/* ============ Bohr model ============ */
+function bohrSVG(e,o){
+  o=o||{};
+  const bw=!!o.bw;
+  const mn=(o.mass!=null)?o.mass:e.massNum, neu=mn-e.z;
+  const ring=bw?"#555":"#31527d", dot=bw?"#000":"#38bdf8", nucF=bw?"#ffffff":"#20344f",
+        nucS=bw?"#000":"#f87171", tx=bw?"#000":"#eaf2fb";
+  const cx=200, cy=150, n=e.shells.length;
+  const r0=46, rMax=136, step=n>1?(rMax-r0)/(n-1):0;
+  let s='<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bohr model of '+esc(e.name)+'">';
+  for(let i=0;i<n;i++){
+    const r=r0+i*step;
+    s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r.toFixed(1)+'" fill="none" stroke="'+ring+'" stroke-width="1.4"/>';
+  }
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="32" fill="'+nucF+'" stroke="'+nucS+'" stroke-width="2.5"/>';
+  if(!o.hideNucleus){
+    s+='<text x="'+cx+'" y="'+(cy-3)+'" fill="'+tx+'" font-family="Segoe UI,Arial" font-size="16" font-weight="700" text-anchor="middle">'+e.z+'p+</text>';
+    s+='<text x="'+cx+'" y="'+(cy+16)+'" fill="'+tx+'" font-family="Segoe UI,Arial" font-size="16" font-weight="700" text-anchor="middle">'+neu+'n</text>';
+  }
+  for(let i=0;i<n;i++){
+    const r=r0+i*step, k=e.shells[i], off=i*0.28;
+    const dr=k>20?2.7:(k>12?3.2:4);
+    for(let j=0;j<k;j++){
+      const a=-Math.PI/2+off+j*2*Math.PI/k;
+      const x=cx+r*Math.cos(a), y=cy+r*Math.sin(a);
+      s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+dr+'" fill="'+dot+'"/>';
+    }
+  }
+  if(o.label!==false){
+    s+='<text x="200" y="290" fill="'+(bw?"#000":"#9fb4cc")+'" font-family="Segoe UI,Arial" font-size="14" text-anchor="middle">'+
+       (o.label?esc(o.label):esc(e.name)+" — "+e.shells.join(", "))+'</text>';
+  }
+  return s+'</svg>';
+}
+
+/* ============ color modes ============ */
+let MODE="fam", HILITE=null, FIND="";
+function colorFor(e,mode){
+  if(mode==="fam")  return CATS[e.cat].c;
+  if(mode==="mnm")  return MNM[e.type].c;
+  if(mode==="state")return STATES[e.state].c;
+  if(mode==="val")  return e.val==null?VALC[0]:VALC[e.val];
+  if(mode==="react")return REACT[e.react].c;
+  return "#33507a";
+}
+function keyFor(e,mode){
+  if(mode==="fam")return e.cat;
+  if(mode==="mnm")return e.type;
+  if(mode==="state")return e.state;
+  if(mode==="val")return e.val==null?"x":String(e.val);
+  if(mode==="react")return String(e.react);
+  return "all";
+}
+function legendItems(mode){
+  if(mode==="fam")  return CATORDER.map(function(k){return{k:k,n:CATS[k].n,c:CATS[k].c};});
+  if(mode==="mnm")  return ["metal","metalloid","nonmetal"].map(function(k){return{k:k,n:MNM[k].n,c:MNM[k].c};});
+  if(mode==="state")return ["s","l","g","u"].map(function(k){return{k:k,n:STATES[k].n,c:STATES[k].c};});
+  if(mode==="val"){const a=[];for(let v=1;v<=8;v++)a.push({k:String(v),n:v+" valence electron"+(v===1?"":"s"),c:VALC[v]});
+                   a.push({k:"x",n:"Varies (transition &amp; f-block)",c:VALC[0]});return a;}
+  if(mode==="react")return [4,3,2,1,0].map(function(i){return{k:String(i),n:REACT[i].n,c:REACT[i].c};});
+  return [];
+}
+const MODENOTE={
+  fam:"Every column is a family. Family members have the same number of valence electrons, so they behave alike — that is the whole reason the table is shaped this way.",
+  mnm:"The staircase running down from boron splits metals (left) from nonmetals (right). The elements the staircase touches are the metalloids, which act a little like both.",
+  state:"Only two elements are liquid at room temperature: bromine and mercury. Everything past element 103 has only ever existed as a handful of atoms, so nobody knows.",
+  val:"Valence electrons are the electrons in the outermost energy level — the ones that do the bonding. Notice they climb 1 to 8 across every row, then reset.",
+  react:"Group 1 loses one electron easily and Group 17 grabs one easily, so both ends are wildly reactive. Group 18 already has a full outer shell, so it does almost nothing.",
+  plain:"No color. Handy for a projector when you want students to sort the families themselves."
+};
+
+/* ============ table rendering ============ */
+function cellHTML(e,topRight,bottom){
+  return '<span class="z">'+e.z+'</span>'+(topRight!=null?'<span class="val">'+topRight+'</span>':'')+
+         '<span class="sym">'+e.sym+'</span><span class="nm">'+esc(e.name)+'</span>'+
+         '<span class="ms">'+bottom+'</span>';
+}
+function renderGrid(host,spec){
+  const f=document.createDocumentFragment();
+  function box(cls,txt,col,row){
+    const d=document.createElement("div"); d.className=cls; d.textContent=txt;
+    d.style.gridColumn=col; d.style.gridRow=row; f.appendChild(d); return d;
+  }
+  box("ghdr","",1,1);
+  for(let g=1;g<=18;g++) box("ghdr",String(g),g+1,1);
+  for(let p=1;p<=7;p++) box("phdr",String(p),1,p+1);
+  EL.forEach(function(e){
+    let col,row;
+    if(e.group===0){ row=(e.z<=71)?10:11; col=4+(e.z-(e.z<=71?57:89)); }
+    else { row=e.period+1; col=e.group+1; }
+    const info=spec(e);
+    const b=document.createElement("button");
+    b.className="el"+(info.bg?"":" nodata");
+    b.dataset.z=e.z;
+    if(info.bg) b.style.background=info.bg;
+    b.style.gridColumn=col; b.style.gridRow=row;
+    b.innerHTML=cellHTML(e,info.tr,info.bottom);
+    b.title=e.name+" — click for details";
+    f.appendChild(b);
+  });
+  const sp=document.createElement("div"); sp.className="fspace"; sp.style.gridRow=9; f.appendChild(sp);
+  [[7,"57–71"],[8,"89–103"]].forEach(function(p){
+    const d=document.createElement("div"); d.className="ph"; d.textContent=p[1];
+    d.style.gridColumn=4; d.style.gridRow=p[0]; f.appendChild(d);
+  });
+  host.innerHTML=""; host.appendChild(f);
+}
+function drawTable(){
+  renderGrid($("ptGrid"),function(e){
+    return {bg:colorFor(e,MODE), tr:(MODE==="val"&&e.val!=null)?e.val:null, bottom:e.mass};
+  });
+  drawLegend(); applyFilter(); $("modeNote").textContent=MODENOTE[MODE];
+}
+function drawLegend(){
+  const items=legendItems(MODE), host=$("legend");
+  host.innerHTML=items.map(function(it){
+    return '<button class="lg'+(HILITE&&HILITE!==it.k?" off":"")+'" data-k="'+it.k+'"><i style="background:'+it.c+'"></i>'+it.n+'</button>';
+  }).join("");
+}
+function applyFilter(){
+  const q=FIND.trim().toLowerCase();
+  document.querySelectorAll("#ptGrid .el").forEach(function(b){
+    const e=byz(+b.dataset.z);
+    let show=true;
+    if(HILITE) show=(keyFor(e,MODE)===HILITE);
+    let hit=false;
+    if(q){
+      hit=(e.name.toLowerCase().indexOf(q)===0)||(e.sym.toLowerCase()===q)||(String(e.z)===q)||
+          (e.name.toLowerCase().indexOf(q)>-1&&q.length>2);
+      show=show&&hit;
+    }
+    b.classList.toggle("faded",!show);
+    b.classList.toggle("hit",!!(q&&hit));
+  });
+}
+
+/* ============ element detail ============ */
+let DETZ=null;
+function famName(e){return CATS[e.cat].n;}
+function valText(e){
+  if(e.val!=null)return e.val+" valence electron"+(e.val===1?"":"s");
+  if(e.cat==="tm")return e.outer+" in the outer level <small>(transition metals vary)</small>";
+  return e.outer+" in the outer level <small>(varies)</small>";
+}
+function chargeText(e){
+  const c=e.charge;
+  if(e.cat==="ng")return "none <small>— full outer shell</small>";
+  if(c==null&&e.group===14)return "+4 or −4 <small>— shares instead</small>";
+  if(c==null)return "varies";
+  return (c>0?"+":"")+c;
+}
+function showDetail(z){
+  const e=byz(z); if(!e)return;
+  DETZ=z;
+  const bg=colorFor(e,MODE==="plain"?"fam":MODE);
+  const idx=EL.indexOf(e);
+  let h='<div id="dTop">'+
+    '<div id="dTile" style="background:'+bg+'"><span class="z">'+e.z+'</span><span class="sym">'+e.sym+'</span><span class="ms">'+e.mass+'</span></div>'+
+    '<div id="dInfo"><h2>'+esc(e.name)+'</h2>'+
+    '<div><span class="pill">'+famName(e)+'</span><span class="pill">'+MNM[e.type].n+'</span>'+
+    '<span class="pill">Group '+(e.group||"f-block")+'</span><span class="pill">Period '+e.period+'</span></div>'+
+    '<div id="dFact">'+esc(e.fact)+'</div></div></div>';
+
+  h+='<div class="dGrid">'+
+    dc("Protons",e.z)+
+    dc("Electrons",e.z+' <small>(neutral atom)</small>')+
+    dc("Neutrons",(e.massNum-e.z)+' <small>(most common)</small>')+
+    dc("Mass number",e.massNum+' <small>(rounded)</small>')+
+    dc("Energy levels",e.shells.length+(e.shells.length===e.period
+        ?' <small>(= period '+e.period+')</small>'
+        :' <small>(rare exception — it sits in period '+e.period+')</small>'))+
+    dc("Electrons per level",e.shells.join(" · "))+
+    dc("Valence electrons",valText(e))+
+    dc("Usual ion charge",chargeText(e))+
+    dc("State at room temp",STATES[e.state].n)+
+    dc("Atomic radius",e.rad!=null?e.rad+' pm':'no reliable data')+
+    dc("Ionization energy",e.ie!=null?e.ie+' <small>kJ/mol</small>':'no reliable data')+
+    dc("Electronegativity",e.en!=null?e.en.toFixed(2):'none <small>(does not bond)</small>')+
+    '</div>';
+
+  h+='<div id="dBohrWrap">'+bohrSVG(e)+'</div>';
+  h+='<div id="dNav">'+
+     '<button class="btn gray small" id="dPrev"'+(idx<=0?" disabled":"")+'>← '+(idx>0?EL[idx-1].sym:"")+'</button>'+
+     '<button class="btn gray small" id="dNext"'+(idx>=EL.length-1?" disabled":"")+'>'+(idx<EL.length-1?EL[idx+1].sym:"")+' →</button>'+
+     '<span class="sp"></span><button class="btn" id="dClose">Close</button></div>';
+  $("detail").innerHTML=h;
+  $("shade").classList.add("on");
+  $("dClose").onclick=hideDetail;
+  const pv=$("dPrev"), nx=$("dNext");
+  if(pv&&!pv.disabled) pv.onclick=function(){showDetail(EL[idx-1].z);};
+  if(nx&&!nx.disabled) nx.onclick=function(){showDetail(EL[idx+1].z);};
+  $("detail").scrollTop=0;
+}
+function dc(k,v){return '<div class="dCell"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>';}
+function hideDetail(){$("shade").classList.remove("on"); DETZ=null;}
+
+/* ============ trends ============ */
+let TREND="rad";
+const TRINFO={
+  rad:{title:"Atomic radius — how big is the atom?",
+       unit:"pm", high:"biggest", low:"smallest", invert:true,
+       what:"Atomic radius is the distance from the nucleus out to the edge of the electron cloud. Bigger number = bigger atom. (These are calculated radii, in picometers — a picometer is a trillionth of a meter.)",
+       across:"<b>Across a period (left → right): atoms get SMALLER.</b> You keep adding protons to the same energy level, so the nucleus pulls the electrons in tighter.",
+       down:"<b>Down a group (top → bottom): atoms get BIGGER.</b> Each row adds a whole new energy level, so the outer electrons sit farther out.",
+       why:"Sound backwards? It is worth saying out loud: adding protons across a row makes the atom smaller, not bigger, because the extra positive charge squeezes the same shell tighter."},
+  ie:{title:"Ionization energy — how hard is it to steal an electron?",
+      unit:"kJ/mol", high:"hardest to steal from", low:"easiest to steal from", invert:false,
+      what:"First ionization energy is the energy it takes to pull one electron completely off a neutral atom. Bigger number = the atom holds its electrons tightly.",
+      across:"<b>Across a period: ionization energy goes UP.</b> Smaller atom + more protons = a much harder grip on the electrons.",
+      down:"<b>Down a group: ionization energy goes DOWN.</b> The outer electron is farther from the nucleus and shielded by the inner shells, so it comes off easily.",
+      why:"This is why Group 1 metals react so violently — cesium gives up its one outer electron more easily than almost anything else. Noble gases sit at the opposite extreme."},
+  en:{title:"Electronegativity — how greedy is the atom for shared electrons?",
+      unit:"", high:"greediest", low:"least greedy", invert:false,
+      what:"Electronegativity is how strongly an atom pulls on the electrons in a bond, on the Pauling scale from about 0.7 to 3.98. Fluorine is the champion at 3.98.",
+      across:"<b>Across a period: electronegativity goes UP.</b> More protons and a smaller atom mean a stronger pull on shared electrons.",
+      down:"<b>Down a group: electronegativity goes DOWN.</b> The bonding electrons sit farther from the nucleus, so the pull is weaker.",
+      why:"Compare two atoms' electronegativity and you can predict the bond: a big gap means the electron transfers (ionic), a small gap means they share (covalent). Noble gases get no value because they normally do not bond at all."}
+};
+function trVal(e){return TREND==="rad"?e.rad:(TREND==="ie"?e.ie:e.en);}
+function trRange(){
+  const v=EL.map(trVal).filter(function(x){return x!=null;});
+  return [Math.min.apply(null,v),Math.max.apply(null,v)];
+}
+function heatColor(t){ // t 0..1 -> cool to hot
+  const stops=[[14,60,110],[16,110,170],[52,180,190],[160,205,90],[251,191,36],[248,113,113]];
+  const x=Math.max(0,Math.min(1,t))*(stops.length-1), i=Math.floor(x), f=x-i;
+  const a=stops[i], b=stops[Math.min(stops.length-1,i+1)];
+  return "rgb("+Math.round(a[0]+(b[0]-a[0])*f)+","+Math.round(a[1]+(b[1]-a[1])*f)+","+Math.round(a[2]+(b[2]-a[2])*f)+")";
+}
+function drawTrends(){
+  const inf=TRINFO[TREND], r=trRange(), lo=r[0], hi=r[1];
+  $("trTitle").textContent=inf.title;
+  $("trWhat").textContent=inf.what;
+  $("trAcross").innerHTML=inf.across;
+  $("trDown").innerHTML=inf.down;
+  $("trWhy").textContent=inf.why;
+  renderGrid($("trGrid"),function(e){
+    const v=trVal(e);
+    if(v==null)return{bg:null,tr:null,bottom:"—"};
+    const t=(v-lo)/(hi-lo||1);
+    return {bg:heatColor(t), tr:null, bottom:(TREND==="en"?v.toFixed(2):v)};
+  });
+  const st=[]; for(let i=0;i<=10;i++) st.push(heatColor(i/10));
+  $("scaleBar").style.background="linear-gradient(90deg,"+st.join(",")+")";
+  $("scaleLo").textContent=lo+(inf.unit?" "+inf.unit:"")+" (low)";
+  $("scaleHi").textContent=hi+(inf.unit?" "+inf.unit:"")+" (high)";
+}
+function fillCmp(){
+  const opts=EL.filter(function(e){return e.rad!=null||e.ie!=null||e.en!=null;})
+    .map(function(e){return '<option value="'+e.z+'">'+e.z+" — "+esc(e.name)+'</option>';}).join("");
+  $("cmpA").innerHTML=opts; $("cmpB").innerHTML=opts;
+  $("cmpA").value=11; $("cmpB").value=17;
+}
+function runCompare(){
+  const a=byz(+$("cmpA").value), b=byz(+$("cmpB").value), out=$("cmpOut");
+  if(!a||!b||a===b){out.innerHTML="Pick two different elements.";return;}
+  let h="";
+  [["rad","Atomic radius","pm",true],["ie","First ionization energy","kJ/mol",false],["en","Electronegativity","",false]].forEach(function(row){
+    const k=row[0], va=(k==="rad"?a.rad:k==="ie"?a.ie:a.en), vb=(k==="rad"?b.rad:k==="ie"?b.ie:b.en);
+    if(va==null||vb==null){h+='<div style="margin:6px 0">'+row[1]+': <span class="dim">not available for both</span></div>';return;}
+    const win=va>vb?a:b, lose=va>vb?b:a, wv=Math.max(va,vb), lv=Math.min(va,vb);
+    h+='<div style="margin:6px 0">'+row[1]+': <span class="win">'+esc(win.name)+'</span> is higher — '+
+       (row[2]?wv+" "+row[2]:wv)+' vs. '+(row[2]?lv+" "+row[2]:lv)+
+       ' <span class="dim">('+esc(lose.name)+')</span></div>';
+  });
+  let why="";
+  if(a.period===b.period) why="These two are in the same period (row "+a.period+"), so compare left to right: the one farther right is smaller, holds its electrons tighter, and is more electronegative.";
+  else if(a.group===b.group&&a.group!==0) why="These two are in the same group (column "+a.group+"), so compare top to bottom: the one lower down is bigger, gives up an electron more easily, and is less electronegative.";
+  else why="These two are in different rows and different columns, so both trends are working at once — check the heat map above to see how each one sits.";
+  out.innerHTML=h+'<div style="margin-top:10px; color:var(--gold); line-height:1.45">'+why+'</div>';
+}
+
+/* ============ storage ============ */
+const KEY="tobinPT1";
+let DB={users:{}};
+try{const raw=localStorage.getItem(KEY); if(raw)DB=JSON.parse(raw)||{users:{}};}catch(err){}
+if(!DB.users)DB.users={};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(err){}}
+
+/* ============ codes ============ */
+function rollEnc(s,prefix){
+  let k=7,out="",sum=0;
+  for(const ch of s){const c=ch.charCodeAt(0);sum+=c;out+=(c^k).toString(36).padStart(2,"0");k=(k*3+c)%29+1;}
+  return (prefix+"-"+out+"-"+(sum%1296).toString(36).padStart(2,"0")).toUpperCase();
+}
+function rollDec(body,check){
+  let k=7,s="",sum=0;
+  for(let i=0;i<body.length;i+=2){const v=parseInt(body.slice(i,i+2),36);const c=v^k;s+=String.fromCharCode(c);sum+=c;k=(k*3+c)%29+1;}
+  if((sum%1296).toString(36).padStart(2,"0").toUpperCase()!==check)return null;
+  return s;
+}
+function encPractice(name,level,got,total){
+  return rollEnc([name.toUpperCase().slice(0,24),level,got,total,stampToday()].join("|"),"PTE");
+}
+function decPractice(code){
+  try{
+    const m=String(code).trim().toUpperCase().match(/^PTE-([0-9A-Z]+)-([0-9A-Z]{2})$/); if(!m)return null;
+    const body=m[1].toLowerCase(); if(body.length%2)return null;
+    const s=rollDec(body,m[2]); if(s===null)return null;
+    const p=s.split("|"); if(p.length!==5)return null;
+    const got=parseInt(p[2],10), total=parseInt(p[3],10);
+    if(isNaN(got)||isNaN(total)||total<1||got<0||got>total)return null;
+    if(p[1]!=="MS"&&p[1]!=="HS")return null;
+    return {name:p[0],level:p[1],got:got,total:total,date:p[4],pct:Math.round(got/total*100)};
+  }catch(err){return null;}
+}
+function encAsg(last,first,period,level,got,total){
+  return rollEnc([last.toUpperCase().slice(0,14),first.toUpperCase().slice(0,12),period||"0",level,got,total,stampToday()].join("|"),"PTA");
+}
+function decAsg(code){
+  try{
+    const m=String(code).trim().toUpperCase().match(/^PTA-([0-9A-Z]+)-([0-9A-Z]{2})$/); if(!m)return null;
+    const body=m[1].toLowerCase(); if(body.length%2)return null;
+    const s=rollDec(body,m[2]); if(s===null)return null;
+    const p=s.split("|"); if(p.length!==7)return null;
+    const got=parseInt(p[4],10), total=parseInt(p[5],10);
+    if(isNaN(got)||isNaN(total)||total<1||got<0||got>total)return null;
+    if(p[3]!=="MS"&&p[3]!=="HS")return null;
+    return {last:p[0],first:p[1],period:p[2],level:p[3],got:got,total:total,date:p[6],pct:Math.round(got/total*100)};
+  }catch(err){return null;}
+}
+
+/* ============ question builders ============ */
+const FAMOPTS=["Alkali metals","Alkaline earth metals","Transition metals","Halogens","Noble gases","Metalloids","Nonmetals","Post-transition metals"];
+function famAnswer(e){
+  return {am:"Alkali metals",ae:"Alkaline earth metals",tm:"Transition metals",hal:"Halogens",
+          ng:"Noble gases",md:"Metalloids",nm:"Nonmetals",ptm:"Post-transition metals",
+          ln:"Lanthanides",an:"Actinides"}[e.cat];
+}
+function famWhy(e){
+  if(e.cat==="am"||e.cat==="ae"||e.cat==="hal"||e.cat==="ng")
+    return e.name+" is in group "+e.group+", and all of group "+e.group+" is the "+famAnswer(e).toLowerCase()+".";
+  if(e.cat==="tm")return e.name+" sits in the middle block, groups 3–12 — those are the transition metals.";
+  if(e.cat==="md")return e.name+" sits right on the staircase, so it is a metalloid: part metal, part nonmetal.";
+  if(e.cat==="ptm")return e.name+" is a metal sitting to the right of the transition metals, so it belongs to the post-transition metals.";
+  return e.name+" is on the nonmetal side of the staircase and is not a halogen or a noble gas, so it is grouped with the other nonmetals.";
+}
+function mcFrom(rng,correct,pool){
+  const wrong=shuffle(rng,pool.filter(function(x){return x!==correct;})).slice(0,3);
+  const opts=shuffle(rng,[correct].concat(wrong));
+  return {opts:opts,ans:opts.indexOf(correct)};
+}
+function tileHTML(e){
+  return '<div class="qTile" style="background:'+CATS[e.cat].c+'"><span class="z">'+e.z+'</span>'+
+         '<span class="sym">'+e.sym+'</span><span class="ms">'+e.mass+'</span></div>';
+}
+function formulaFor(a,b){ // a = metal (+1/+2), b = nonmetal (-1/-2)
+  const p=a.charge, n=-b.charge, g=(function(x,y){while(y){const t=y;y=x%y;x=t;}return x;})(p,n);
+  const sa=n/g, sb=p/g;
+  return a.sym+(sa>1?String(sa):"")+b.sym+(sb>1?String(sb):"");
+}
+
+const MS_MAIN=elsWhere(function(e){return e.z<=20;});
+const MS_ANY =elsWhere(function(e){return e.z<=36;});
+/* hydrogen is left out of family questions on purpose — it is group 1 but behaves like a nonmetal,
+   so "which family" has no clean answer for it */
+const MS_FAM =elsWhere(function(e){return e.z<=36&&e.z!==1&&["am","ae","tm","hal","ng","md","nm","ptm"].indexOf(e.cat)>=0;});
+const HS_MAIN=elsWhere(function(e){return e.val!=null&&e.z<=56;});
+const HS_ION =elsWhere(function(e){return e.charge!=null&&e.charge!==0&&e.z<=56;});
+
+function buildMS(rng){
+  const q=[];
+  let e=pick(rng,MS_ANY);
+  q.push({t:"num",pre:tileHTML(e),
+    q:"This is the periodic table square for <b>"+e.name+"</b>. How many <b>protons</b> are in one atom of "+e.name+"?",
+    ans:e.z, why:"The atomic number is "+e.z+", and the atomic number always equals the number of protons."});
+
+  e=pick(rng,MS_ANY);
+  q.push({t:"num",pre:tileHTML(e),
+    q:"A <b>neutral</b> atom of "+e.name+" has how many <b>electrons</b>?",
+    ans:e.z, why:"Neutral means the charges cancel out, so electrons = protons = "+e.z+"."});
+
+  e=pick(rng,MS_ANY);
+  q.push({t:"num",
+    q:e.name+" has an atomic number of <b>"+e.z+"</b> and a mass number of <b>"+e.massNum+"</b>. How many <b>neutrons</b> does it have?",
+    ans:e.massNum-e.z, why:"Neutrons = mass number − atomic number = "+e.massNum+" − "+e.z+" = "+(e.massNum-e.z)+"."});
+
+  e=pick(rng,elsWhere(function(x){return x.z<=20&&x.val!=null;}));
+  q.push({t:"num",pre:'<div class="qBohr">'+bohrSVG(e,{label:"Mystery element"})+'</div>',
+    q:"Count the electrons in the <b>outermost</b> ring of this Bohr model. How many are there?",
+    ans:e.shells[e.shells.length-1],
+    why:"This is "+e.name+". Its electrons fill up "+e.shells.join(", ")+" — so the outer level holds "+e.shells[e.shells.length-1]+"."});
+
+  e=pick(rng,MS_FAM);
+  var m=mcFrom(rng,famAnswer(e),FAMOPTS);
+  q.push({t:"mc",pre:tileHTML(e),q:"Which family does <b>"+e.name+"</b> belong to?",opts:m.opts,ans:m.ans,
+    why:famWhy(e)});
+
+  e=pick(rng,MS_ANY);
+  var mt=mcFrom(rng,MNM[e.type].n,["Metal","Nonmetal","Metalloid"]);
+  q.push({t:"mc",pre:tileHTML(e),q:"Is <b>"+e.name+"</b> a metal, a nonmetal, or a metalloid?",
+    opts:mt.opts,ans:mt.ans,
+    why:e.type==="metalloid"?e.name+" sits right on the staircase, so it is a metalloid — it acts a little like both.":
+        (e.type==="metal"?e.name+" is on the left side of the staircase, so it is a metal.":
+                          e.name+" is on the right side of the staircase, so it is a nonmetal.")});
+
+  var ng=pick(rng,elsWhere(function(x){return x.cat==="ng"&&x.z<=54;}));
+  var not=shuffle(rng,elsWhere(function(x){return x.cat!=="ng"&&x.z<=36;})).slice(0,3);
+  var o1=shuffle(rng,[ng].concat(not));
+  q.push({t:"mc",q:"Which of these elements is a <b>noble gas</b>?",
+    opts:o1.map(function(x){return x.name+" ("+x.sym+")";}),ans:o1.indexOf(ng),
+    why:ng.name+" is in group 18, the far right column. Noble gases already have a full outer level, so they almost never react."});
+
+  var o2=shuffle(rng,["The same number of valence electrons","The same number of protons","The same number of neutrons","Exactly the same mass"]);
+  q.push({t:"mc",q:"Elements in the same <b>group</b> (column) of the periodic table share what?",
+    opts:o2,ans:o2.indexOf("The same number of valence electrons"),
+    why:"Same column = same number of valence electrons, and valence electrons are what decide how an element reacts. That is why a family behaves alike."});
+
+  e=pick(rng,elsWhere(function(x){return x.z<=36&&x.state!=="u";}));
+  var o3=shuffle(rng,["Solid","Liquid","Gas"]);
+  q.push({t:"mc",pre:tileHTML(e),q:"At room temperature, "+e.name+" is a…",
+    opts:o3,ans:o3.indexOf(STATES[e.state].n),
+    why:e.state==="l"?e.name+" is one of only two elements that is liquid at room temperature (the other is "+(e.sym==="Br"?"mercury":"bromine")+")."
+        :e.name+" is a "+STATES[e.state].n.toLowerCase()+" at room temperature."});
+
+  var g=pick(rng,[1,2,17,18]);
+  var fam=shuffle(rng,elsWhere(function(x){return x.group===g&&x.z<=54&&x.z!==1;}));
+  var target=fam[0], buddy=fam[1];
+  var others=shuffle(rng,elsWhere(function(x){return x.group!==g&&x.z<=54&&x.group>0;})).slice(0,3);
+  var o4=shuffle(rng,[buddy].concat(others));
+  q.push({t:"mc",q:"Which element would you expect to act most like <b>"+target.name+"</b>?",
+    opts:o4.map(function(x){return x.name+" ("+x.sym+")";}),ans:o4.indexOf(buddy),
+    why:target.name+" and "+buddy.name+" are both in group "+g+", so they have the same number of valence electrons and react in similar ways."});
+
+  e=pick(rng,MS_ANY);
+  var o5=shuffle(rng,[e].concat(shuffle(rng,MS_ANY.filter(function(x){return x!==e;})).slice(0,3)));
+  q.push({t:"mc",q:"Which element has the symbol <b>"+e.sym+"</b>?",
+    opts:o5.map(function(x){return x.name;}),ans:o5.indexOf(e),
+    why:'"'+e.sym+'" is the symbol for '+e.name+"."});
+
+  e=pick(rng,elsWhere(function(x){return x.z<=36&&x.group>0;}));
+  var o6=shuffle(rng,["How many energy levels (rings) its electrons fill","How many protons it has","How many neutrons it has","Its mass in grams"]);
+  q.push({t:"mc",q:e.name+" sits in <b>period "+e.period+"</b>. What does the period number tell you?",
+    opts:o6,ans:o6.indexOf("How many energy levels (rings) its electrons fill"),
+    why:"The period number equals the number of occupied energy levels. "+e.name+" is in period "+e.period+", so its electrons fill "+e.period+" level"+(e.period===1?"":"s")+": "+e.shells.join(", ")+"."});
+  return q;
+}
+
+function buildHS(rng){
+  const q=[];
+  let e=pick(rng,HS_MAIN);
+  q.push({t:"num",pre:tileHTML(e),q:"How many <b>valence electrons</b> does an atom of "+e.name+" have?",
+    ans:e.val, why:e.name+" is in group "+e.group+". For main-group elements the valence count is the group number for groups 1–2 and the group number minus 10 for groups 13–18, so "+e.name+" has "+e.val+"."});
+
+  e=pick(rng,HS_ION);
+  var ctxt=(e.charge>0?"+":"")+e.charge;
+  var cm=mcFrom(rng,ctxt,["+1","+2","+3","−1","−2","−3"]);
+  q.push({t:"mc",pre:tileHTML(e),q:"What charge does a "+e.name+" ion most likely carry?",
+    opts:cm.opts,ans:cm.ans,
+    why:e.charge>0?e.name+" has "+e.val+" valence electron"+(e.val===1?"":"s")+" and loses "+(e.val===1?"it":"them")+" to reach a full outer level, leaving a "+ctxt+" charge."
+                  :e.name+" has "+e.val+" valence electrons and gains "+(8-e.val)+" to fill its outer level, giving it a "+ctxt+" charge."});
+
+  var per=pick(rng,[2,3,4]);
+  var row=shuffle(rng,elsWhere(function(x){return x.period===per&&x.group>0&&x.rad!=null;}));
+  var ra=row[0], rb=row[1];
+  if(ra.rad===rb.rad)rb=row[2]||rb;
+  var bigR=ra.rad>rb.rad?ra:rb, smallR=ra.rad>rb.rad?rb:ra;
+  var ro=shuffle(rng,[ra,rb]);
+  q.push({t:"mc",q:"Both of these are in period "+per+". Which one has the <b>larger atomic radius</b>?",
+    opts:ro.map(function(x){return x.name+" ("+x.sym+")";}),ans:ro.indexOf(bigR),
+    why:bigR.name+" is farther LEFT. Moving right across a period adds protons to the same energy level, so the nucleus pulls the electron cloud in tighter — "+smallR.name+" ("+smallR.rad+" pm) is smaller than "+bigR.name+" ("+bigR.rad+" pm)."});
+
+  var gg=pick(rng,[1,2,17,18]);
+  var col=shuffle(rng,elsWhere(function(x){return x.group===gg&&x.ie!=null;}));
+  var ia=col[0], ib=col[1];
+  var hiI=ia.ie>ib.ie?ia:ib, loI=ia.ie>ib.ie?ib:ia;
+  var io=shuffle(rng,[ia,ib]);
+  q.push({t:"mc",q:"Both of these are in group "+gg+". Which one has the <b>higher first ionization energy</b>?",
+    opts:io.map(function(x){return x.name+" ("+x.sym+")";}),ans:io.indexOf(hiI),
+    why:hiI.name+" is HIGHER up the column ("+hiI.ie+" kJ/mol vs. "+loI.ie+"). Its outer electron sits closer to the nucleus with less shielding, so it takes more energy to pull off."});
+
+  var ea=pick(rng,elsWhere(function(x){return x.en!=null&&x.z<=54;}));
+  var eb=pick(rng,elsWhere(function(x){return x.en!=null&&x.z<=54&&Math.abs(x.en-ea.en)>0.3;}));
+  var hiE=ea.en>eb.en?ea:eb, loE=ea.en>eb.en?eb:ea;
+  var eo=shuffle(rng,[ea,eb]);
+  q.push({t:"mc",q:"Which of these is <b>more electronegative</b> — pulls harder on shared electrons?",
+    opts:eo.map(function(x){return x.name+" ("+x.sym+")";}),ans:eo.indexOf(hiE),
+    why:hiE.name+" is "+hiE.en.toFixed(2)+" on the Pauling scale and "+loE.name+" is "+loE.en.toFixed(2)+". Electronegativity climbs as you go right across a period and up a group — fluorine, top right, is the highest of all."});
+
+  e=pick(rng,elsWhere(function(x){return x.shells.length>=3&&x.z<=38;}));
+  var lvl=pick(rng,[2,3]);
+  q.push({t:"num",q:"The electrons in an atom of "+e.name+" are arranged <b>"+e.shells.join("-")+"</b>. How many electrons are in its <b>"+ordinal(lvl)+"</b> energy level?",
+    ans:e.shells[lvl-1],
+    why:"Read the arrangement left to right, one number per level: "+e.shells.map(function(v,i){return "level "+(i+1)+" = "+v;}).join(", ")+"."});
+
+  e=pick(rng,HS_ION);
+  var ch=e.charge;
+  q.push({t:"num",q:"An ion of "+e.name+" carries a charge of <b>"+(ch>0?"+":"")+ch+"</b>. How many <b>electrons</b> does that ion have?",
+    ans:e.z-ch,
+    why:e.name+" has "+e.z+" protons. A charge of "+(ch>0?"+":"")+ch+" means it "+(ch>0?"lost "+ch+" electron"+(ch===1?"":"s"):"gained "+(-ch)+" electron"+(ch===-1?"":"s"))+", so it has "+e.z+" "+(ch>0?"−":"+")+" "+Math.abs(ch)+" = "+(e.z-ch)+" electrons."});
+
+  var metal=pick(rng,elsWhere(function(x){return (x.cat==="am"||x.cat==="ae")&&x.z<=56;}));
+  var nonm =pick(rng,elsWhere(function(x){return (x.cat==="hal"||x.sym==="O"||x.sym==="S")&&x.z<=53;}));
+  var bo=shuffle(rng,["Ionic — the metal transfers electrons to the nonmetal","Covalent — the two atoms share electrons","Metallic — the electrons pool between metal atoms","No bond — both already have full outer levels"]);
+  q.push({t:"mc",q:"What kind of bond would form between <b>"+metal.name+"</b> and <b>"+nonm.name+"</b>?",
+    opts:bo,ans:bo.indexOf("Ionic — the metal transfers electrons to the nonmetal"),
+    why:metal.name+" is a metal with low electronegativity ("+metal.en.toFixed(2)+") and "+nonm.name+" is a nonmetal with high electronegativity ("+nonm.en.toFixed(2)+"). A gap that big means the electrons transfer instead of being shared — that is an ionic bond."});
+
+  var tpick=pick(rng,[
+    {q:"As you move LEFT to RIGHT across a period, atomic radius…",a:"Decreases",w:"More protons pull the same energy level in tighter, so atoms shrink across a row."},
+    {q:"As you move DOWN a group, atomic radius…",a:"Increases",w:"Each row down adds a whole new energy level, so the atom gets bigger."},
+    {q:"As you move LEFT to RIGHT across a period, ionization energy…",a:"Increases",w:"Smaller atoms with more protons hold their electrons far more tightly."},
+    {q:"As you move DOWN a group, electronegativity…",a:"Decreases",w:"Bonding electrons sit farther from the nucleus, so the pull on them weakens."}
+  ]);
+  var to=shuffle(rng,["Increases","Decreases","Stays exactly the same","Increases, then drops to zero"]);
+  q.push({t:"mc",q:tpick.q,opts:to,ans:to.indexOf(tpick.a),why:tpick.w});
+
+  e=pick(rng,elsWhere(function(x){return x.z<=20&&x.group>0;}));
+  var co=shuffle(rng,[e].concat(shuffle(rng,elsWhere(function(x){return x.z<=20&&x!==e;})).slice(0,3)));
+  q.push({t:"mc",q:"Which element has its electrons arranged <b>"+e.shells.join("-")+"</b>?",
+    opts:co.map(function(x){return x.name+" ("+x.sym+")";}),ans:co.indexOf(e),
+    why:"Add the numbers up: "+e.shells.join(" + ")+" = "+e.z+" electrons. A neutral atom with "+e.z+" electrons has "+e.z+" protons, and element number "+e.z+" is "+e.name+"."});
+
+  e=pick(rng,elsWhere(function(x){return x.val!=null&&x.z<=56&&x.shells.length===x.period;}));
+  q.push({t:"num",q:e.name+" is in <b>period "+e.period+"</b>. How many <b>occupied energy levels</b> does one of its atoms have?",
+    ans:e.period,
+    why:"The period number is the number of occupied energy levels. "+e.name+" fills "+e.period+": "+e.shells.join(", ")+"."});
+
+  var fm=pick(rng,elsWhere(function(x){return (x.group===1||x.group===2)&&x.z<=56;}));
+  var fn=pick(rng,elsWhere(function(x){return (x.group===16||x.group===17)&&x.z<=53;}));
+  var right=formulaFor(fm,fn);
+  var wrongs=[fm.sym+fn.sym, fm.sym+"2"+fn.sym, fm.sym+fn.sym+"2", fm.sym+"2"+fn.sym+"3", fm.sym+"3"+fn.sym+"2"]
+    .filter(function(x){return x!==right;});
+  var fo=shuffle(rng,[right].concat(shuffle(rng,wrongs).slice(0,3)));
+  q.push({t:"mc",q:"What is the most likely formula for the compound made from <b>"+fm.name+"</b> and <b>"+fn.name+"</b>?",
+    opts:fo,ans:fo.indexOf(right),
+    why:fm.name+" forms "+(fm.charge>0?"+":"")+fm.charge+" and "+fn.name+" forms "+fn.charge+". The charges have to cancel to zero, which gives "+right+"."});
+  return q;
+}
+
+/* ============ practice state ============ */
+let ASG=null, PLEVEL="ms", PU=null, QS=[];
+try{const p=(new URLSearchParams(location.search).get("assign")||"").toLowerCase();
+    if(p==="ms"||p==="hs")ASG=p;}catch(err){}
+
+function ukey(name,level){return name.trim().toUpperCase()+"|"+level+(ASG?"|A":"");}
+function urec(){
+  const k=ukey(PU.name,PLEVEL);
+  if(!DB.users[k])DB.users[k]={res:[],set:0};
+  const r=DB.users[k];
+  if(!r.res)r.res=[];
+  if(typeof r.set!=="number")r.set=0;
+  return r;
+}
+function buildQuestions(){
+  const r=urec();
+  const seed=hashStr(PU.name.trim().toUpperCase()+"|"+PLEVEL+"|"+r.set);
+  const rng=mulberry32(seed);
+  QS=(PLEVEL==="hs"?buildHS(rng):buildMS(rng));
+  if(r.res.length!==QS.length)r.res=new Array(QS.length).fill(null);
+  save();
+}
+function pScore(){
+  const r=urec();
+  let got=0; r.res.forEach(function(v){if(v===1)got++;});
+  let done=0; r.res.forEach(function(v){if(v!==null)done++;});
+  return {got:got,done:done,total:QS.length};
+}
+function pCodeNow(){
+  const sc=pScore();
+  if(ASG)return encAsg(PU.last||"",PU.first||"",PU.period||"0",PLEVEL.toUpperCase(),sc.got,sc.total);
+  return encPractice(PU.name,PLEVEL.toUpperCase(),sc.got,sc.total);
+}
+function renderPractice(){
+  const r=urec(), host=$("qArea");
+  host.innerHTML="";
+  QS.forEach(function(q,i){
+    const row=document.createElement("div");
+    row.className="qrow"+(r.res[i]===1?" right":"");
+    let h='<div class="qtext"><span class="qn">'+(i+1)+'.</span>'+q.q+'</div>';
+    if(q.pre)h=(q.pre)+h;
+    if(q.t==="mc"){
+      h+=q.opts.map(function(o,j){return '<button class="mcopt" data-i="'+i+'" data-j="'+j+'">'+esc(o)+'</button>';}).join("");
+    }else{
+      h+='<div class="numrow"><input type="number" data-i="'+i+'" placeholder="answer"> '+
+         '<button class="btn small" data-check="'+i+'">Check</button><span class="mark" id="mk'+i+'"></span></div>';
+    }
+    h+='<div class="why" id="why'+i+'">'+q.why+'</div>';
+    row.innerHTML=h;
+    host.appendChild(row);
+    if(r.res[i]!==null)lockRow(i);
+  });
+  updatePBar();
+}
+function lockRow(i){
+  const q=QS[i], r=urec(), row=$("qArea").children[i];
+  if(!row)return;
+  $("why"+i).style.display="block";
+  if(q.t==="mc"){
+    row.querySelectorAll(".mcopt").forEach(function(b,j){
+      if(j===q.ans)b.classList.add("right");
+      b.disabled=false;
+    });
+  }else{
+    const mk=$("mk"+i);
+    if(mk)mk.innerHTML=(r.res[i]===1?'<span style="color:var(--green)">correct — '+q.ans+'</span>'
+                                     :'<span style="color:var(--red)">answer: '+q.ans+'</span>');
+  }
+  row.classList.toggle("right",r.res[i]===1);
+}
+function answerQ(i,correct){
+  const r=urec();
+  if(r.res[i]===null){ r.res[i]=correct?1:0; save(); }
+  lockRow(i); updatePBar();
+}
+function updatePBar(){
+  const sc=pScore();
+  $("pFill").style.width=(sc.total?Math.round(sc.done/sc.total*100):0)+"%";
+  $("pScoreTxt").textContent=sc.done+" of "+sc.total+" answered · "+sc.got+" correct ("+
+    (sc.total?Math.round(sc.got/sc.total*100):0)+"%)";
+  $("pCode").textContent=pCodeNow();
+  const done=sc.done===sc.total&&sc.total>0;
+  $("pDone").style.display=done?"block":"none";
+  if(done)$("pDoneMsg").textContent="You scored "+sc.got+" out of "+sc.total+" ("+Math.round(sc.got/sc.total*100)+"%). Copy the code above and turn it in.";
+}
+function startPractice(){
+  $("pGate").style.display="none"; $("pMain").style.display="block";
+  $("pWho").textContent=PU.name;
+  $("pSetTxt").textContent=(PLEVEL==="hs"?"High School set — atomic structure & periodic trends":"8th Grade set — atoms & the periodic table")+
+    (ASG?" · assigned by your teacher · "+periodLabel(PU.period):"");
+  $("pNewSet").style.display=ASG?"none":"inline-block";
+  buildQuestions(); renderPractice();
+}
+
+/* ============ print sheets ============ */
+const SHEETS=[
+  {id:"ref",  t:"Full reference table",   d:"Every element with its symbol, number, and atomic mass, plus a family key. One page, black and white — good for a binder or a test-day reference.", key:false},
+  {id:"blank",t:"Blank table — label the families", d:"Atomic numbers only. Students fill in symbols for a chosen row, shade the metal / nonmetal / metalloid regions, and label the families.", key:true},
+  {id:"square",t:"Read the square", d:"Ten elements: fill in protons, electrons, neutrons, family, and metal type. The bread-and-butter S8P1 practice sheet.", key:true},
+  {id:"bohr", t:"Bohr model practice", d:"Six atoms to draw and six to read. Elements 1–20, the ones students are actually expected to model.", key:true},
+  {id:"trend",t:"Periodic trends (High School)", d:"Rank the atoms, pick the winner of each pair, and explain the why using nuclear pull and shielding.", key:true}
+];
+function pFoot(){return '<div class="foot">tobinscience.com</div>';}
+function pHead(title,sub,name){
+  return '<h1>'+title+'</h1><div class="sub">'+sub+'</div>'+
+    (name!==false?'<div class="nameline">Name: ______________________________&nbsp;&nbsp;&nbsp;&nbsp;Period: ______&nbsp;&nbsp;&nbsp;&nbsp;Date: ______________</div>':'');
+}
+function printTableHTML(opts){
+  opts=opts||{};
+  let cells=[];
+  function put(col,row,html,cls){cells.push('<div class="c '+(cls||"")+'" style="grid-column:'+col+';grid-row:'+row+'">'+html+'</div>');}
+  let h='<div class="ptp">';
+  h+='<div class="hd" style="grid-column:1;grid-row:1"></div>';
+  for(let g=1;g<=18;g++)h+='<div class="hd" style="grid-column:'+(g+1)+';grid-row:1">'+g+'</div>';
+  for(let p=1;p<=7;p++)h+='<div class="hd" style="grid-column:1;grid-row:'+(p+1)+'">'+p+'</div>';
+  EL.forEach(function(e){
+    let col,row;
+    if(e.group===0){row=(e.z<=71)?10:11; col=4+(e.z-(e.z<=71?57:89));}
+    else{row=e.period+1; col=e.group+1;}
+    let inner;
+    if(opts.blank) inner='<span class="zz">'+e.z+'</span>';
+    else inner='<span class="zz">'+e.z+'</span><b>'+e.sym+'</b>'+(opts.mass?'<span class="zz">'+e.mass+'</span>':'');
+    put(col,row,inner,opts.blank?"blank":"");
+  });
+  h+=cells.join("");
+  h+='<div class="sp" style="grid-row:9"></div>';
+  h+='<div class="c" style="grid-column:4;grid-row:7;font-size:5.5pt">57-71</div>';
+  h+='<div class="c" style="grid-column:4;grid-row:8;font-size:5.5pt">89-103</div>';
+  return h+'</div>';
+}
+/* one from each of the families 8th graders are held to, so no single family dominates */
+const SQUARE_SET=[3,8,9,12,13,17,20,26,29,53];
+const BOHR_DRAW=[3,7,11,13,17,20];
+const BOHR_READ=[4,6,10,12,16,19];
+const TREND_PAIRS=[["Na","Cl"],["Li","Cs"],["Mg","Ba"],["F","I"],["C","O"],["K","Br"]];
+
+function sheetHTML(id,key){
+  let h='<div class="psheet">';
+  if(id==="ref"){
+    h+=pHead("Periodic Table of the Elements","Physical Science reference sheet",false);
+    h+=printTableHTML({mass:true});
+    h+='<div class="lgp">'+CATORDER.map(function(k){return '<span>'+CATS[k].n+'</span>';}).join("")+'</div>';
+    h+='<div style="font-size:8.5pt;margin-top:6px">Top number = atomic number (protons). Middle = chemical symbol. Bottom = average atomic mass. Group number runs across the top; period number runs down the left side.</div>';
+    h+=pFoot();
+  }
+  else if(id==="blank"){
+    if(key){
+      h+='<div class="keytag">ANSWER KEY</div>'+pHead("Blank Periodic Table — Label the Families","Key",false);
+      h+=printTableHTML({});
+      h+='<div style="font-size:9.5pt;margin-top:8px"><b>1.</b> Group 1 = alkali metals · Group 2 = alkaline earth metals · Groups 3–12 = transition metals · Group 17 = halogens · Group 18 = noble gases.<br>'+
+         '<b>2.</b> Metalloids (the staircase): B, Si, Ge, As, Sb, Te, Po. Metals sit to the left of the staircase; nonmetals sit to the right.<br>'+
+         '<b>3.</b> Period 2 symbols left to right: Li, Be, B, C, N, O, F, Ne.<br>'+
+         '<b>4.</b> Group number tells you valence electrons (groups 1–2 directly; groups 13–18 subtract 10). Period number tells you how many energy levels are filled.</div>';
+    }else{
+      h+=pHead("Blank Periodic Table — Label the Families","Use the atomic numbers to find your way around.");
+      h+=printTableHTML({blank:true});
+      h+='<ol>'+
+        '<li>Label these families right on the table: <b>alkali metals, alkaline earth metals, transition metals, halogens, noble gases</b>.</li>'+
+        '<li>Draw the staircase that separates metals from nonmetals. Shade the <b>metalloids</b> and write an M in every metal box in period 3.</li>'+
+        '<li>Write the correct symbol in each box of <b>period 2</b> (elements 3 through 10).</li>'+
+        '<li>Pick any box. What two things can you tell about that element just from <i>where</i> it sits? <span class="wl" style="min-width:330px"></span></li>'+
+        '</ol>';
+    }
+    h+=pFoot();
+  }
+  else if(id==="square"){
+    h+=(key?'<div class="keytag">ANSWER KEY</div>':"")+
+       pHead("Read the Square","Use the periodic table to fill in every column.",key?false:true);
+    h+='<table><tr><th>Element</th><th>Symbol</th><th>Atomic #</th><th>Mass #<br>(rounded)</th><th>Protons</th><th>Electrons</th><th>Neutrons</th><th>Family</th><th>Metal / Nonmetal /<br>Metalloid</th></tr>';
+    SQUARE_SET.forEach(function(z){
+      const e=byz(z);
+      if(key){
+        h+='<tr><td>'+e.name+'</td><td>'+e.sym+'</td><td>'+e.z+'</td><td>'+e.massNum+'</td><td>'+e.z+'</td><td>'+e.z+'</td><td>'+(e.massNum-e.z)+'</td><td>'+famAnswer(e)+'</td><td>'+MNM[e.type].n+'</td></tr>';
+      }else{
+        h+='<tr><td>'+e.name+'</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+      }
+    });
+    h+='</table>';
+    if(!key)h+='<ol><li>Which of the ten is the most reactive, and how does its position tell you that? <span class="wl" style="min-width:300px"></span></li>'+
+      '<li>Find two elements on this list that are in the <b>same family</b>. Name them, and explain how their position tells you so. <span class="wl" style="min-width:270px"></span></li>'+
+      '<li>Why is the atomic mass on the table almost never a whole number? <span class="wl" style="min-width:300px"></span></li></ol>';
+    else h+='<ol><li>Fluorine — group 17, one electron short of a full outer level, so it grabs electrons violently. (Lithium is also acceptable: group 1, one electron to give away.)</li>'+
+      '<li>Accept any correct pair from the same column: fluorine + chlorine + iodine (group 17, halogens), magnesium + calcium (group 2, alkaline earth metals), or iron + copper (both in the transition block). Students must say they share a column, which means the same number of valence electrons.</li>'+
+      '<li>Because it is a weighted average of all the isotopes of that element, not the mass of one single atom.</li></ol>';
+    h+=pFoot();
+  }
+  else if(id==="bohr"){
+    h+=(key?'<div class="keytag">ANSWER KEY</div>':"")+
+       pHead("Bohr Model Practice","Protons and neutrons go in the nucleus. Electrons fill 2, then 8, then 8.",key?false:true);
+    h+='<div style="font-size:10pt;margin-top:4px"><b>Part A.</b> '+(key?"Completed models:":"Draw the Bohr model for each atom. Label the nucleus with protons and neutrons.")+'</div>';
+    h+='<div class="bohrbox">';
+    BOHR_DRAW.forEach(function(z){
+      const e=byz(z);
+      h+='<div class="bb">'+(key?bohrSVG(e,{bw:true,label:e.name+" — "+e.shells.join(", ")})
+        :'<div style="height:150px;border:1px dashed #888;margin-bottom:4px"></div>')+
+        '<div class="cap"><b>'+e.name+'</b> ('+e.sym+') — '+e.z+' protons, '+(e.massNum-e.z)+' neutrons</div></div>';
+    });
+    h+='</div>';
+    h+='<div style="font-size:10pt;margin-top:10px"><b>Part B.</b> Fill in the table from each element’s position.</div>';
+    h+='<table><tr><th>Element</th><th>Energy levels</th><th>Electrons per level</th><th>Valence electrons</th><th>Gains or loses?</th></tr>';
+    BOHR_READ.forEach(function(z){
+      const e=byz(z);
+      if(key){
+        const act=e.cat==="ng"?"neither — already full":(e.val<=3?"loses "+e.val:(e.val===4?"shares":"gains "+(8-e.val)));
+        h+='<tr><td>'+e.name+'</td><td>'+e.shells.length+'</td><td>'+e.shells.join(", ")+'</td><td>'+e.val+'</td><td>'+act+'</td></tr>';
+      }else h+='<tr><td>'+e.name+' ('+e.sym+')</td><td></td><td></td><td></td><td></td></tr>';
+    });
+    h+='</table>'+pFoot();
+  }
+  else if(id==="trend"){
+    h+=(key?'<div class="keytag">ANSWER KEY</div>':"")+
+       pHead("Periodic Trends","High School — atomic radius, ionization energy, electronegativity.",key?false:true);
+    h+='<div style="font-size:10pt;margin-top:4px"><b>Part A.</b> Circle the atom with the LARGER radius, then say why in one sentence.</div>';
+    h+='<table><tr><th>Pair</th><th>Larger radius</th><th>Why</th></tr>';
+    TREND_PAIRS.forEach(function(p){
+      const a=EL.find(function(x){return x.sym===p[0];}), b=EL.find(function(x){return x.sym===p[1];});
+      if(key){
+        const big=a.rad>b.rad?a:b;
+        const why=(a.period===b.period)?"Same period — "+big.name+" is farther left, so fewer protons pulling the same shell in.":
+                                        "Same group — "+big.name+" is lower down, so it has more energy levels.";
+        h+='<tr><td>'+a.name+' vs. '+b.name+'</td><td><b>'+big.name+'</b> ('+big.rad+' pm)</td><td>'+why+'</td></tr>';
+      }else h+='<tr><td>'+a.name+' ('+a.sym+') &nbsp; vs. &nbsp; '+b.name+' ('+b.sym+')</td><td></td><td></td></tr>';
+    });
+    h+='</table>';
+    h+='<div style="font-size:10pt;margin-top:10px"><b>Part B.</b> Complete each sentence with <i>increases</i> or <i>decreases</i>.</div>';
+    const stmts=[["Across a period, left to right, atomic radius","decreases"],
+                 ["Down a group, top to bottom, atomic radius","increases"],
+                 ["Across a period, left to right, ionization energy","increases"],
+                 ["Down a group, top to bottom, ionization energy","decreases"],
+                 ["Across a period, left to right, electronegativity","increases"],
+                 ["Down a group, top to bottom, electronegativity","decreases"]];
+    h+='<ol>'+stmts.map(function(s){
+      return '<li>'+s[0]+' <span class="wl">'+(key?"<b>"+s[1]+"</b>":"")+'</span>.</li>';}).join("")+'</ol>';
+    h+='<div style="font-size:10pt;margin-top:8px"><b>Part C.</b> '+
+       (key?'Ionization energy and electronegativity move together because both come down to how hard the nucleus pulls on outer electrons. Atomic radius moves the opposite way — a smaller atom holds its electrons closer, so they are harder to remove and pulled harder in a bond. Fluorine is the extreme case: small, high ionization energy, highest electronegativity of any element.'
+           :'Ionization energy and electronegativity follow the same direction as each other, but the opposite direction from atomic radius. Explain in two or three sentences why that makes sense.<div style="height:70px;border-bottom:1px solid #000"></div><div style="height:22px;border-bottom:1px solid #000"></div>')+
+       '</div>';
+    h+=pFoot();
+  }
+  return h+'</div>';
+}
+function doPrint(id,withKey){
+  let h=sheetHTML(id,false);
+  if(withKey)h+=sheetHTML(id,true);
+  $("printArea").innerHTML=h;
+  window.print();
+}
+function drawSheets(){
+  $("sheetGrid").innerHTML=SHEETS.map(function(s){
+    return '<div class="sheet"><h3>'+s.t+'</h3><p>'+s.d+'</p><div class="row">'+
+      '<button class="btn small" data-sheet="'+s.id+'">Print sheet</button>'+
+      (s.key?'<button class="btn gray small" data-sheet="'+s.id+'" data-key="1">Print with key</button>':"")+
+      '</div></div>';
+  }).join("");
+}
+
+/* ============ teacher tools ============ */
+function gradeCodes(){
+  const raw=$("gradeIn").value||"", out=$("gradeOut");
+  const codes=raw.match(/PTA-[0-9A-Z]+-[0-9A-Z]{2}/gi)||[];
+  const strays=(raw.match(/PTE-[0-9A-Z]+-[0-9A-Z]{2}/gi)||[]).length;
+  const rows=[], bad=[]; const seen={};
+  codes.forEach(function(c){
+    const d=decAsg(c);
+    if(!d){bad.push(c);return;}
+    const k=d.last+"|"+d.first+"|"+d.period;
+    if(seen[k]!=null){ if(d.got>rows[seen[k]].got)rows[seen[k]]=d; return; }
+    seen[k]=rows.length; rows.push(d);
+  });
+  if(!rows.length){
+    out.innerHTML='<span style="color:var(--red)">No valid assignment codes found.'+
+      (strays?" Found "+strays+" free-practice code"+(strays===1?"":"s")+" (PTE) — check those one at a time below.":"")+'</span>';
+    $("gradeCopy").style.display="none"; return;
+  }
+  rows.sort(function(a,b){
+    const pa=parseInt(a.period,10)||99, pb=parseInt(b.period,10)||99;
+    if(pa!==pb)return pa-pb;
+    return a.last.localeCompare(b.last)||a.first.localeCompare(b.first);
+  });
+  let h='<table class="gradeTable"><tr><th>Period</th><th>Last</th><th>First</th><th>Set</th><th>Score</th><th>%</th><th>Date</th></tr>';
+  rows.forEach(function(d){
+    h+='<tr><td>'+(parseInt(d.period,10)||"?")+'</td><td>'+esc(tcase(d.last))+'</td><td>'+esc(tcase(d.first))+
+       '</td><td>'+(d.level==="HS"?"High School":"8th Grade")+'</td><td>'+d.got+" / "+d.total+'</td><td class="pct">'+d.pct+'%</td><td>'+prettyStamp(d.date)+'</td></tr>';
+  });
+  h+='</table>';
+  const notes=[];
+  if(bad.length)notes.push(bad.length+" code"+(bad.length===1?"":"s")+" could not be read (typo or altered)");
+  if(strays)notes.push(strays+" free-practice PTE code"+(strays===1?"":"s")+" skipped");
+  if(notes.length)h+='<div class="dim" style="margin-top:8px; font-size:.9em">'+notes.join(" · ")+'</div>';
+  out.innerHTML=h;
+  $("gradeCopy").style.display="inline-block";
+  $("gradeCopy").onclick=function(){
+    const txt=rows.map(function(d){return tcase(d.last)+", "+tcase(d.first)+"\t"+d.pct;}).join("\n");
+    navigator.clipboard.writeText(txt).then(function(){
+      $("gradeCopy").textContent="Copied!";
+      setTimeout(function(){$("gradeCopy").textContent="Copy for gradebook";},1400);
+    },function(){});
+  };
+}
+function verifyOne(){
+  const d=decPractice($("verifyIn").value), out=$("verifyOut");
+  if(!d){
+    const a=decAsg($("verifyIn").value);
+    if(a){out.innerHTML='<span style="color:var(--gold)">That is an assignment code — paste it into the grading box above. '+
+      esc(tcase(a.first))+" "+esc(tcase(a.last))+", "+a.got+"/"+a.total+" ("+a.pct+"%)</span>"; return;}
+    out.innerHTML='<span style="color:var(--red)">Not a valid code.</span>'; return;
+  }
+  out.innerHTML='<span style="color:var(--green)"><b>'+esc(tcase(d.name))+'</b> — '+
+    (d.level==="HS"?"High School":"8th Grade")+" set — "+d.got+" of "+d.total+" correct ("+d.pct+"%) on "+prettyStamp(d.date)+"</span>";
+}
+
+/* ============ wiring ============ */
+document.getElementById("logoTop").src=LOGO;
+document.getElementById("logoFoot").src=LOGO;
+
+document.querySelectorAll("#tabs button").forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll("#tabs button").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on");
+    document.querySelectorAll(".view").forEach(function(v){v.classList.remove("on");});
+    $("v"+b.dataset.v).classList.add("on");
+    if(b.dataset.v==="trends")drawTrends();
+    window.scrollTo(0,0);
+  };
+});
+function goTab(v){const b=document.querySelector('#tabs button[data-v="'+v+'"]'); if(b)b.click();}
+
+$("colorBy").onchange=function(){MODE=this.value; HILITE=null; drawTable();};
+$("findIn").oninput=function(){FIND=this.value; applyFilter();};
+$("findClear").onclick=function(){$("findIn").value=""; FIND=""; applyFilter();};
+$("bigTog").onchange=function(){document.body.classList.toggle("big",this.checked); $("bigTog2").checked=this.checked;};
+$("bigTog2").onchange=function(){document.body.classList.toggle("big",this.checked); $("bigTog").checked=this.checked;};
+$("legend").onclick=function(ev){
+  const b=ev.target.closest(".lg"); if(!b)return;
+  HILITE=(HILITE===b.dataset.k)?null:b.dataset.k;
+  drawLegend(); applyFilter();
+};
+document.addEventListener("click",function(ev){
+  const el=ev.target.closest(".el"); if(!el)return;
+  showDetail(+el.dataset.z);
+});
+$("shade").onclick=function(ev){if(ev.target===$("shade"))hideDetail();};
+document.addEventListener("keydown",function(ev){
+  if($("shade").classList.contains("on")){
+    if(ev.key==="Escape")hideDetail();
+    if(ev.key==="ArrowRight"||ev.key==="ArrowLeft"){
+      const i=EL.indexOf(byz(DETZ)), n=i+(ev.key==="ArrowRight"?1:-1);
+      if(n>=0&&n<EL.length)showDetail(EL[n].z);
+      ev.preventDefault();
+    }
+  }
+});
+document.querySelectorAll("#trSeg button").forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll("#trSeg button").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on"); TREND=b.dataset.t; drawTrends();
+  };
+});
+$("cmpGo").onclick=runCompare;
+
+document.querySelectorAll("#pLevelSeg button").forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll("#pLevelSeg button").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on"); PLEVEL=b.dataset.l;
+  };
+});
+$("pGo").onclick=function(){
+  if(ASG){
+    const f=$("pFirst").value.trim(), l=$("pLast").value.trim(), p=$("pPeriod").value;
+    if(f.length<2||l.length<2){alert("Please type your first and last name.");return;}
+    if(!p){alert("Please choose your class period.");return;}
+    PU={name:tcase(f+" "+l),first:f,last:l,period:p};
+  }else{
+    const n=$("pName").value.trim();
+    if(n.length<3){alert("Please type your first and last name.");return;}
+    PU={name:tcase(n),first:"",last:"",period:""};
+  }
+  startPractice();
+};
+$("pSwitch").onclick=function(){
+  PU=null; QS=[];
+  $("pMain").style.display="none"; $("pGate").style.display="block";
+};
+$("pNewSet").onclick=function(){
+  const r=urec(); r.set=(r.set||0)+1; r.res=[]; save();
+  buildQuestions(); renderPractice();
+};
+$("pCopy").onclick=function(){
+  navigator.clipboard.writeText(pCodeNow()).then(function(){
+    $("pCopy").textContent="Copied!";
+    setTimeout(function(){$("pCopy").textContent="Copy my code";},1400);
+  },function(){});
+};
+$("qArea").onclick=function(ev){
+  const mc=ev.target.closest(".mcopt");
+  if(mc){
+    const i=+mc.dataset.i, j=+mc.dataset.j, r=urec();
+    if(r.res[i]===null){
+      answerQ(i,j===QS[i].ans);
+      if(j!==QS[i].ans){mc.classList.add("wrong"); $("qArea").children[i].classList.add("wrong");
+        setTimeout(function(){const row=$("qArea").children[i]; if(row)row.classList.remove("wrong");},320);}
+    }else{
+      mc.classList.toggle("wrong",j!==QS[i].ans);
+    }
+    return;
+  }
+  const ck=ev.target.closest("[data-check]");
+  if(ck){
+    const i=+ck.dataset.check;
+    const inp=$("qArea").children[i].querySelector("input[type=number]");
+    const v=parseFloat(inp.value);
+    if(isNaN(v)){alert("Type a number first.");return;}
+    const ok=Math.abs(v-QS[i].ans)<1e-9;
+    const r=urec();
+    if(r.res[i]===null)answerQ(i,ok);
+    else{ $("mk"+i).innerHTML=ok?'<span style="color:var(--green)">correct — '+QS[i].ans+'</span>'
+                                :'<span style="color:var(--red)">answer: '+QS[i].ans+'</span>'; }
+  }
+};
+$("qArea").addEventListener("keydown",function(ev){
+  if(ev.key!=="Enter")return;
+  const inp=ev.target.closest("input[type=number]"); if(!inp)return;
+  const row=inp.closest(".qrow"); const btn=row.querySelector("[data-check]");
+  if(btn)btn.click();
+  ev.preventDefault();
+});
+
+$("sheetGrid").onclick=function(ev){
+  const b=ev.target.closest("[data-sheet]"); if(!b)return;
+  doPrint(b.dataset.sheet,b.dataset.key==="1");
+};
+$("asgMake").onclick=function(){
+  const lv=$("asgLevel").value;
+  const url=location.origin+location.pathname+"?assign="+lv;
+  $("asgLinkRow").style.display="block";
+  $("asgLinkIn").value=url;
+  $("asgLinkNote").textContent=(lv==="hs"?"High School":"8th Grade")+" set — 12 questions, 1 point each.";
+};
+$("asgLinkCopy").onclick=function(){
+  navigator.clipboard.writeText($("asgLinkIn").value).then(function(){
+    $("asgLinkCopy").textContent="Copied!";
+    setTimeout(function(){$("asgLinkCopy").textContent="Copy link";},1400);
+  },function(){});
+};
+$("gradeBtn").onclick=gradeCodes;
+$("verifyBtn").onclick=verifyOne;
+$("resetDevice").onclick=function(){
+  if(!confirm("Erase every saved name and score on this device? This cannot be undone."))return;
+  DB={users:{}}; save(); location.reload();
+};
+
+/* ============ boot ============ */
+drawTable(); fillCmp(); drawSheets();
+if(ASG){
+  PLEVEL=ASG;
+  $("pAsgInfo").style.display="block";
+  $("pAsgInfo").textContent="Assignment: "+(ASG==="hs"?"High School — atomic structure & trends":"8th Grade — atoms & the periodic table");
+  $("pName").style.display="none";
+  $("pAsgFields").style.display="block";
+  $("pLevelPick").style.display="none";
+  $("pGateHint").textContent="Sign in exactly the way your teacher knows you.";
+  goTab("practice");
+}
+</script>
+</body>
+</html>
