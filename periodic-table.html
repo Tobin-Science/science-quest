@@ -90,13 +90,21 @@ body.big .el .z,body.big .el .val{font-size:.65em;}
 body.big .ghdr,body.big .phdr{font-size:.9em;}
 
 /* ---------- legend ---------- */
-#legend,#trLegend{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
-.lg{display:inline-flex; align-items:center; gap:7px; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:4px 13px 4px 5px; font-size:.85em; cursor:pointer;}
+#legend,#trLegend{display:flex; flex-wrap:wrap; gap:9px; margin-top:14px;}
+.lg{display:inline-flex; align-items:center; gap:9px; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:6px 16px 6px 7px; font-size:.98em; font-weight:600; color:var(--ink); cursor:pointer;}
 .lg:hover{border-color:var(--accent);}
-.lg.off{opacity:.4;}
-.lg i{width:15px; height:15px; border-radius:4px; display:inline-block;}
-.scale{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px;}
-.scaleBar{height:15px; width:220px; border-radius:999px; border:1px solid var(--line);}
+.lg.off{opacity:.38;}
+.lg i{width:18px; height:18px; border-radius:5px; display:inline-block; flex:none;}
+#modeNote{margin-top:14px; background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--accent);
+  border-radius:12px; padding:13px 17px; font-size:1.02em; line-height:1.55; color:#d3e2f2;}
+.scale{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:14px; font-size:1em;}
+.scale .pill{font-size:.92em; color:#c2d4e6;}
+#scaleLo,#scaleHi{color:#c2d4e6; font-weight:600;}
+.scaleBar{height:17px; width:230px; border-radius:999px; border:1px solid var(--line);}
+body.big .lg{font-size:1.18em; padding:8px 20px 8px 9px;}
+body.big .lg i{width:22px; height:22px;}
+body.big #modeNote{font-size:1.25em; padding:16px 20px;}
+body.big .scale,body.big #scaleLo,body.big #scaleHi{font-size:1.15em;}
 
 /* ---------- element detail ---------- */
 #shade{display:none; position:fixed; inset:0; background:rgba(4,10,20,.78); z-index:40; align-items:center; justify-content:center; padding:14px;}
@@ -121,9 +129,11 @@ body.big .ghdr,body.big .phdr{font-size:.9em;}
 #dNav .sp{flex:1;}
 
 /* ---------- trends ---------- */
-.arrowNote{display:flex; gap:14px; flex-wrap:wrap; margin-top:10px;}
-.arrowNote div{flex:1; min-width:220px; background:var(--panel2); border-radius:10px; padding:10px 13px; font-size:.93em; line-height:1.4;}
+.arrowNote{display:flex; gap:14px; flex-wrap:wrap; margin-top:12px;}
+.arrowNote div{flex:1; min-width:220px; background:var(--panel2); border-radius:10px; padding:12px 15px; font-size:1.01em; line-height:1.5; color:#d3e2f2;}
 .arrowNote b{color:var(--accent);}
+#trWhat,#trWhy{color:#cadcee; font-size:1.02em; line-height:1.55;}
+body.big .arrowNote div,body.big #trWhat,body.big #trWhy{font-size:1.22em;}
 #cmpRow{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px;}
 #cmpOut{margin-top:12px; line-height:1.5;}
 #cmpOut .win{color:var(--green); font-weight:700;}
@@ -267,7 +277,7 @@ body.big .ghdr,body.big .phdr{font-size:.9em;}
 
   <div class="ptScroll"><div class="pt" id="ptGrid"></div></div>
   <div id="legend"></div>
-  <div class="dim" style="margin-top:12px; font-size:.9em" id="modeNote"></div>
+  <div id="modeNote"></div>
 </div>
 
 <!-- ================= TRENDS ================= -->
@@ -286,12 +296,12 @@ body.big .ghdr,body.big .phdr{font-size:.9em;}
 
   <div class="card" style="margin-bottom:14px">
     <h2 id="trTitle"></h2>
-    <div class="dim" id="trWhat" style="margin-top:5px; line-height:1.45"></div>
+    <div id="trWhat" style="margin-top:6px"></div>
     <div class="arrowNote">
       <div id="trAcross"></div>
       <div id="trDown"></div>
     </div>
-    <div class="dim" id="trWhy" style="margin-top:10px; line-height:1.45; font-size:.93em"></div>
+    <div id="trWhy" style="margin-top:12px"></div>
   </div>
 
   <div class="ptScroll"><div class="pt" id="trGrid"></div></div>
