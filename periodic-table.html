@@ -596,6 +596,33 @@ const CATS={
   an :{n:"Actinide",            c:"#fda4af"}
 };
 const CATORDER=["am","ae","tm","ptm","md","nm","hal","ng","ln","an"];
+/* families for the "Family / group" color mode — strictly column-based, the way they are taught.
+   Groups 13-16 are named for the element at the top of the column. Hydrogen gets its own chip:
+   it sits in group 1 but is NOT an alkali metal, and coloring it red would teach that mistake. */
+const FAMS={
+  hyd:{n:"Hydrogen — a family of one",c:"#67e8f9"},
+  am :{n:"Alkali metals",        c:"#f87171"},
+  ae :{n:"Alkaline earth metals",c:"#fb923c"},
+  tm :{n:"Transition metals",    c:"#fbbf24"},
+  g13:{n:"Boron group",          c:"#a3e635"},
+  g14:{n:"Carbon group",         c:"#4ade80"},
+  g15:{n:"Nitrogen group",       c:"#2dd4bf"},
+  g16:{n:"Oxygen group",         c:"#38bdf8"},
+  hal:{n:"Halogens",             c:"#818cf8"},
+  nob:{n:"Noble gases",          c:"#c084fc"},
+  ln :{n:"Lanthanides",          c:"#f472b6"},
+  an :{n:"Actinides",            c:"#fda4af"}
+};
+const FAMORDER=["hyd","am","ae","tm","g13","g14","g15","g16","hal","nob","ln","an"];
+function famKeyOf(e){
+  if(e.z===1)return "hyd";
+  if(e.group===0)return e.z<=71?"ln":"an";
+  if(e.group===1)return "am";
+  if(e.group===2)return "ae";
+  if(e.group<=12)return "tm";
+  if(e.group<=16)return "g"+e.group;
+  return e.group===17?"hal":"nob";
+}
 const MNM={metal:{n:"Metal",c:"#fbbf24"},metalloid:{n:"Metalloid",c:"#34d399"},nonmetal:{n:"Nonmetal",c:"#38bdf8"}};
 const STATES={s:{n:"Solid",c:"#94a3b8"},l:{n:"Liquid",c:"#38bdf8"},g:{n:"Gas",c:"#fbbf24"},u:{n:"Unknown — made in a lab",c:"#475569"}};
 const VALC=["#475569","#f87171","#fb923c","#fbbf24","#a3e635","#34d399","#38bdf8","#818cf8","#c084fc"];
@@ -688,7 +715,7 @@ function bohrSVG(e,o){
 /* ============ color modes ============ */
 let MODE="fam", HILITE=null, FIND="";
 function colorFor(e,mode){
-  if(mode==="fam")  return CATS[e.cat].c;
+  if(mode==="fam")  return FAMS[famKeyOf(e)].c;
   if(mode==="mnm")  return MNM[e.type].c;
   if(mode==="state")return STATES[e.state].c;
   if(mode==="val")  return e.val==null?VALC[0]:VALC[e.val];
@@ -696,7 +723,7 @@ function colorFor(e,mode){
   return "#33507a";
 }
 function keyFor(e,mode){
-  if(mode==="fam")return e.cat;
+  if(mode==="fam")return famKeyOf(e);
   if(mode==="mnm")return e.type;
   if(mode==="state")return e.state;
   if(mode==="val")return e.val==null?"x":String(e.val);
@@ -704,7 +731,7 @@ function keyFor(e,mode){
   return "all";
 }
 function legendItems(mode){
-  if(mode==="fam")  return CATORDER.map(function(k){return{k:k,n:CATS[k].n,c:CATS[k].c};});
+  if(mode==="fam")  return FAMORDER.map(function(k){return{k:k,n:FAMS[k].n,c:FAMS[k].c};});
   if(mode==="mnm")  return ["metal","metalloid","nonmetal"].map(function(k){return{k:k,n:MNM[k].n,c:MNM[k].c};});
   if(mode==="state")return ["s","l","g","u"].map(function(k){return{k:k,n:STATES[k].n,c:STATES[k].c};});
   if(mode==="val"){const a=[];for(let v=1;v<=8;v++)a.push({k:String(v),n:v+" valence electron"+(v===1?"":"s"),c:VALC[v]});
@@ -713,10 +740,10 @@ function legendItems(mode){
   return [];
 }
 const MODENOTE={
-  fam:"Every column is a family. Family members have the same number of valence electrons, so they behave alike — that is the whole reason the table is shaped this way.",
+  fam:"Every column is a family, and family members have the same number of valence electrons — that is why they behave alike. Groups 13–16 are named for the element at the top of the column: the boron, carbon, nitrogen, and oxygen groups. Hydrogen gets its own color because it sits above group 1 but is not an alkali metal.",
   mnm:"The staircase running down from boron splits metals (left) from nonmetals (right). The elements the staircase touches are the metalloids, which act a little like both.",
   state:"Only two elements are liquid at room temperature: bromine and mercury. Everything past element 103 has only ever existed as a handful of atoms, so nobody knows.",
-  val:"Valence electrons are the electrons in the outermost energy level — the ones that do the bonding. Notice they climb 1 to 8 across every row, then reset.",
+  val:"Valence electrons are the electrons in the outermost energy level — the ones that do the bonding. Notice they climb 1 to 8 across every row, then reset. Helium shows 2 instead of 8 because its one energy level is completely full at 2 — that is why it acts like the other noble gases.",
   react:"Group 1 loses one electron easily and Group 17 grabs one easily, so both ends are wildly reactive. Group 18 already has a full outer shell, so it does almost nothing.",
   plain:"No color. Handy for a projector when you want students to sort the families themselves."
 };
@@ -788,7 +815,7 @@ function applyFilter(){
 
 /* ============ element detail ============ */
 let DETZ=null;
-function famName(e){return CATS[e.cat].n;}
+function famName(e){return FAMS[famKeyOf(e)].n;}
 function valText(e){
   if(e.val!=null)return e.val+" valence electron"+(e.val===1?"":"s");
   if(e.cat==="tm")return e.outer+" in the outer level <small>(transition metals vary)</small>";
@@ -973,19 +1000,14 @@ function decAsg(code){
 }
 
 /* ============ question builders ============ */
-const FAMOPTS=["Alkali metals","Alkaline earth metals","Transition metals","Halogens","Noble gases","Metalloids","Nonmetals","Post-transition metals"];
-function famAnswer(e){
-  return {am:"Alkali metals",ae:"Alkaline earth metals",tm:"Transition metals",hal:"Halogens",
-          ng:"Noble gases",md:"Metalloids",nm:"Nonmetals",ptm:"Post-transition metals",
-          ln:"Lanthanides",an:"Actinides"}[e.cat];
-}
+const FAMOPTS=["Alkali metals","Alkaline earth metals","Transition metals","Boron group","Carbon group","Nitrogen group","Oxygen group","Halogens","Noble gases"];
+function famAnswer(e){return FAMS[famKeyOf(e)].n;}
 function famWhy(e){
-  if(e.cat==="am"||e.cat==="ae"||e.cat==="hal"||e.cat==="ng")
-    return e.name+" is in group "+e.group+", and all of group "+e.group+" is the "+famAnswer(e).toLowerCase()+".";
-  if(e.cat==="tm")return e.name+" sits in the middle block, groups 3–12 — those are the transition metals.";
-  if(e.cat==="md")return e.name+" sits right on the staircase, so it is a metalloid: part metal, part nonmetal.";
-  if(e.cat==="ptm")return e.name+" is a metal sitting to the right of the transition metals, so it belongs to the post-transition metals.";
-  return e.name+" is on the nonmetal side of the staircase and is not a halogen or a noble gas, so it is grouped with the other nonmetals.";
+  const k=famKeyOf(e);
+  if(k==="tm")return e.name+" sits in the middle block, groups 3–12 — those are the transition metals.";
+  if(k==="g13"||k==="g14"||k==="g15"||k==="g16")
+    return e.name+" is in group "+e.group+" — the "+famAnswer(e).toLowerCase()+". Families in groups 13–16 are named for the element at the top of the column.";
+  return e.name+" is in group "+e.group+", and all of group "+e.group+" is the "+famAnswer(e).toLowerCase()+".";
 }
 function mcFrom(rng,correct,pool){
   const wrong=shuffle(rng,pool.filter(function(x){return x!==correct;})).slice(0,3);
@@ -993,7 +1015,7 @@ function mcFrom(rng,correct,pool){
   return {opts:opts,ans:opts.indexOf(correct)};
 }
 function tileHTML(e){
-  return '<div class="qTile" style="background:'+CATS[e.cat].c+'"><span class="z">'+e.z+'</span>'+
+  return '<div class="qTile" style="background:'+FAMS[famKeyOf(e)].c+'"><span class="z">'+e.z+'</span>'+
          '<span class="sym">'+e.sym+'</span><span class="ms">'+e.mass+'</span></div>';
 }
 function formulaFor(a,b){ // a = metal (+1/+2), b = nonmetal (-1/-2)
@@ -1004,9 +1026,9 @@ function formulaFor(a,b){ // a = metal (+1/+2), b = nonmetal (-1/-2)
 
 const MS_MAIN=elsWhere(function(e){return e.z<=20;});
 const MS_ANY =elsWhere(function(e){return e.z<=36;});
-/* hydrogen is left out of family questions on purpose — it is group 1 but behaves like a nonmetal,
-   so "which family" has no clean answer for it */
-const MS_FAM =elsWhere(function(e){return e.z<=36&&e.z!==1&&["am","ae","tm","hal","ng","md","nm","ptm"].indexOf(e.cat)>=0;});
+/* hydrogen is left out of family questions on purpose — it is a family of one,
+   so "which family" has no multiple-choice answer for it */
+const MS_FAM =elsWhere(function(e){return e.z<=36&&e.z!==1&&e.group>0;});
 const HS_MAIN=elsWhere(function(e){return e.val!=null&&e.z<=56;});
 const HS_ION =elsWhere(function(e){return e.charge!=null&&e.charge!==0&&e.z<=56;});
 
@@ -1321,15 +1343,15 @@ function sheetHTML(id,key){
   if(id==="ref"){
     h+=pHead("Periodic Table of the Elements","Physical Science reference sheet",false);
     h+=printTableHTML({mass:true});
-    h+='<div class="lgp">'+CATORDER.map(function(k){return '<span>'+CATS[k].n+'</span>';}).join("")+'</div>';
-    h+='<div style="font-size:8.5pt;margin-top:6px">Top number = atomic number (protons). Middle = chemical symbol. Bottom = average atomic mass. Group number runs across the top; period number runs down the left side.</div>';
+    h+='<div class="lgp">'+FAMORDER.filter(function(k){return k!=="hyd";}).map(function(k){return '<span>'+FAMS[k].n+'</span>';}).join("")+'</div>';
+    h+='<div style="font-size:8.5pt;margin-top:6px">Top number = atomic number (protons). Middle = chemical symbol. Bottom = average atomic mass. Group number runs across the top; period number runs down the left side. Groups 13–16 are named for the element at the top of the column. Hydrogen sits above group 1 but is in a family of its own. Metalloids (B, Si, Ge, As, Sb, Te, Po) form the staircase between metals and nonmetals.</div>';
     h+=pFoot();
   }
   else if(id==="blank"){
     if(key){
       h+='<div class="keytag">ANSWER KEY</div>'+pHead("Blank Periodic Table — Label the Families","Key",false);
       h+=printTableHTML({});
-      h+='<div style="font-size:9.5pt;margin-top:8px"><b>1.</b> Group 1 = alkali metals · Group 2 = alkaline earth metals · Groups 3–12 = transition metals · Group 17 = halogens · Group 18 = noble gases.<br>'+
+      h+='<div style="font-size:9.5pt;margin-top:8px"><b>1.</b> Group 1 = alkali metals · Group 2 = alkaline earth metals · Groups 3–12 = transition metals · Group 13 = boron group · Group 14 = carbon group · Group 15 = nitrogen group · Group 16 = oxygen group · Group 17 = halogens · Group 18 = noble gases. (Hydrogen sits above group 1 but is not an alkali metal.)<br>'+
          '<b>2.</b> Metalloids (the staircase): B, Si, Ge, As, Sb, Te, Po. Metals sit to the left of the staircase; nonmetals sit to the right.<br>'+
          '<b>3.</b> Period 2 symbols left to right: Li, Be, B, C, N, O, F, Ne.<br>'+
          '<b>4.</b> Group number tells you valence electrons (groups 1–2 directly; groups 13–18 subtract 10). Period number tells you how many energy levels are filled.</div>';
