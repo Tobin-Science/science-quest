@@ -98,6 +98,22 @@ h2 .icn{color:var(--accent);}
 .fnote{background:#0c1626; border:1px dashed var(--line); border-radius:12px; padding:11px 15px; color:var(--dim); font-size:.92em; line-height:1.5; margin-top:18px; max-width:760px;}
 .fnote b{color:var(--ink);}
 
+/* ---------- walk the chart ---------- */
+#wkFormula{font-size:2.6em; text-align:center; color:var(--gold); margin:10px 0 4px; letter-spacing:1px;}
+#wkStreak{font-size:.85em; color:var(--dim); font-weight:600;}
+.wkQ{font-weight:700; margin:12px 0 8px;}
+.wkBtns{display:flex; gap:9px; flex-wrap:wrap;}
+.wkBtns button{flex:1; min-width:190px; background:#0c1626; border:2px solid var(--line); color:var(--ink); padding:11px 14px; border-radius:10px; font-weight:600; text-align:left;}
+.wkBtns button:hover{border-color:var(--accent);}
+.wkBtns button.right{border-color:var(--green); background:#0d2e22;}
+.wkBtns button.wrong{border-color:var(--red); background:#331416; animation:shake .3s;}
+.wkBtns button:disabled{cursor:default; opacity:.9;}
+.wkFeed{margin-top:10px; border-radius:9px; padding:10px 13px; line-height:1.5; font-size:.95em; display:none;}
+.wkFeed.good{display:block; background:#0d2e22; border-left:4px solid var(--green);}
+.wkFeed.bad{display:block; background:#3a2205; border-left:4px solid var(--gold);}
+.wkFeed .dh{font-weight:800; color:var(--gold); display:block; margin-bottom:3px;}
+body.big #wkFormula{font-size:3.1em;}
+
 /* ---------- namer ---------- */
 #namerRow{display:flex; gap:9px; flex-wrap:wrap; align-items:center;}
 #namerIn{flex:1; min-width:210px; font-size:1.1em; font-family:Consolas,monospace;}
@@ -331,6 +347,27 @@ body.big .pill,body.big .qrow .qtag{font-size:.8em;}
   </div>
 
   <div class="card">
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+      <h2 style="flex:1"><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4L19 6"/></svg> Try one with me</h2>
+      <span id="wkStreak"></span>
+    </div>
+    <div class="dim" style="margin:5px 0 2px">Walk a real compound down the chart. Wrong turns get explained, not just marked.</div>
+    <div id="wkFormula"></div>
+    <div class="wkQ" id="wkQ1">Step 1 — what is it made of?</div>
+    <div class="wkBtns" id="wkB1">
+      <button data-k="ionic">A metal and a nonmetal</button>
+      <button data-k="covalent">Two nonmetals</button>
+    </div>
+    <div class="wkFeed" id="wkF1"></div>
+    <div id="wkStep2" style="display:none">
+      <div class="wkQ">Step 2 — so which name is right?</div>
+      <div class="wkBtns" id="wkB2" style="flex-direction:column"></div>
+      <div class="wkFeed" id="wkF2"></div>
+    </div>
+    <div style="margin-top:12px"><button class="btn small" id="wkNext" style="display:none">Another one →</button></div>
+  </div>
+
+  <div class="card">
     <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8L21 21"/></svg> Compound namer — type anything</h2>
     <div class="dim" style="margin:5px 0 10px">Type a <b>formula</b> and get the name, or type a <b>name</b> and get the formula. Either way it shows you every step it took, the same steps the chart asks you for.</div>
     <div id="namerRow">
@@ -383,7 +420,7 @@ body.big .pill,body.big .qrow .qtag{font-size:.8em;}
 
   <div class="card">
     <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.5" cy="12" r="4.5"/><circle cx="16.5" cy="12" r="4.5"/></svg> Why covalent compounds need prefixes at all</h2>
-    <div class="dim" style="margin:5px 0 4px; line-height:1.5">Two metals-and-nonmetals only ever combine one way, because the charges have to cancel. Two nonmetals share electrons instead, and they can share in more than one arrangement. So the name has to carry the count — otherwise these two compounds would have the same name and one of them will kill you.</div>
+    <div class="dim" style="margin:5px 0 4px; line-height:1.5">Two metals-and-nonmetals only ever combine one way, because the charges have to cancel. Two nonmetals share electrons instead, and they can share in more than one arrangement. So the name has to carry the count — otherwise these two very different compounds would share one name, and one of them is dangerous to breathe.</div>
     <div class="sbs" id="coWhy"></div>
     <div style="margin-top:14px; background:#0c1626; border-radius:12px; padding:12px 15px; line-height:1.55">
       <b style="color:var(--ionic)">Compare that to ionic.</b> There is only one magnesium chloride, and it is <span class="fx">MgCl<sub>2</sub></span>. Magnesium is always 2+, chlorine is always 1&minus;, so the formula has no choice. That is exactly why ionic names never use prefixes — the name does not need to carry a count, because the charges already fix it.
@@ -1541,7 +1578,9 @@ function ccSVG(step){
   const d=ccData();
   const boxA='<rect x="60" y="46" width="150" height="104" rx="16" fill="#16283f" stroke="'+(step>=1?"#fbbf24":"#2a4568")+'" stroke-width="3"/>';
   const boxB='<rect x="330" y="46" width="150" height="104" rx="16" fill="#16283f" stroke="'+(step>=1?"#fbbf24":"#2a4568")+'" stroke-width="3"/>';
-  let s='<svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">';
+  /* the stage grows as the walkthrough needs the space below the cards */
+  const H=step>=2?300:196;
+  let s='<svg viewBox="0 0 540 '+H+'" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">';
   s+=boxA+boxB;
   s+='<text x="118" y="118" font-size="52" font-weight="800" fill="#eaf2fb">'+CCM+'</text>';
   s+='<text x="'+(118+CCM.length*30)+'" y="86" font-size="27" font-weight="800" fill="'+(step>=1?"#fbbf24":"#9fb4cc")+'">'+d.ch+'+</text>';
@@ -1598,78 +1637,155 @@ function ccRender(){
    ============================================================ */
 const ET_METALS=["Li","Na","K","Be","Mg","Ca","Al","Sr","Ga"];
 const ET_NONS=["F","Cl","Br","O","S","N","P"];
-function atomSVG(sym,cx,cy,mode,extra){
-  /* mode: "neutral" | "ion" ; extra = electrons drawn/removed */
-  const e=ELEMENTS[sym], val=e.val, R=46;
-  let s='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="#2a4568" stroke-width="2"/>';
-  s+='<circle cx="'+cx+'" cy="'+cy+'" r="22" fill="#16283f" stroke="#38bdf8" stroke-width="2"/>';
-  s+='<text x="'+cx+'" y="'+(cy+7)+'" font-size="20" font-weight="800" fill="#eaf2fb" text-anchor="middle">'+sym+'</text>';
-  const isMetal=e.type==="m";
-  const shown=mode==="ion"?(isMetal?0:8):val;
-  const gained=mode==="ion"&&!isMetal?(8-val):0;
-  for(let i=0;i<8;i++){
-    const a=(-90+i*45)*Math.PI/180, x=cx+R*Math.cos(a), y=cy+R*Math.sin(a);
-    if(i<shown-gained){
-      s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="6" fill="'+(isMetal?"#fbbf24":"#38bdf8")+'"/>';
-    }else if(i<shown){
-      s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="6" fill="#fbbf24" stroke="#fff" stroke-width="1.5"/>';
-    }else if(mode==="neutral"&&!isMetal){
-      s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="6" fill="none" stroke="#4a6a8c" stroke-width="2" stroke-dasharray="3 3"/>';
-    }
-  }
-  if(mode==="ion"){
-    const ch=isMetal?CAT_BY[sym].ch[0]:AN_BY[sym].ch;
-    s+='<text x="'+(cx+R+6)+'" y="'+(cy-R+4)+'" font-size="19" font-weight="800" fill="'+(isMetal?"#fbbf24":"#38bdf8")+'">'+Math.abs(ch)+(isMetal?"+":"−")+'</text>';
-  }
-  s+='<text x="'+cx+'" y="'+(cy+R+24)+'" font-size="14" fill="#9fb4cc" text-anchor="middle">'+ELEMENTS[sym].n+'</text>';
-  s+='<text x="'+cx+'" y="'+(cy+R+41)+'" font-size="12" fill="#9fb4cc" text-anchor="middle">'+
-     (mode==="neutral"?val+" valence electron"+(val===1?"":"s"):(isMetal?"gave away "+CAT_BY[sym].ch[0]:"full outer level"))+'</text>';
-  return s;
-}
-function etDraw(){
+/* The whole cast is on stage from the start: every metal atom on the left with
+   its give-away electrons, every nonmetal on the right with its empty seats.
+   Press the button and the electrons fly across one at a time. When an atom
+   finishes — gave its last, or filled its last seat — its charge pops in. */
+let ET={timer:null,queue:[],flying:null,done:0,running:false,finished:false};
+function etData(){
   const mv=$("etMetal").value,nv=$("etNon").value;
   const m=CAT_BY[mv]?mv:"Al", n=AN_BY[nv]?nv:"O";
   const give=CAT_BY[m].ch[0], take=Math.abs(AN_BY[n].ch);
-  const L=give*take/gcd(give,take), nm=L/give, nn=L/take;
-  const parts=ionicFormula(m,give,n);
-
-  let s='<svg viewBox="0 0 620 400" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">';
-  s+='<text x="310" y="22" font-size="15" fill="#9fb4cc" text-anchor="middle">BEFORE — two neutral atoms</text>';
-  s+=atomSVG(m,150,100,"neutral");
-  s+=atomSVG(n,470,100,"neutral");
-  s+='<defs><marker id="ah2" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#fbbf24"/></marker></defs>';
-  s+='<path d="M212 100 L 400 100" stroke="#fbbf24" stroke-width="4" fill="none" marker-end="url(#ah2)" stroke-dasharray="9 6"/>';
-  s+='<text x="306" y="88" font-size="15" font-weight="700" fill="#fbbf24" text-anchor="middle">'+give+' electron'+(give===1?"":"s")+'</text>';
-  s+='<text x="306" y="120" font-size="13" fill="#9fb4cc" text-anchor="middle">but '+ELEMENTS[n].n.toLowerCase()+' only has room for '+take+'</text>';
-  s+='<line x1="40" y1="196" x2="580" y2="196" stroke="#2a4568" stroke-width="2"/>';
-  s+='<text x="310" y="222" font-size="15" fill="#9fb4cc" text-anchor="middle">AFTER — the only ratio with nothing left over</text>';
-
-  /* rows of ions */
-  const total=nm+nn, startX=310-(total*54)/2+27;
-  for(let i=0;i<nm;i++)s+=miniIon(m,startX+i*54,300,true);
-  for(let i=0;i<nn;i++)s+=miniIon(n,startX+(nm+i)*54,300,false);
-  s+='<text x="310" y="382" font-size="13" fill="#9fb4cc" text-anchor="middle">'+
-     nm+' × '+give+'+ = '+L+'+ &#160;&#160;and&#160;&#160; '+nn+' × '+take+'− = '+L+'− &#160;&#160;→&#160;&#160; balanced</text>';
-  s+='</svg>';
-  $("etStage").innerHTML=s;
-
-  $("etWords").innerHTML="Each <b>"+ELEMENTS[m].n.toLowerCase()+"</b> atom has "+ELEMENTS[m].val+
-    " valence electron"+(ELEMENTS[m].val===1?"":"s")+" and gives "+give+" away. Each <b>"+ELEMENTS[n].n.toLowerCase()+
-    "</b> atom is "+take+" short of a full outer level, so it takes "+take+". Electrons cannot be left sitting in mid-air — every one given away has to land somewhere. The smallest number that "+give+
-    " and "+take+" both go into is <b>"+L+"</b>, so you need <b>"+nm+" "+ELEMENTS[m].n.toLowerCase()+
-    "</b> and <b>"+nn+" "+ELEMENTS[n].n.toLowerCase()+"</b>. That is "+plainF(parts)+" — and it is exactly what the criss-cross gave you.";
-
-  $("etCount").innerHTML=
-    '<div><b style="color:var(--gold)">Electrons out</b><br>'+nm+' '+ELEMENTS[m].n.toLowerCase()+' × '+give+' each = <b>'+L+'</b></div>'+
-    '<div><b style="color:var(--accent)">Electrons in</b><br>'+nn+' '+ELEMENTS[n].n.toLowerCase()+' × '+take+' each = <b>'+L+'</b></div>'+
-    '<div><b style="color:var(--green)">Formula</b><br>'+plainF(parts)+' — '+ionicName(m,give,n)+'</div>';
+  const L=give*take/gcd(give,take);
+  return {m:m,n:n,give:give,take:take,L:L,nm:L/give,nn:L/take,parts:ionicFormula(m,give,n)};
 }
-function miniIon(sym,cx,cy,pos){
-  const c=pos?CAT_BY[sym].ch[0]:Math.abs(AN_BY[sym].ch);
-  let s='<circle cx="'+cx+'" cy="'+cy+'" r="24" fill="'+(pos?"#3a2a05":"#0d2434")+'" stroke="'+(pos?"#fbbf24":"#38bdf8")+'" stroke-width="2.5"/>';
-  s+='<text x="'+cx+'" y="'+(cy+7)+'" font-size="18" font-weight="800" fill="#eaf2fb" text-anchor="middle">'+sym+'</text>';
-  s+='<text x="'+(cx+20)+'" y="'+(cy-16)+'" font-size="14" font-weight="800" fill="'+(pos?"#fbbf24":"#38bdf8")+'">'+c+(pos?"+":"−")+'</text>';
-  return s;
+function etPos(count,i,x0,H){
+  /* vertical center positions for `count` atoms in a column of height H */
+  const gap=Math.min(124,(H-110)/Math.max(1,count-1)||0);
+  const top=222-((count-1)*gap)/2;
+  return {x:x0,y:top+i*gap};
+}
+function etScene(d){
+  const W=640,H=430;
+  let s='<svg id="etSvg" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">';
+  s+='<text x="'+(W/2)+'" y="24" font-size="15" fill="#9fb4cc" text-anchor="middle">'+
+     d.nm+' '+esc(ELEMENTS[d.m].n.toLowerCase())+' atom'+(d.nm===1?"":"s")+' · '+
+     d.nn+' '+esc(ELEMENTS[d.n].n.toLowerCase())+' atom'+(d.nn===1?"":"s")+
+     ' — the smallest cast where every electron finds a seat</text>';
+  /* metals, left column */
+  for(let i=0;i<d.nm;i++){
+    const p=etPos(d.nm,i,150,H);
+    s+='<circle cx="'+p.x+'" cy="'+p.y+'" r="46" fill="none" stroke="#2a4568" stroke-width="2"/>';
+    s+='<circle cx="'+p.x+'" cy="'+p.y+'" r="22" fill="#16283f" stroke="#fbbf24" stroke-width="2"/>';
+    s+='<text x="'+p.x+'" y="'+(p.y+7)+'" font-size="19" font-weight="800" fill="#eaf2fb" text-anchor="middle">'+d.m+'</text>';
+    for(let e=0;e<d.give;e++){
+      const a=(-90+e*(360/Math.max(3,d.give)))*Math.PI/180;
+      s+='<circle id="me_'+i+'_'+e+'" cx="'+(p.x+46*Math.cos(a)).toFixed(1)+'" cy="'+(p.y+46*Math.sin(a)).toFixed(1)+'" r="7" fill="#fbbf24"/>';
+    }
+    s+='<text id="mq_'+i+'" x="'+(p.x+50)+'" y="'+(p.y-44)+'" font-size="19" font-weight="800" fill="#fbbf24" opacity="0">'+d.give+'+</text>';
+  }
+  /* nonmetals, right column: filled valence dots + dashed empty seats */
+  for(let j=0;j<d.nn;j++){
+    const p=etPos(d.nn,j,W-150,H);
+    s+='<circle cx="'+p.x+'" cy="'+p.y+'" r="46" fill="none" stroke="#2a4568" stroke-width="2"/>';
+    s+='<circle cx="'+p.x+'" cy="'+p.y+'" r="22" fill="#16283f" stroke="#38bdf8" stroke-width="2"/>';
+    s+='<text x="'+p.x+'" y="'+(p.y+7)+'" font-size="19" font-weight="800" fill="#eaf2fb" text-anchor="middle">'+d.n+'</text>';
+    const val=8-d.take;
+    for(let e=0;e<8;e++){
+      const a=(-90+e*45)*Math.PI/180, x=(p.x+46*Math.cos(a)).toFixed(1), y=(p.y+46*Math.sin(a)).toFixed(1);
+      if(e<val)s+='<circle cx="'+x+'" cy="'+y+'" r="7" fill="#38bdf8"/>';
+      else s+='<circle id="seat_'+j+'_'+(e-val)+'" cx="'+x+'" cy="'+y+'" r="7" fill="none" stroke="#4a6a8c" stroke-width="2" stroke-dasharray="3 3"/>';
+    }
+    s+='<text id="nq_'+j+'" x="'+(p.x+50)+'" y="'+(p.y-44)+'" font-size="19" font-weight="800" fill="#38bdf8" opacity="0">'+d.take+'−</text>';
+  }
+  s+='<circle id="fly" r="7" fill="#fbbf24" stroke="#fff" stroke-width="1.5" opacity="0"/>';
+  s+='<text id="etTally" x="'+(W/2)+'" y="'+(H-14)+'" font-size="14" fill="#9fb4cc" text-anchor="middle">'+
+     d.L+' electron'+(d.L===1?"":"s")+' need to move. Press the button.</text>';
+  return s+'</svg>';
+}
+function etBuildQueue(d){
+  /* electron k comes from metal floor(k/give), lands on seat k of the nonmetal row */
+  const q=[];
+  for(let k=0;k<d.L;k++){
+    q.push({mi:Math.floor(k/d.give), me:k%d.give, nj:Math.floor(k/d.take), seat:k%d.take});
+  }
+  return q;
+}
+function etDraw(){
+  if(ET.timer){clearInterval(ET.timer);ET.timer=null;}
+  const d=etData();
+  ET={timer:null,queue:etBuildQueue(d),flying:null,done:0,running:false,finished:false,d:d};
+  $("etStage").innerHTML=etScene(d);
+  $("etGo").textContent="Transfer the electrons";
+  $("etWords").innerHTML="Each <b>"+ELEMENTS[d.m].n.toLowerCase()+"</b> atom has "+d.give+
+    " electron"+(d.give===1?"":"s")+" to give away, and each <b>"+ELEMENTS[d.n].n.toLowerCase()+
+    "</b> atom has exactly "+d.take+" empty seat"+(d.take===1?"":"s")+" in its outer level. Electrons cannot be left sitting in mid-air — every one given away has to land somewhere. The smallest number that "+d.give+
+    " and "+d.take+" both go into is <b>"+d.L+"</b>, so it takes <b>"+d.nm+" "+ELEMENTS[d.m].n.toLowerCase()+
+    "</b> and <b>"+d.nn+" "+ELEMENTS[d.n].n.toLowerCase()+"</b>. Watch it happen, then check the criss-cross: it lands on the same answer.";
+  $("etCount").innerHTML="";
+}
+function etFinishInstant(){
+  const d=ET.d;
+  ET.queue.forEach(function(t){
+    const e=$("me_"+t.mi+"_"+t.me); if(e)e.setAttribute("opacity","0");
+    const seat=$("seat_"+t.nj+"_"+t.seat);
+    if(seat){seat.setAttribute("fill","#fbbf24");seat.setAttribute("stroke","#fff");seat.removeAttribute("stroke-dasharray");}
+  });
+  for(let i=0;i<d.nm;i++){const q=$("mq_"+i); if(q)q.setAttribute("opacity","1");}
+  for(let j=0;j<d.nn;j++){const q=$("nq_"+j); if(q)q.setAttribute("opacity","1");}
+  ET.done=ET.queue.length; ET.queue=[]; ET.flying=null;
+  etComplete();
+}
+function etComplete(){
+  const d=ET.d;
+  ET.running=false; ET.finished=true;
+  if(ET.timer){clearInterval(ET.timer);ET.timer=null;}
+  const fly=$("fly"); if(fly)fly.setAttribute("opacity","0");
+  const t=$("etTally");
+  if(t)t.textContent=d.nm+" × "+d.give+"+ = "+d.L+"+ · "+d.nn+" × "+d.take+"− = "+d.L+"− → balanced, nothing left over";
+  $("etGo").textContent="Run it again";
+  $("etCount").innerHTML=
+    '<div><b style="color:var(--gold)">Electrons out</b><br>'+d.nm+' '+ELEMENTS[d.m].n.toLowerCase()+' × '+d.give+' each = <b>'+d.L+'</b></div>'+
+    '<div><b style="color:var(--accent)">Electrons in</b><br>'+d.nn+' '+ELEMENTS[d.n].n.toLowerCase()+' × '+d.take+' each = <b>'+d.L+'</b></div>'+
+    '<div><b style="color:var(--green)">Formula</b><br>'+plainF(d.parts)+' — '+ionicName(d.m,d.give,d.n)+'</div>';
+}
+function etStart(){
+  if(ET.running){etFinishInstant();return;}         /* second press skips ahead */
+  if(ET.finished){etDraw();}                        /* run it again = fresh scene */
+  const d=ET.d;
+  ET.running=true;
+  $("etGo").textContent="Skip to the end";
+  const FLIGHT=420, GAP=110;                        /* ms per electron, pause between */
+  let t0=null, nextAt=Date.now();
+  ET.timer=setInterval(function(){
+    const now=Date.now();
+    if(!ET.flying){
+      if(!ET.queue.length){etComplete();return;}
+      if(now<nextAt)return;
+      ET.flying=ET.queue.shift(); t0=now;
+      const f=ET.flying, e=$("me_"+f.mi+"_"+f.me);
+      if(e)e.setAttribute("opacity","0");
+      const seat=$("seat_"+f.nj+"_"+f.seat), fly=$("fly");
+      if(e&&seat&&fly){
+        f.x0=+e.getAttribute("cx"); f.y0=+e.getAttribute("cy");
+        f.x1=+seat.getAttribute("cx"); f.y1=+seat.getAttribute("cy");
+        fly.setAttribute("opacity","1");
+        fly.setAttribute("cx",f.x0); fly.setAttribute("cy",f.y0);
+      }
+    }
+    const f=ET.flying, el=Math.min(1,(now-t0)/FLIGHT);
+    const ease=el<0.5?2*el*el:1-Math.pow(-2*el+2,2)/2;
+    const fly=$("fly");
+    if(fly&&f.x0!=null){
+      fly.setAttribute("cx",(f.x0+(f.x1-f.x0)*ease).toFixed(1));
+      /* a small arc so crossing electrons do not overlap */
+      fly.setAttribute("cy",(f.y0+(f.y1-f.y0)*ease-36*Math.sin(Math.PI*ease)).toFixed(1));
+    }
+    if(el>=1){
+      const seat=$("seat_"+f.nj+"_"+f.seat);
+      if(seat){seat.setAttribute("fill","#fbbf24");seat.setAttribute("stroke","#fff");seat.removeAttribute("stroke-dasharray");}
+      if(fly)fly.setAttribute("opacity","0");
+      ET.done++;
+      const tally=$("etTally");
+      if(tally)tally.textContent=ET.done+" of "+ET.d.L+" moved";
+      /* charge pops the moment an atom finishes its part */
+      if(f.me===ET.d.give-1){const q=$("mq_"+f.mi); if(q)q.setAttribute("opacity","1");}
+      if(f.seat===ET.d.take-1){const q=$("nq_"+f.nj); if(q)q.setAttribute("opacity","1");}
+      ET.flying=null;
+      if(!ET.queue.length){etComplete();return;}
+      nextAt=now+GAP;
+    }
+  },16);
 }
 
 /* ---------- covalent "why prefixes" + diatomics ---------- */
@@ -1849,9 +1965,9 @@ function qPrefix(rng){
   return {t:"mc",tag:"Prefixes",q:"Which prefix means <b>"+p.n+"</b>?",opts:m.opts,ans:m.ans,why:p.n+" = "+p.p+". "+p.m};
 }
 /* --- error hunt --- */
-function badName(rng,rn){
+/* every believable wrong name for THIS compound, each tagged with its mistake */
+function badNamesFor(it,rn){
   const kinds=[];
-  const it=rng()<0.55?randIonic(rng,rn):randCov(rng);
   const d=distinct(it.parts);
   if(it.kind==="ionic"){
     const c=CAT_BY[it.cat];
@@ -1873,7 +1989,11 @@ function badName(rng,rn){
     const off=d[1][1]===10?9:d[1][1]+1;
     kinds.push({tag:"wrongCount",bad:(d[0][1]>1?PREFIX_BY_N[d[0][1]]:"")+ELEMENTS[d[0][0]].n.toLowerCase()+" "+joinPrefix(PREFIX_BY_N[off],IDE[d[1][0]])});
   }
-  const k=pick(rng,kinds);
+  return kinds;
+}
+function badName(rng,rn){
+  const it=rng()<0.55?randIonic(rng,rn):randCov(rng);
+  const k=pick(rng,badNamesFor(it,rn));
   return {it:it,bad:k.bad,tag:k.tag};
 }
 const ERR_LABEL={
@@ -2490,9 +2610,16 @@ document.querySelectorAll("#tabs button").forEach(function(b){
     b.classList.add("on");
     document.querySelectorAll(".view").forEach(function(v){v.classList.remove("on");});
     $("v"+b.dataset.v).classList.add("on");
+    try{history.replaceState(null,"","#"+b.dataset.v);}catch(err){}
     window.scrollTo(0,0);
   };
 });
+/* deep links: naming-compounds.html#practice opens straight on that tab */
+(function(){
+  const h=(location.hash||"").replace("#","").toLowerCase();
+  const b=h&&document.querySelector('#tabs button[data-v="'+h+'"]');
+  if(b)b.click();
+})();
 function syncBig(on){
   document.body.classList.toggle("big",on);
   ["bigTog","bigTog2","bigTog3"].forEach(function(id){if($(id))$(id).checked=on;});
@@ -2526,9 +2653,99 @@ ccRender();
 /* electron transfer */
 $("etMetal").innerHTML=ET_METALS.map(function(s){return '<option value="'+s+'"'+(s==="Al"?" selected":"")+'>'+ELEMENTS[s].n+'</option>';}).join("");
 $("etNon").innerHTML=ET_NONS.map(function(s){return '<option value="'+s+'"'+(s==="O"?" selected":"")+'>'+ELEMENTS[s].n+'</option>';}).join("");
-$("etGo").onclick=etDraw;
+$("etGo").onclick=etStart;
 $("etMetal").onchange=etDraw; $("etNon").onchange=etDraw;
 etDraw();
+
+/* ---------- walk the chart ---------- */
+let WK={it:null,step:1,streak:0};
+function wkNew(){
+  const rng=Math.random;
+  WK.it=(rng()<0.5?randIonic(rng,ROMAN_ON):randCov(rng));
+  WK.step=1;
+  $("wkFormula").innerHTML=fxF(WK.it.parts);
+  $("wkF1").className="wkFeed"; $("wkF1").innerHTML="";
+  $("wkF2").className="wkFeed"; $("wkF2").innerHTML="";
+  $("wkStep2").style.display="none";
+  $("wkNext").style.display="none";
+  document.querySelectorAll("#wkB1 button").forEach(function(b){b.disabled=false;b.classList.remove("right","wrong");});
+  document.querySelectorAll(".fpick").forEach(function(x){x.classList.remove("on");});
+  document.querySelectorAll(".fdetail").forEach(function(x){x.classList.remove("on");});
+  $("wkStreak").textContent=WK.streak>1?WK.streak+" in a row":"";
+}
+function wkElemLine(){
+  const d=distinct(WK.it.parts);
+  return d.map(function(x){
+    const e=ELEMENTS[x[0]];
+    return "<b>"+x[0]+"</b> is "+e.n.toLowerCase()+", a "+(e.type==="m"?"metal":e.type==="d"?"metalloid — it counts as a nonmetal here":"nonmetal");
+  }).join(", and ")+".";
+}
+function wkStep2(){
+  WK.step=2;
+  $("wkStep2").style.display="block";
+  const right=WK.it.answer;
+  const pool=badNamesFor(WK.it,ROMAN_ON)
+    .map(function(k){return {txt:cap(k.bad),tag:k.tag};})
+    .filter(function(o,i,arr){
+      return normName(o.txt)!==normName(right)&&arr.findIndex(function(x){return x.txt===o.txt;})===i;
+    });
+  const wrongs=shuffle(Math.random,pool).slice(0,2);
+  const opts=shuffle(Math.random,[{txt:right,tag:null}].concat(wrongs));
+  $("wkB2").innerHTML=opts.map(function(o,i){return '<button data-i="'+i+'" data-tag="'+(o.tag||"")+'" style="min-width:0">'+esc(o.txt)+'</button>';}).join("");
+  WK.opts=opts;
+}
+$("wkB1").onclick=function(ev){
+  const b=ev.target.closest("button"); if(!b||b.disabled||WK.step!==1)return;
+  const truth=WK.it.kind, picked=b.dataset.k;
+  if(picked===truth){
+    b.classList.add("right");
+    document.querySelectorAll("#wkB1 button").forEach(function(x){x.disabled=true;});
+    /* light the matching branch of the chart above */
+    const branch=document.querySelector('.fpick[data-b="'+(truth==="ionic"?"ion":"cov")+'"]');
+    if(branch)branch.classList.add("on");
+    $("wkF1").className="wkFeed good";
+    $("wkF1").innerHTML="Right — "+wkElemLine()+" "+(truth==="ionic"
+      ?"Metal + nonmetal, so this is <b>ionic</b>: no prefixes, and the second element ends in −ide."
+      :"Two nonmetals, so this is <b>covalent</b>: Greek prefixes carry the counts.");
+    wkStep2();
+  }else{
+    b.classList.add("wrong"); b.disabled=true;
+    $("wkF1").className="wkFeed bad";
+    $("wkF1").innerHTML='<span class="dh">Look again at the periodic table.</span>'+wkElemLine()+" Try the other branch.";
+  }
+};
+$("wkB2").onclick=function(ev){
+  const b=ev.target.closest("button"); if(!b||b.disabled||WK.step!==2)return;
+  const o=WK.opts[+b.dataset.i];
+  if(o.tag===null){
+    b.classList.add("right");
+    document.querySelectorAll("#wkB2 button").forEach(function(x){x.disabled=true;});
+    WK.streak++;
+    $("wkStreak").textContent=WK.streak>1?WK.streak+" in a row":"";
+    $("wkF2").className="wkFeed good";
+    $("wkF2").innerHTML="<b>"+esc(cap(WK.it.answer))+"</b> — that walk is the whole skill. Same two questions, every compound, every time.";
+    $("wkNext").style.display="inline-block";
+  }else{
+    b.classList.add("wrong"); b.disabled=true;
+    WK.streak=0; $("wkStreak").textContent="";
+    const m=MISTAKES[o.tag];
+    $("wkF2").className="wkFeed bad";
+    $("wkF2").innerHTML='<span class="dh">'+m.h+'</span>'+m.fix+" Pick again.";
+  }
+};
+$("wkNext").onclick=wkNew;
+wkNew();
+
+/* flash card keyboard shortcuts */
+document.addEventListener("keydown",function(ev){
+  if(!$("vdrills").classList.contains("on"))return;
+  if($("drFc").style.display==="none")return;
+  const t=ev.target&&ev.target.tagName;
+  if(t==="INPUT"||t==="TEXTAREA"||t==="SELECT")return;
+  if(ev.key==="ArrowRight"){FCI=(FCI+1)%PREFIX.length;fcRender();ev.preventDefault();}
+  else if(ev.key==="ArrowLeft"){FCI=(FCI+PREFIX.length-1)%PREFIX.length;fcRender();ev.preventDefault();}
+  else if(ev.key===" "||ev.key==="Enter"){$("fcCard").classList.toggle("flip");ev.preventDefault();}
+});
 
 /* practice */
 $("pSetSel").innerHTML=SETS.map(function(s){return '<option value="'+s.id+'">'+esc(s.n)+'</option>';}).join("");
