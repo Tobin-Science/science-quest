@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<title>Chemistry Activities — free interactive chemistry tools for 8th grade &amp; High School | Tobin Science</title>
+<meta name="description" content="Free interactive chemistry activities for 8th grade and High School Physical Science. Explore the periodic table, name ionic and covalent compounds with feedback that diagnoses the mistake, and print worksheets with answer keys. Everything runs in the browser and works offline on any Chromebook.">
+<meta property="og:title" content="Chemistry Activities — free interactive chemistry for the classroom">
+<meta property="og:description" content="Interactive periodic table, compound naming with misconception feedback, printable worksheets with keys. Free, no logins, works offline.">
+<meta property="og:image" content="https://tobinscience.com/chemistry-cover.jpg">
+<meta property="og:url" content="https://tobinscience.com/chemistry.html">
+<meta property="og:type" content="website">
+<style>
+  :root{
+    --ink:#16232f; --muted:#5a6a78; --faint:#8a97a3;
+    --line:#e4e9ee; --bg:#f6f8fb; --card:#ffffff;
+    --ac:#2456b3; --ac-dark:#1c4693; --green:#2f7a4d;
+    --shadow:0 1px 2px rgba(22,35,47,.05),0 8px 24px rgba(22,35,47,.07);
+    --shadow-lift:0 2px 4px rgba(22,35,47,.06),0 14px 34px rgba(22,35,47,.13);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+  a{color:var(--ac)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav-in{max-width:1120px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:800;font-size:17px;letter-spacing:-.2px}
+  .brand img{height:34px;width:34px;border-radius:8px}
+  .brand .grn{color:var(--green)}
+  .nav-links{margin-left:auto;display:flex;gap:4px}
+  .nav-links a{text-decoration:none;color:var(--muted);font-weight:600;font-size:14px;padding:8px 12px;border-radius:8px}
+  .nav-links a:hover{background:var(--bg);color:var(--ink)}
+  @media(max-width:560px){.nav-in{flex-wrap:wrap;justify-content:center}.nav-links{margin-left:0}.nav-links a{padding:6px 8px;font-size:13px}}
+
+  .hero{text-align:center;padding:42px 22px 34px;background:linear-gradient(180deg,#ffffff 0%,var(--bg) 100%);border-bottom:1px solid var(--line)}
+  .hero .kicker{font-size:12.5px;letter-spacing:3px;text-transform:uppercase;color:var(--ac);font-weight:700}
+  h1{font-size:clamp(28px,5vw,42px);line-height:1.12;letter-spacing:-1px;margin:12px auto 14px;max-width:760px}
+  .hero .sub{font-size:clamp(15.5px,2vw,17.5px);color:var(--muted);max-width:660px;margin:0 auto 22px}
+  .chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:30px;padding:7px 14px}
+  .chip .dot{color:var(--green);font-weight:800}
+
+  .crumb{max-width:1120px;margin:0 auto;padding:16px 22px 0;font-size:13.5px;color:var(--faint)}
+  .crumb a{text-decoration:none;font-weight:600}
+  .crumb a:hover{text-decoration:underline}
+
+  section{padding:40px 0 8px}
+  .sec-head{margin-bottom:22px}
+  .sec-head h2{font-size:24px;letter-spacing:-.4px}
+  .sec-head p{color:var(--muted);font-size:15px;margin-top:4px;max-width:680px}
+
+  .btn{display:inline-block;padding:12px 22px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;text-align:center;transition:transform .12s ease,box-shadow .12s ease}
+  .btn.primary{background:var(--ac);color:#fff;box-shadow:0 6px 16px rgba(36,86,179,.28)}
+  .btn.primary:hover{background:var(--ac-dark);transform:translateY(-1px)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--faint);transform:translateY(-1px)}
+
+  /* activity cards — image on top, room to grow to any number */
+  .acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:20px}
+  .acard{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform .15s ease,box-shadow .15s ease}
+  .acard:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift)}
+  .acard>img{width:100%;height:auto;display:block;border-bottom:1px solid var(--line)}
+  .abody{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1}
+  .badge{align-self:flex-start;font-size:11.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--ac);background:rgba(36,86,179,.08);border-radius:6px;padding:3px 8px;margin-bottom:9px}
+  .abody h3{font-size:19px;letter-spacing:-.2px;margin-bottom:6px}
+  .abody>p{color:var(--muted);font-size:14px;line-height:1.55}
+  .abody ul{margin:12px 0 0 18px;color:var(--muted);font-size:13.6px;line-height:1.55;flex:1}
+  .abody ul li{margin-bottom:5px}
+  .abody .btn{margin-top:16px;align-self:flex-start}
+
+  .note{background:#fff;border:1px solid var(--line);border-left:4px solid var(--ac);border-radius:12px;padding:16px 20px;margin-top:26px;color:var(--muted);font-size:14.2px;line-height:1.6}
+  .note b{color:var(--ink)}
+
+  footer{margin-top:56px;border-top:1px solid var(--line);background:#fff}
+  .foot-in{max-width:1120px;margin:0 auto;padding:30px 22px;display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;justify-content:space-between}
+  .foot-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}
+  .foot-brand img{height:30px;width:30px;border-radius:7px}
+  .foot-brand .grn{color:var(--green)}
+  .foot-note{color:var(--faint);font-size:13px;margin-top:8px;max-width:340px}
+  .foot-links{display:flex;gap:44px;flex-wrap:wrap}
+  .foot-links h4{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
+  .foot-links a{display:block;color:var(--muted);text-decoration:none;font-size:13.5px;padding:3px 0}
+  .foot-links a:hover{color:var(--ink)}
+  .foot-base{border-top:1px solid var(--line);text-align:center;color:var(--faint);font-size:12.5px;padding:14px 22px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <a class="brand" href="/home.html"><img src="tobin-logo.png" alt="Tobin Science logo">Tobin<span class="grn">Science</span></a>
+    <div class="nav-links">
+      <a href="/home.html#hubs">Learning Hubs</a>
+      <a href="/home.html#games">Games</a>
+      <a href="/simple-science.html">Videos</a>
+      <a href="/home.html#tpt">More Resources</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="kicker">8th Grade &amp; High School Physical Science</div>
+  <h1>Chemistry Activities</h1>
+  <p class="sub">Free interactive chemistry for your classroom. Every activity runs right in the browser, works with the wifi off, and asks students for nothing but their name.</p>
+  <div class="chips">
+    <span class="chip"><span class="dot">✓</span> Free</span>
+    <span class="chip"><span class="dot">✓</span> No student accounts or logins</span>
+    <span class="chip"><span class="dot">✓</span> Works offline on any Chromebook</span>
+    <span class="chip"><span class="dot">✓</span> Printables with answer keys</span>
+  </div>
+</div>
+
+<div class="crumb"><a href="/home.html">Home</a> &rsaquo; Chemistry Activities</div>
+
+<div class="wrap">
+
+  <section>
+    <div class="sec-head">
+      <h2>Pick an activity</h2>
+      <p>Each one covers a different piece of the chemistry unit, and each one hands you a verifiable progress code so you can grade it without collecting a thing.</p>
+    </div>
+
+    <div class="acts">
+
+      <div class="acard">
+        <img src="periodic-table-cover.jpg" alt="Periodic Table Explorer cover art">
+        <div class="abody">
+          <span class="badge">S8P1 · SPS1 · SPS2</span>
+          <h3>Periodic Table Explorer</h3>
+          <p>An interactive periodic table that recolors itself however you need it to.</p>
+          <ul>
+            <li>Color all 118 elements by family, metal type, state, valence electrons, or reactivity with one click</li>
+            <li>Open any element for its Bohr model, valence count, ion charge, and a real-world fact</li>
+            <li>High School trend heat maps for atomic radius, ionization energy, and electronegativity</li>
+            <li>Name-seeded practice with a code you can verify, plus five printable worksheets with keys</li>
+          </ul>
+          <a class="btn primary" href="/periodic-table.html">Open the Explorer →</a>
+        </div>
+      </div>
+
+      <div class="acard">
+        <img src="naming-compounds-cover.jpg" alt="Naming Binary Compounds cover art">
+        <div class="abody">
+          <span class="badge">SPS2 · High School</span>
+          <h3>Naming Binary Compounds</h3>
+          <p>Ionic and covalent naming, with feedback that names the mistake instead of just marking it wrong.</p>
+          <ul>
+            <li>A clickable naming flow chart, plus a namer that works both directions and shows every step</li>
+            <li>Watch <i>why</i> the criss-cross method works, and watch the electrons transfer to match the formula</li>
+            <li>Greek prefix flash cards and a sixty-second speed drill</li>
+            <li>Wrong answers get diagnosed — prefixes on an ionic compound, a missing Roman numeral, a criss-cross that never got reduced — and each student finishes with a study list built from their own mistakes</li>
+            <li>Transition metals and Roman numerals switch on and off, so you can teach it in two passes</li>
+          </ul>
+          <a class="btn primary" href="/naming-compounds.html">Open Naming Compounds →</a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="note">
+      <b>More chemistry activities are on the way.</b> Chemical reactions and balancing equations are next in line. This page is where they will land, so bookmark it rather than the individual activities.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Related</h2>
+      <p>Other free tools that pair well with the chemistry unit.</p>
+    </div>
+    <div class="acts">
+      <div class="acard">
+        <img src="virtual-lab-cover.jpg" alt="Virtual Lab Bench cover art">
+        <div class="abody">
+          <span class="badge">8th Grade · High School</span>
+          <h3>Virtual Lab Bench</h3>
+          <p>Fifteen interactive labs with virtual equipment — including atom building, conservation of mass, phase changes, and pH. Every student gets different numbers, and every lab hands you a verifiable code.</p>
+          <a class="btn ghost" href="/virtual-lab-bench.html">Open the Lab Bench →</a>
+        </div>
+      </div>
+      <div class="acard">
+        <img src="simple-science-cover.jpg" alt="Simple Science Videos cover art">
+        <div class="abody">
+          <span class="badge">Standard by standard</span>
+          <h3>Simple Science Videos</h3>
+          <p>One-minute videos that break each Physical Science standard into plain language — good openers and reviews for the chemistry standards.</p>
+          <a class="btn ghost" href="/simple-science.html">Browse the videos →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="foot-in">
+    <div>
+      <div class="foot-brand"><img src="tobin-logo.png" alt="">Tobin<span class="grn">Science</span></div>
+      <p class="foot-note">Classroom games and curriculum built by a middle-school science teacher — standards-aligned, classroom-tested, and reusable year after year.</p>
+    </div>
+    <div class="foot-links">
+      <div>
+        <h4>Chemistry</h4>
+        <a href="/periodic-table.html">Periodic Table Explorer</a>
+        <a href="/naming-compounds.html">Naming Binary Compounds</a>
+      </div>
+      <div>
+        <h4>Learning Hubs</h4>
+        <a href="https://tobin-science.github.io/science-hub/">Science Hub</a>
+        <a href="https://tobin-science.github.io/science-hub/math.html">Math Hub</a>
+      </div>
+      <div>
+        <h4>More</h4>
+        <a href="/home.html">All resources</a>
+        <a href="/virtual-lab-bench.html">Virtual Lab Bench</a>
+        <a href="/simple-science.html">Simple Science Videos</a>
+        <a href="/science-in-sports.html">Science in Sports &amp; Activities</a>
+        <a href="/feedback.html">Leave feedback</a>
+      </div>
+    </div>
+  </div>
+  <div class="foot-base"><a href="/feedback.html" style="font-weight:600">Feedback is encouraged so we can provide the best service possible to our teachers →</a><div style="margin-top:8px">© 2026 Tobin Science · Built for the classroom</div></div>
+</footer>
+
+</body>
+</html>

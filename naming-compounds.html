@@ -1,0 +1,2678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<title>Naming Binary Compounds — free ionic &amp; covalent naming practice for High School Physical Science | Tobin Science</title>
+<meta name="description" content="A free interactive page for naming binary ionic and covalent compounds. Walk the naming flow chart, watch why the criss-cross method works, see the electrons transfer, drill Greek prefixes with flash cards, and practice formula-to-name and name-to-formula with feedback that names the exact mistake a student made. Roman numerals for transition metals can be switched on or off. Printable worksheets with keys. Works offline on any Chromebook.">
+<meta property="og:title" content="Naming Binary Compounds — free ionic &amp; covalent naming practice">
+<meta property="og:description" content="Interactive naming flow chart, criss-cross walkthrough, electron transfer diagrams, Greek prefix flash cards, and name-seeded practice that diagnoses the mistake instead of just marking it wrong.">
+<meta property="og:image" content="https://tobinscience.com/naming-compounds-cover.jpg">
+<meta property="og:url" content="https://tobinscience.com/naming-compounds.html">
+<meta property="og:type" content="website">
+<style>
+:root{
+  --bg:#0e1a2b; --panel:#16283f; --panel2:#1d3350; --ink:#eaf2fb; --dim:#9fb4cc;
+  --accent:#38bdf8; --gold:#fbbf24; --green:#34d399; --red:#f87171; --purple:#a78bfa;
+  --line:#2a4568; --tile-ink:#0b1a2a;
+  --ionic:#f472b6; --coval:#60a5fa;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{background:var(--bg); color:var(--ink); font-family:"Segoe UI",system-ui,Arial,sans-serif; min-height:100vh;}
+.wrap{max-width:1180px; margin:0 auto; padding:16px;}
+h1{font-size:1.7em; letter-spacing:.5px;}
+h2{font-size:1.25em;}
+h3{font-size:1.05em;}
+.dim{color:var(--dim);}
+a{color:var(--accent);}
+button{font-family:inherit; cursor:pointer; border:none; border-radius:10px; font-size:1em;}
+.btn{background:var(--accent); color:#082033; font-weight:700; padding:10px 18px; transition:transform .1s;}
+.btn:hover{transform:translateY(-2px);}
+.btn.gray{background:#33507a; color:var(--ink);}
+.btn.gold{background:var(--gold); color:#3a2a00;}
+.btn.green{background:var(--green); color:#03301f;}
+.btn.small{padding:6px 12px; font-size:.9em;}
+.btn:disabled{opacity:.45; cursor:default; transform:none;}
+.card{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px;}
+.card+.card{margin-top:14px;}
+input[type=text],input[type=number],select,textarea{background:#0c1626; border:2px solid var(--line); color:var(--ink); border-radius:8px; padding:8px 10px; font-size:1em; font-family:inherit;}
+input:focus,select:focus,textarea:focus{outline:none; border-color:var(--accent);}
+hr{border:none; border-top:1px solid var(--line); margin:14px 0;}
+.icn{width:1.15em; height:1.15em; vertical-align:-0.2em; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; display:inline-block;}
+h2 .icn{color:var(--accent);}
+.pill{display:inline-block; background:#0c1626; border-radius:999px; padding:3px 12px; font-size:.8em; color:var(--dim); margin:2px;}
+.codeChip{font-family:Consolas,monospace; font-size:1.1em; background:#0c1626; border:1px dashed var(--gold); color:var(--gold); padding:8px 14px; border-radius:10px; display:inline-block; letter-spacing:1px; word-break:break-all; max-width:100%;}
+.fx{font-family:"Segoe UI",Arial,sans-serif; font-weight:700; letter-spacing:.3px; white-space:nowrap;}
+.fx sub{font-size:.68em; font-weight:700;}
+.fx sup{font-size:.68em; font-weight:700;}
+
+/* ---------- header + tabs ---------- */
+#head{text-align:center; padding:18px 10px 6px;}
+#head img{width:72px; height:72px; border-radius:50%; margin-bottom:6px;}
+#tabs{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:16px 0 14px;}
+#tabs button{background:var(--panel); color:var(--dim); border:2px solid var(--line); padding:9px 16px; font-weight:700;}
+#tabs button:hover{border-color:var(--accent); color:var(--ink);}
+#tabs button.on{background:var(--accent); color:#082033; border-color:var(--accent);}
+.view{display:none;}
+.view.on{display:block;}
+
+/* ---------- toolbar ---------- */
+.tools{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px;}
+.tools .grp{background:var(--panel2); border-radius:10px; padding:7px 12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.tools label{font-size:.9em; color:var(--dim); font-weight:600;}
+.tools select{padding:6px 8px;}
+.seg{display:flex; gap:0; border-radius:10px; overflow:hidden; border:2px solid var(--line);}
+.seg button{border-radius:0; background:#0c1626; color:var(--dim); padding:7px 14px; font-weight:700; font-size:.92em;}
+.seg button.on{background:var(--accent); color:#082033;}
+.seg button+button{border-left:1px solid var(--line);}
+.tog{display:inline-flex; align-items:center; gap:8px; background:var(--panel2); border-radius:10px; padding:7px 12px; cursor:pointer;}
+.tog input{width:18px; height:18px; accent-color:#38bdf8; cursor:pointer;}
+.tog span{font-size:.92em; font-weight:600;}
+
+/* ---------- flow chart ---------- */
+#flowWrap{display:flex; flex-direction:column; align-items:center; gap:0;}
+.fbox{background:var(--panel); border:2px solid var(--line); border-radius:12px; padding:11px 20px; text-align:center; font-weight:700; max-width:100%;}
+.fbox.head{background:var(--panel2); border-color:var(--accent); font-size:1.15em;}
+.fbox small{display:block; font-weight:400; color:var(--dim); font-size:.8em; margin-top:3px;}
+.fdown{width:3px; height:22px; background:var(--line);}
+.frow{display:flex; gap:16px; justify-content:center; flex-wrap:wrap; width:100%;}
+.fbranch{flex:1; min-width:270px; max-width:400px; display:flex; flex-direction:column; align-items:center;}
+.fpick{background:var(--panel2); border:2px solid var(--line); border-radius:12px; padding:12px 16px; width:100%; text-align:center; color:var(--ink); font-weight:700; transition:transform .1s,border-color .1s;}
+.fpick:hover{transform:translateY(-2px);}
+.fpick.ion:hover,.fpick.ion.on{border-color:var(--ionic); background:#3a1a2c;}
+.fpick.cov:hover,.fpick.cov.on{border-color:var(--coval); background:#152a4a;}
+.fpick small{display:block; font-weight:400; color:var(--dim); font-size:.82em; margin-top:3px;}
+.fpick.on small{color:#d7e5f4;}
+.fdetail{display:none; width:100%; margin-top:12px; background:var(--panel); border:2px solid var(--line); border-radius:12px; padding:14px; line-height:1.5; text-align:left;}
+.fdetail.on{display:block;}
+.fdetail.ion{border-color:var(--ionic);}
+.fdetail.cov{border-color:var(--coval);}
+.fdetail ol{margin:8px 0 0 20px;}
+.fdetail ol li{margin-bottom:7px;}
+.fdetail .ex{margin-top:12px; background:#0c1626; border-radius:10px; padding:11px 13px;}
+.fdetail .ex .exq{font-size:1.35em; color:var(--gold); margin-bottom:5px;}
+.fdetail .ex .exs{color:#cfe0f1; font-size:.95em; margin:3px 0;}
+.fdetail .ex .exa{font-size:1.15em; color:var(--green); font-weight:700; margin-top:6px;}
+.fnote{background:#0c1626; border:1px dashed var(--line); border-radius:12px; padding:11px 15px; color:var(--dim); font-size:.92em; line-height:1.5; margin-top:18px; max-width:760px;}
+.fnote b{color:var(--ink);}
+
+/* ---------- namer ---------- */
+#namerRow{display:flex; gap:9px; flex-wrap:wrap; align-items:center;}
+#namerIn{flex:1; min-width:210px; font-size:1.1em; font-family:Consolas,monospace;}
+#namerOut{margin-top:12px;}
+.nstep{background:var(--panel2); border-left:4px solid var(--accent); border-radius:9px; padding:9px 13px; margin:7px 0; line-height:1.45;}
+.nstep b{color:var(--accent);}
+.nfinal{background:#0d2e22; border:2px solid var(--green); border-radius:12px; padding:13px 16px; margin-top:10px; font-size:1.2em; font-weight:700; text-align:center;}
+.nbad{background:#331416; border:2px solid var(--red); border-radius:12px; padding:12px 15px; margin-top:10px; line-height:1.45;}
+.chips{display:flex; flex-wrap:wrap; gap:7px; margin-top:9px;}
+.chips button{background:#0c1626; border:1px solid var(--line); color:var(--dim); padding:5px 12px; font-size:.9em; border-radius:999px;}
+.chips button:hover{border-color:var(--accent); color:var(--ink);}
+
+/* ---------- criss cross stepper ---------- */
+#ccStage{background:#0a1420; border-radius:14px; padding:16px 10px; text-align:center; overflow-x:auto;}
+#ccStage svg{width:100%; max-width:560px; height:auto;}
+#ccWords{margin-top:12px; background:var(--panel2); border-left:4px solid var(--gold); border-radius:9px; padding:11px 15px; line-height:1.5; min-height:62px;}
+#ccWords b{color:var(--gold);}
+.ccBtns{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:12px;}
+.ccDots{display:flex; gap:6px; margin-left:auto;}
+.ccDots i{width:9px; height:9px; border-radius:50%; background:var(--line); display:block;}
+.ccDots i.on{background:var(--gold);}
+
+/* ---------- electron transfer ---------- */
+#etStage{background:#0a1420; border-radius:14px; padding:14px 8px; text-align:center; overflow-x:auto;}
+#etStage svg{width:100%; max-width:620px; height:auto;}
+#etWords{margin-top:12px; background:var(--panel2); border-left:4px solid var(--green); border-radius:9px; padding:11px 15px; line-height:1.5;}
+#etWords b{color:var(--green);}
+#etCount{margin-top:10px; display:flex; gap:16px; flex-wrap:wrap;}
+#etCount>div{flex:1; min-width:210px; background:#0c1626; border-radius:10px; padding:11px 13px; line-height:1.5; font-size:.96em;}
+
+/* ---------- side by side compare ---------- */
+.sbs{display:flex; gap:14px; flex-wrap:wrap; margin-top:12px;}
+.sbs>div{flex:1; min-width:230px; background:#0c1626; border-radius:12px; padding:13px 15px; text-align:center;}
+.sbs .big{font-size:2em; color:var(--gold); margin-bottom:4px;}
+.sbs .nm{font-weight:700; margin-bottom:5px;}
+.sbs .ds{color:var(--dim); font-size:.9em; line-height:1.45;}
+.diaGrid{display:flex; flex-wrap:wrap; gap:9px; margin-top:11px;}
+.diaGrid div{background:#0c1626; border:1px solid var(--line); border-radius:10px; padding:9px 15px; text-align:center; min-width:78px;}
+.diaGrid div .s{font-size:1.35em; font-weight:800; color:var(--accent);}
+.diaGrid div .n{font-size:.78em; color:var(--dim);}
+
+/* ---------- practice ---------- */
+#pGate{max-width:430px; margin:22px auto; text-align:center;}
+#pGate input,#pGate select{width:100%; margin:8px 0; text-align:center; font-size:1.05em;}
+.qrow{margin:12px 0; padding:12px; background:var(--panel2); border-radius:10px; border-left:4px solid var(--line);}
+.qrow.right{border-left-color:var(--green);}
+.qrow.miss{border-left-color:var(--red);}
+.qrow .qtext{margin-bottom:9px; line-height:1.45;}
+.qrow .qn{color:var(--accent); font-weight:800; margin-right:6px;}
+.qrow .qtag{display:inline-block; font-size:.72em; letter-spacing:.5px; text-transform:uppercase; color:var(--dim); background:#0c1626; border-radius:999px; padding:2px 10px; margin-left:8px; vertical-align:2px;}
+.qrow .big{font-size:2.1em; color:var(--gold); text-align:center; margin:6px 0 10px; letter-spacing:1px;}
+.qrow .mark{font-weight:800; margin-left:8px;}
+.qrow .why{color:var(--gold); font-size:.9em; margin-top:9px; display:none; line-height:1.5; background:#0c1626; border-radius:9px; padding:10px 13px;}
+.qrow .why b{color:var(--ink);}
+.qrow .diag{display:none; margin-top:9px; border-radius:9px; padding:10px 13px; line-height:1.5; font-size:.92em; background:#3a2205; border-left:4px solid var(--gold);}
+.qrow .diag .dh{font-weight:800; color:var(--gold); display:block; margin-bottom:3px;}
+.qrow .diag .fix{display:block; margin-top:6px; color:#ffe3a3;}
+.mcopt{display:block; width:100%; text-align:left; margin:5px 0; padding:9px 13px; border-radius:8px; background:#0c1626; color:var(--ink); border:2px solid var(--line); font-size:.97em;}
+.mcopt:hover{border-color:var(--accent);}
+.mcopt.right{border-color:var(--green); background:#0d2e22;}
+.mcopt.wrong{border-color:var(--red); background:#331416;}
+.mcopt:disabled{cursor:default;}
+.numrow{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+.numrow input[type=text]{min-width:210px; flex:1; font-size:1.05em;}
+.blankrow{display:flex; gap:7px; align-items:center; flex-wrap:wrap; font-size:1.15em; line-height:2.1;}
+.blankrow input{width:130px; text-align:center; font-size:1em; padding:5px 7px;}
+.pbar{background:#0c1626; border-radius:999px; height:14px; overflow:hidden; margin:12px 0 4px;}
+.pfill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--gold)); transition:width .5s;}
+#pDone{display:none; border:2px solid var(--gold); background:#241d05; text-align:center; padding:16px; border-radius:16px; margin-top:14px;}
+#pDone h2{color:var(--gold);}
+#pReport{display:none; margin-top:14px;}
+.rpt{background:#0c1626; border-radius:10px; padding:11px 14px; margin:7px 0; line-height:1.5; border-left:4px solid var(--red);}
+.rpt b{color:var(--gold);}
+
+/* ---------- flash cards ---------- */
+#fcStage{perspective:1200px; margin:16px auto; max-width:440px;}
+#fcCard{position:relative; width:100%; aspect-ratio:3/2; transform-style:preserve-3d; transition:transform .5s; cursor:pointer;}
+#fcCard.flip{transform:rotateY(180deg);}
+#fcCard>div{position:absolute; inset:0; backface-visibility:hidden; border-radius:18px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px; text-align:center; border:2px solid var(--line);}
+#fcFront{background:var(--panel2);}
+#fcBack{background:#0d2e22; border-color:var(--green); transform:rotateY(180deg);}
+#fcFront .m{font-size:2.6em; font-weight:800; color:var(--gold); line-height:1.1;}
+#fcBack .m{font-size:2.6em; font-weight:800; color:var(--green); line-height:1.1;}
+#fcCard .s{color:var(--dim); font-size:.92em; margin-top:9px; line-height:1.45;}
+#fcCard .hint{position:absolute; bottom:9px; left:0; right:0; color:var(--dim); font-size:.76em;}
+.fcBtns{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:12px;}
+#fcProg{text-align:center; color:var(--dim); margin-top:9px; font-size:.92em;}
+
+/* ---------- speed drill ---------- */
+#sdBig{font-size:2.4em; text-align:center; color:var(--gold); margin:12px 0; letter-spacing:1px; min-height:1.2em;}
+#sdOpts{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:9px;}
+#sdOpts button{background:#0c1626; border:2px solid var(--line); color:var(--ink); padding:12px 14px; font-size:1em; text-align:center;}
+#sdOpts button:hover{border-color:var(--accent);}
+#sdOpts button.right{border-color:var(--green); background:#0d2e22;}
+#sdOpts button.wrong{border-color:var(--red); background:#331416;}
+#sdBar{background:#0c1626; border-radius:999px; height:12px; overflow:hidden; margin:10px 0;}
+#sdFill{height:100%; width:100%; background:linear-gradient(90deg,var(--green),var(--gold),var(--red)); transition:width .25s linear;}
+#sdStats{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:8px;}
+#sdStats div{background:#0c1626; border-radius:10px; padding:8px 16px; text-align:center; min-width:96px;}
+#sdStats div .k{font-size:.74em; color:var(--dim); text-transform:uppercase; letter-spacing:.5px;}
+#sdStats div .v{font-size:1.4em; font-weight:800;}
+#sdBest{text-align:center; margin-top:10px; color:var(--dim);}
+
+/* ---------- reference tables ---------- */
+#refPrefix,#refCharge,#refRoman,#refIde,#gradeOut{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+.rtable{width:100%; border-collapse:collapse; margin-top:10px; font-size:.95em;}
+.rtable th,.rtable td{border:1px solid var(--line); padding:6px 10px; text-align:left;}
+.rtable th{background:#0c1626; color:var(--accent);}
+.rtable td.c{text-align:center;}
+.rtable tr:hover td{background:#182c45;}
+.refGrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(158px,1fr)); gap:9px; margin-top:11px;}
+.refGrid div{background:#0c1626; border:1px solid var(--line); border-radius:10px; padding:9px 12px;}
+.refGrid div .k{font-size:.78em; color:var(--dim); text-transform:uppercase; letter-spacing:.5px;}
+.refGrid div .v{font-weight:700; font-size:1.06em; margin-top:2px;}
+body.big{font-size:1.22em;}
+body.big .pill,body.big .qrow .qtag{font-size:.8em;}
+
+/* ---------- print sheet picker ---------- */
+#sheetGrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(275px,1fr)); gap:14px; margin-top:14px;}
+.sheet{background:var(--panel); border:2px solid var(--line); border-radius:14px; padding:14px; text-align:left;}
+.sheet h3{margin-bottom:5px;}
+.sheet p{color:var(--dim); font-size:.9em; line-height:1.4; margin-bottom:10px;}
+.sheet .row{display:flex; gap:8px; flex-wrap:wrap;}
+
+/* ---------- teacher ---------- */
+.gradeTable{width:100%; border-collapse:collapse; margin-top:10px; font-size:.95em;}
+.gradeTable th,.gradeTable td{border:1px solid var(--line); padding:6px 10px; text-align:left;}
+.gradeTable th{background:#0c1626; color:var(--accent);}
+.gradeTable td.pct{font-weight:700; font-variant-numeric:tabular-nums;}
+#gradeIn{width:100%; min-height:90px; font-family:Consolas,monospace; font-size:.9em;}
+#asgLinkRow{display:none; margin-top:10px;}
+#asgLinkRow input{width:100%; font-family:Consolas,monospace; font-size:.9em; margin-bottom:8px;}
+
+/* ---------- footer ---------- */
+#tsFoot{text-align:center; margin:30px 0 14px;}
+.tsBtn{display:inline-flex; align-items:center; gap:13px; background:var(--panel); border:2px solid var(--line); border-radius:16px; padding:10px 22px 10px 12px; color:var(--ink); text-decoration:none; font-weight:700; font-size:1.02em; text-align:left; transition:transform .12s,border-color .12s;}
+.tsBtn:hover{transform:translateY(-2px); border-color:var(--accent);}
+.tsBtn img{width:46px; height:46px; border-radius:50%;}
+
+@media(max-width:620px){
+  .wrap{padding:10px;}
+  #tabs button{padding:8px 12px; font-size:.92em;}
+  .qrow .big{font-size:1.7em;}
+  #sdBig{font-size:1.8em;}
+}
+
+/* ---------- print ---------- */
+#printArea{display:none;}
+@media print{
+  @page{margin:0.5in;}
+  #app{display:none !important;}
+  #printArea{display:block; background:#fff; color:#000;}
+  body{background:#fff; color:#000;}
+  .psheet{page-break-after:always; font-family:"Segoe UI",Arial,sans-serif;}
+  .psheet:last-child{page-break-after:auto;}
+}
+#printArea{background:#fff; color:#000;}
+.psheet{font-family:"Segoe UI",Arial,sans-serif; color:#000; padding:0 0 10px;}
+.psheet h1{font-size:17pt; margin-bottom:2px;}
+.psheet h2{font-size:11.5pt; margin:9px 0 3px;}
+.psheet .sub{font-size:9.5pt; color:#333; margin-bottom:6px;}
+.psheet .nameline{font-size:10pt; margin:6px 0 10px; border-bottom:1px solid #000; padding-bottom:3px;}
+.psheet ol{margin:6px 0 0 20px; font-size:10pt;}
+.psheet ol li{margin-bottom:8px; line-height:1.5;}
+.psheet .wl{display:inline-block; border-bottom:1px solid #000; min-width:80px;}
+.psheet table{width:100%; border-collapse:collapse; font-size:9.5pt; margin-top:6px;}
+.psheet table th,.psheet table td{border:1px solid #000; padding:4px 6px; text-align:left;}
+.psheet table th{background:#eee;}
+.psheet table td.c{text-align:center;}
+.psheet .two{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.psheet .box{border:1px solid #000; padding:7px 9px; font-size:9.5pt; line-height:1.45;}
+.psheet .box h3{font-size:10.5pt; margin-bottom:3px;}
+.psheet .keytag{display:inline-block; border:2px solid #000; padding:2px 10px; font-weight:700; font-size:10pt; margin-bottom:6px;}
+.psheet .foot{text-align:center; font-size:8.5pt; color:#444; margin-top:10px;}
+.psheet .fchart{font-size:9pt; line-height:1.5;}
+.psheet .fchart .lvl{border:1px solid #000; padding:5px 8px; margin:4px 0; display:block;}
+.psheet .fchart .arw{text-align:center; font-size:11pt; margin:1px 0;}
+.psheet .rule{background:#f2f2f2; border:1px solid #000; padding:6px 9px; font-size:9.5pt; margin:5px 0; line-height:1.45;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+
+<div id="head">
+  <img id="logoTop" alt="Tobin Science">
+  <h1>Tobin Science — Naming Binary Compounds</h1>
+  <div class="dim">Two-element compounds only: ionic and covalent. Built for High School Physical Science.</div>
+</div>
+
+<div id="tabs">
+  <button data-v="flow" class="on">Flow Chart</button>
+  <button data-v="how">How It Works</button>
+  <button data-v="practice">Practice</button>
+  <button data-v="drills">Drills</button>
+  <button data-v="ref">Reference</button>
+  <button data-v="print">Print</button>
+  <button data-v="teacher">Teacher Tools</button>
+</div>
+
+<!-- ================= FLOW CHART ================= -->
+<div class="view on" id="vflow">
+  <div class="tools">
+    <label class="tog"><input type="checkbox" id="tmTog"><span>Transition metals — Roman numerals</span></label>
+    <label class="tog"><input type="checkbox" id="bigTog"><span>Projector text</span></label>
+  </div>
+
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4M12 17v4M5.5 12h13M7 7l-2.5 5L7 17M17 7l2.5 5L17 17"/></svg> Start here: what is it made of?</h2>
+    <div class="dim" style="margin:5px 0 14px">Click a branch. The chart fills in the rule and works an example for you.</div>
+    <div id="flowWrap">
+      <div class="fbox head">What is it made of?<small>Look at the two elements in the formula and find them on the periodic table.</small></div>
+      <div class="fdown"></div>
+      <div class="frow">
+        <div class="fbranch">
+          <button class="fpick ion" data-b="ion">Metal + nonmetal<small>left side + right side</small></button>
+          <div class="fdown"></div>
+          <div class="fbox" style="border-color:var(--ionic)">IONIC COMPOUND</div>
+          <div class="fdetail ion" id="fdIon"></div>
+        </div>
+        <div class="fbranch">
+          <button class="fpick cov" data-b="cov">Two nonmetals<small>both from the right side</small></button>
+          <div class="fdown"></div>
+          <div class="fbox" style="border-color:var(--coval)">COVALENT COMPOUND</div>
+          <div class="fdetail cov" id="fdCov"></div>
+        </div>
+      </div>
+      <div class="fnote">
+        <b>What about three or more elements?</b> Those are polyatomic compounds — sodium nitrate, calcium sulfate, that whole family. They use a chart of polyatomic ions and they are <b>not part of this course</b>. If you count three different element symbols in a formula, it is not one of ours. Everything on this page is a <b>binary</b> compound: exactly two elements.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8L21 21"/></svg> Compound namer — type anything</h2>
+    <div class="dim" style="margin:5px 0 10px">Type a <b>formula</b> and get the name, or type a <b>name</b> and get the formula. Either way it shows you every step it took, the same steps the chart asks you for.</div>
+    <div id="namerRow">
+      <input type="text" id="namerIn" placeholder="MgCl2   or   dinitrogen tetroxide" autocomplete="off" spellcheck="false">
+      <button class="btn" id="namerGo">Work it out</button>
+    </div>
+    <div class="chips" id="namerChips"></div>
+    <div id="namerOut"></div>
+  </div>
+</div>
+
+<!-- ================= HOW IT WORKS ================= -->
+<div class="view" id="vhow">
+  <div class="tools">
+    <label class="tog"><input type="checkbox" id="bigTog2"><span>Projector text</span></label>
+  </div>
+
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l16 16M20 4L4 20"/></svg> Why the criss-cross method works</h2>
+    <div class="dim" style="margin:5px 0 12px">Most students learn to swap the numbers without ever being told why. Step through it once and it stops being a trick.</div>
+    <div style="display:flex; gap:9px; flex-wrap:wrap; align-items:center; margin-bottom:12px">
+      <span class="dim" style="font-size:.92em">Try it with</span>
+      <select id="ccMetal"></select>
+      <span class="dim">+</span>
+      <select id="ccNon"></select>
+      <button class="btn small gray" id="ccReset">Start over</button>
+    </div>
+    <div id="ccStage"></div>
+    <div id="ccWords"></div>
+    <div class="ccBtns">
+      <button class="btn small gray" id="ccBack">Back</button>
+      <button class="btn small" id="ccNext">Next step</button>
+      <div class="ccDots" id="ccDots"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.2"/><ellipse cx="12" cy="12" rx="10" ry="4.4"/><ellipse cx="12" cy="12" rx="10" ry="4.4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.4" transform="rotate(120 12 12)"/></svg> Watch the electrons move</h2>
+    <div class="dim" style="margin:5px 0 12px">The subscripts in an ionic formula are not a rule someone invented. They are the only numbers that make every electron given away land on an atom that wants it. Nothing left over on either side.</div>
+    <div style="display:flex; gap:9px; flex-wrap:wrap; align-items:center; margin-bottom:12px">
+      <select id="etMetal"></select>
+      <span class="dim">+</span>
+      <select id="etNon"></select>
+      <button class="btn small" id="etGo">Transfer the electrons</button>
+    </div>
+    <div id="etStage"></div>
+    <div id="etWords"></div>
+    <div id="etCount"></div>
+  </div>
+
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.5" cy="12" r="4.5"/><circle cx="16.5" cy="12" r="4.5"/></svg> Why covalent compounds need prefixes at all</h2>
+    <div class="dim" style="margin:5px 0 4px; line-height:1.5">Two metals-and-nonmetals only ever combine one way, because the charges have to cancel. Two nonmetals share electrons instead, and they can share in more than one arrangement. So the name has to carry the count — otherwise these two compounds would have the same name and one of them will kill you.</div>
+    <div class="sbs" id="coWhy"></div>
+    <div style="margin-top:14px; background:#0c1626; border-radius:12px; padding:12px 15px; line-height:1.55">
+      <b style="color:var(--ionic)">Compare that to ionic.</b> There is only one magnesium chloride, and it is <span class="fx">MgCl<sub>2</sub></span>. Magnesium is always 2+, chlorine is always 1&minus;, so the formula has no choice. That is exactly why ionic names never use prefixes — the name does not need to carry a count, because the charges already fix it.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="12" r="3.4"/><circle cx="16" cy="12" r="3.4"/><path d="M11.4 12h1.2"/></svg> The seven diatomic elements</h2>
+    <div class="dim" style="margin:5px 0 4px; line-height:1.5">These seven never appear alone. Left by themselves they pair up with a twin. That is what <b>diatomic</b> means — two atoms of the <b>same</b> element. It does not mean a two-element compound, which is what everything else on this page is.</div>
+    <div class="diaGrid" id="diaGrid"></div>
+    <div style="margin-top:12px; background:#0c1626; border-radius:12px; padding:12px 15px; line-height:1.55">
+      <b style="color:var(--gold)">Memory trick:</b> <b>Br I N Cl H O F</b> — "Brinklehof." Or find them on the periodic table: they make a 7 shape, starting at hydrogen and running down the halogen column.
+      <div style="margin-top:8px" class="dim">Careful: <span class="fx">O<sub>2</sub></span> is oxygen gas, an <b>element</b>. <span class="fx">CO<sub>2</sub></span> is carbon dioxide, a <b>compound</b>. A subscript alone does not make something a compound — two different symbols do.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= PRACTICE ================= -->
+<div class="view" id="vpractice">
+  <div id="pGate" class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5"/><path d="M4.5 20.5c1.4-3.6 4.2-5.5 7.5-5.5s6.1 1.9 7.5 5.5"/></svg> Sign in to practice</h2>
+    <div id="pAsgInfo" class="dim" style="display:none; margin:6px 0 2px; color:var(--accent); font-weight:700;"></div>
+    <div class="dim" id="pGateHint" style="margin-top:4px">First and last name — this is how your teacher gives you credit.</div>
+    <input type="text" id="pName" maxlength="24" placeholder="e.g. Jordan Smith" autocomplete="off">
+    <div id="pAsgFields" style="display:none">
+      <input type="text" id="pFirst" maxlength="12" placeholder="First name" autocomplete="off">
+      <input type="text" id="pLast" maxlength="14" placeholder="Last name" autocomplete="off">
+      <select id="pPeriod">
+        <option value="">Class period&hellip;</option>
+        <option value="1">1st period</option><option value="2">2nd period</option>
+        <option value="3">3rd period</option><option value="4">4th period</option>
+        <option value="5">5th period</option><option value="6">6th period</option>
+        <option value="7">7th period</option><option value="8">8th period</option>
+      </select>
+    </div>
+    <div id="pSetPick" style="margin:12px 0 4px">
+      <div class="dim" style="margin-bottom:6px">Which set?</div>
+      <select id="pSetSel"></select>
+    </div>
+    <div id="pRomanPick" style="margin:10px 0 2px">
+      <label class="tog" style="width:100%; justify-content:center"><input type="checkbox" id="pRoman"><span>Include transition metals (Roman numerals)</span></label>
+    </div>
+    <button class="btn" id="pGo" style="margin-top:12px">Start practice &rarr;</button>
+  </div>
+
+  <div id="pMain" style="display:none">
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <h2 style="flex:1">Chemist: <span id="pWho" style="color:var(--accent)"></span></h2>
+        <button class="btn gray small" id="pSwitch">Switch user</button>
+      </div>
+      <div class="dim" id="pSetTxt" style="margin-top:3px"></div>
+      <div class="pbar"><div class="pfill" id="pFill"></div></div>
+      <div class="dim" id="pScoreTxt"></div>
+      <div style="margin-top:12px">
+        <span class="dim">Code for your teacher: </span>
+        <span class="codeChip" id="pCode"></span>
+        <button class="btn small" id="pCopy" style="margin-left:6px">Copy my code</button>
+      </div>
+      <div class="dim" style="margin-top:7px; font-size:.87em">Your code updates as you answer. Every student gets different compounds, so the answers cannot be copied.</div>
+      <div id="pDone">
+        <h2>ALL QUESTIONS ANSWERED</h2>
+        <div style="margin-top:5px" id="pDoneMsg"></div>
+      </div>
+    </div>
+    <div id="pReport" class="card">
+      <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 16H3z"/><path d="M12 9v4M12 16.2v.1"/></svg> What to study</h2>
+      <div class="dim" style="margin:4px 0 8px; font-size:.92em">Built from the mistakes you actually made, not a generic list.</div>
+      <div id="pReportBody"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.4l2.7 2.7 5.3-5.6"/></svg> Your questions</h2>
+      <div class="dim" style="margin:4px 0 6px; font-size:.92em">Multiple choice counts your <b>first</b> answer only. Typed answers get one check — spelling counts, but close spelling still earns the point.</div>
+      <div id="qArea"></div>
+    </div>
+    <div style="text-align:center; margin-top:14px">
+      <button class="btn gray small" id="pNewSet">Give me a fresh set of questions</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= DRILLS ================= -->
+<div class="view" id="vdrills">
+  <div class="tools">
+    <div class="seg" id="drSeg">
+      <button data-d="fc" class="on">Prefix flash cards</button>
+      <button data-d="sd">Speed drill</button>
+    </div>
+  </div>
+
+  <div id="drFc">
+    <div class="card">
+      <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="14" height="12" rx="2"/><path d="M7 3.5h14v12"/></svg> Greek prefix flash cards</h2>
+      <div class="dim" style="margin:5px 0 10px">Click the card to flip it. These are the ten prefixes covalent naming runs on — you have to know them cold or nothing else works.</div>
+      <div style="display:flex; gap:9px; flex-wrap:wrap; align-items:center">
+        <div class="seg" id="fcDirSeg">
+          <button data-d="p2n" class="on">Prefix &rarr; number</button>
+          <button data-d="n2p">Number &rarr; prefix</button>
+        </div>
+        <label class="tog"><input type="checkbox" id="fcShuffle" checked><span>Shuffle</span></label>
+      </div>
+      <div id="fcStage">
+        <div id="fcCard">
+          <div id="fcFront"><div class="m"></div><div class="s"></div><div class="hint">click to flip</div></div>
+          <div id="fcBack"><div class="m"></div><div class="s"></div><div class="hint">click to flip back</div></div>
+        </div>
+      </div>
+      <div class="fcBtns">
+        <button class="btn gray small" id="fcPrev">&larr; Previous</button>
+        <button class="btn small" id="fcFlip">Flip</button>
+        <button class="btn gray small" id="fcNext">Next &rarr;</button>
+      </div>
+      <div id="fcProg"></div>
+    </div>
+  </div>
+
+  <div id="drSd" style="display:none">
+    <div class="card">
+      <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.4 1.6M9 2.5h6"/></svg> Sixty second speed drill</h2>
+      <div class="dim" style="margin:5px 0 10px">Ionic or covalent — call it as fast as you can. A wrong answer costs you two seconds. This is the skill everything else depends on, so it is worth being fast at.</div>
+      <div style="display:flex; gap:9px; flex-wrap:wrap; align-items:center; margin-bottom:10px">
+        <div class="seg" id="sdModeSeg">
+          <button data-m="cls" class="on">Ionic or covalent?</button>
+          <button data-m="pre">Prefix &rarr; number</button>
+          <button data-m="nam">Name the compound</button>
+        </div>
+        <button class="btn" id="sdStart">Start</button>
+      </div>
+      <div id="sdBar"><div id="sdFill"></div></div>
+      <div id="sdBig"></div>
+      <div id="sdOpts"></div>
+      <div id="sdStats"></div>
+      <div id="sdBest"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= REFERENCE ================= -->
+<div class="view" id="vref">
+  <div class="tools">
+    <label class="tog"><input type="checkbox" id="bigTog3"><span>Projector text</span></label>
+  </div>
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h9"/></svg> The four rules, in order</h2>
+    <div id="refRules" style="margin-top:8px"></div>
+  </div>
+  <div class="card">
+    <h2>Greek prefixes</h2>
+    <div id="refPrefix"></div>
+  </div>
+  <div class="card">
+    <h2>Charges you can read straight off the periodic table</h2>
+    <div class="dim" style="margin-top:4px; font-size:.93em">Group number tells you the charge for every main-group element. No memorizing.</div>
+    <div id="refCharge"></div>
+  </div>
+  <div class="card">
+    <h2>Transition metals — which ones need a Roman numeral</h2>
+    <div class="dim" style="margin-top:4px; font-size:.93em">A Roman numeral is not decoration. It tells the reader which charge this metal is using <b>this time</b>. Four metals in the middle block never change, so they never take one.</div>
+    <div id="refRoman"></div>
+  </div>
+  <div class="card">
+    <h2>The &minus;ide endings</h2>
+    <div id="refIde"></div>
+  </div>
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 16H3z"/><path d="M12 9v4M12 16.2v.1"/></svg> The mistakes that cost the most points</h2>
+    <div id="refTraps" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- ================= PRINT ================= -->
+<div class="view" id="vprint">
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9V3.5h11V9M6.5 18H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1.5M6.5 14.5h11v6h-11z"/></svg> Printable sheets</h2>
+    <div class="dim" style="margin-top:4px; line-height:1.45">Black and white, no color ink needed. Each one opens your printer dialog — choose <b>Save as PDF</b> if you would rather keep a copy. Answer keys print as their own page, so print the student copy for them and the key for you.</div>
+  </div>
+  <div id="sheetGrid"></div>
+</div>
+
+<!-- ================= TEACHER ================= -->
+<div class="view" id="vteacher">
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M9 2.5h6v3.5H9zM8 11h8M8 15h5"/></svg> Assign a practice set</h2>
+    <div class="dim" style="margin:4px 0 8px; font-size:.92em">Pick a set and share the link. Students sign in with name + period, answer 12 questions built from their own name, and hand you a code. Multiple choice only earns its point if the <b>first</b> answer is right.</div>
+    <div style="margin:8px 0; display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+      <select id="asgSet"></select>
+      <label class="tog"><input type="checkbox" id="asgRoman"><span>Roman numerals</span></label>
+      <button class="btn small" id="asgMake">Create assignment link</button>
+    </div>
+    <div id="asgLinkRow">
+      <input type="text" id="asgLinkIn" readonly>
+      <button class="btn small" id="asgLinkCopy">Copy link</button>
+      <span class="dim" id="asgLinkNote" style="margin-left:8px; font-size:.9em"></span>
+    </div>
+    <hr>
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h9"/></svg> Grade assignment codes</h2>
+    <div class="dim" style="margin:4px 0 8px; font-size:.92em">Paste every student code below — one big mess is fine. You get a roster sorted by period, then last name.</div>
+    <textarea id="gradeIn" placeholder="Paste codes here (NCA-&hellip;)"></textarea>
+    <div style="margin-top:8px"><button class="btn small" id="gradeBtn">Grade codes</button> <button class="btn gray small" id="gradeCopy" style="display:none">Copy for gradebook</button></div>
+    <div id="gradeOut" style="margin-top:6px; overflow-x:auto"></div>
+    <hr>
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8L21 21"/></svg> Check one practice code</h2>
+    <div class="dim" style="margin:4px 0 8px; font-size:.92em">For free-practice codes (NCE-&hellip;) students earn outside an assignment.</div>
+    <div style="margin:8px 0"><input type="text" id="verifyIn" placeholder="Paste student code" style="width:280px"> <button class="btn small" id="verifyBtn">Check</button></div>
+    <div id="verifyOut" class="dim"></div>
+    <hr>
+    <div class="dim" style="line-height:1.5">Codes carry the student's name, set, score, and the date, so they cannot be swapped between students. Nothing is uploaded — everything runs on the device, and the page works with the wifi off.</div>
+    <div style="margin-top:10px"><button class="btn gray small" id="resetDevice">Reset all data on this device</button></div>
+  </div>
+
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 16l9 5 9-5"/></svg> Standards this covers</h2>
+    <div class="dim" style="margin-top:6px; line-height:1.6">
+      <b style="color:var(--ink)">SPS2</b> — Explore the nature of matter, its classifications, and its system for naming types of matter. Predict formulas for stable ionic compounds based on charge, and use IUPAC nomenclature for both chemical names and formulas of ionic compounds and binary covalent compounds.
+      <div style="margin-top:10px"></div>
+      <b style="color:var(--ink)">SPS1</b> — Valence electrons and position on the periodic table are what this page uses to get every charge, so it doubles as trend and electron-arrangement review.
+      <div style="margin-top:10px"></div>
+      <b style="color:var(--ink)">Deliberately left out:</b> polyatomic ions, acids, and hydrates. Binary compounds only, ionic and covalent.
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div id="tsFoot">
+  <a class="tsBtn" href="https://www.tobinscience.com" target="_blank" rel="noopener">
+    <img id="logoFoot" alt="Tobin Science logo">
+    <span>Find more great resources at<br><span style="color:var(--accent)">TobinScience.com</span></span>
+  </a>
+  <div style="margin-top:12px"><a href="https://www.tobinscience.com/chemistry.html" style="font-weight:700; font-size:.95em">&larr; All Chemistry Activities</a></div>
+</div>
+
+</div><!-- /app -->
+
+<div id="printArea"></div>
+
+<script>
+"use strict";
+
+const LOGO="data:image/png;base64,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";
+/* ============================================================
+   ELEMENT DATA
+   type: m metal · n nonmetal · d metalloid
+   grp = group number · per = period · val = valence electrons
+   sh  = electrons per energy level (main group only, for Bohr drawings)
+   ============================================================ */
+const ELEMENTS={
+  H :{n:"Hydrogen", grp:1, per:1, type:"n", val:1, sh:[1]},
+  He:{n:"Helium",   grp:18,per:1, type:"n", val:2, sh:[2]},
+  Li:{n:"Lithium",  grp:1, per:2, type:"m", val:1, sh:[2,1]},
+  Be:{n:"Beryllium",grp:2, per:2, type:"m", val:2, sh:[2,2]},
+  B :{n:"Boron",    grp:13,per:2, type:"d", val:3, sh:[2,3]},
+  C :{n:"Carbon",   grp:14,per:2, type:"n", val:4, sh:[2,4]},
+  N :{n:"Nitrogen", grp:15,per:2, type:"n", val:5, sh:[2,5]},
+  O :{n:"Oxygen",   grp:16,per:2, type:"n", val:6, sh:[2,6]},
+  F :{n:"Fluorine", grp:17,per:2, type:"n", val:7, sh:[2,7]},
+  Ne:{n:"Neon",     grp:18,per:2, type:"n", val:8, sh:[2,8]},
+  Na:{n:"Sodium",   grp:1, per:3, type:"m", val:1, sh:[2,8,1]},
+  Mg:{n:"Magnesium",grp:2, per:3, type:"m", val:2, sh:[2,8,2]},
+  Al:{n:"Aluminum", grp:13,per:3, type:"m", val:3, sh:[2,8,3]},
+  Si:{n:"Silicon",  grp:14,per:3, type:"d", val:4, sh:[2,8,4]},
+  P :{n:"Phosphorus",grp:15,per:3,type:"n", val:5, sh:[2,8,5]},
+  S :{n:"Sulfur",   grp:16,per:3, type:"n", val:6, sh:[2,8,6]},
+  Cl:{n:"Chlorine", grp:17,per:3, type:"n", val:7, sh:[2,8,7]},
+  Ar:{n:"Argon",    grp:18,per:3, type:"n", val:8, sh:[2,8,8]},
+  K :{n:"Potassium",grp:1, per:4, type:"m", val:1, sh:[2,8,8,1]},
+  Ca:{n:"Calcium",  grp:2, per:4, type:"m", val:2, sh:[2,8,8,2]},
+  Sc:{n:"Scandium", grp:3, per:4, type:"m", val:null,sh:null},
+  Ti:{n:"Titanium", grp:4, per:4, type:"m", val:null,sh:null},
+  Cr:{n:"Chromium", grp:6, per:4, type:"m", val:null,sh:null},
+  Mn:{n:"Manganese",grp:7, per:4, type:"m", val:null,sh:null},
+  Fe:{n:"Iron",     grp:8, per:4, type:"m", val:null,sh:null},
+  Co:{n:"Cobalt",   grp:9, per:4, type:"m", val:null,sh:null},
+  Ni:{n:"Nickel",   grp:10,per:4, type:"m", val:null,sh:null},
+  Cu:{n:"Copper",   grp:11,per:4, type:"m", val:null,sh:null},
+  Zn:{n:"Zinc",     grp:12,per:4, type:"m", val:null,sh:null},
+  Ga:{n:"Gallium",  grp:13,per:4, type:"m", val:3, sh:[2,8,18,3]},
+  Ge:{n:"Germanium",grp:14,per:4, type:"d", val:4, sh:[2,8,18,4]},
+  As:{n:"Arsenic",  grp:15,per:4, type:"d", val:5, sh:[2,8,18,5]},
+  Se:{n:"Selenium", grp:16,per:4, type:"n", val:6, sh:[2,8,18,6]},
+  Br:{n:"Bromine",  grp:17,per:4, type:"n", val:7, sh:[2,8,18,7]},
+  Kr:{n:"Krypton",  grp:18,per:4, type:"n", val:8, sh:[2,8,18,8]},
+  Rb:{n:"Rubidium", grp:1, per:5, type:"m", val:1, sh:[2,8,18,8,1]},
+  Sr:{n:"Strontium",grp:2, per:5, type:"m", val:2, sh:[2,8,18,8,2]},
+  Ag:{n:"Silver",   grp:11,per:5, type:"m", val:null,sh:null},
+  Cd:{n:"Cadmium",  grp:12,per:5, type:"m", val:null,sh:null},
+  Sn:{n:"Tin",      grp:14,per:5, type:"m", val:null,sh:null},
+  Sb:{n:"Antimony", grp:15,per:5, type:"d", val:5, sh:null},
+  Te:{n:"Tellurium",grp:16,per:5, type:"n", val:6, sh:null},
+  I :{n:"Iodine",   grp:17,per:5, type:"n", val:7, sh:[2,8,18,18,7]},
+  Xe:{n:"Xenon",    grp:18,per:5, type:"n", val:8, sh:null},
+  Cs:{n:"Cesium",   grp:1, per:6, type:"m", val:1, sh:null},
+  Ba:{n:"Barium",   grp:2, per:6, type:"m", val:2, sh:null},
+  Pt:{n:"Platinum", grp:10,per:6, type:"m", val:null,sh:null},
+  Au:{n:"Gold",     grp:11,per:6, type:"m", val:null,sh:null},
+  Pb:{n:"Lead",     grp:14,per:6, type:"m", val:null,sh:null}
+};
+/* longest symbols first so "Cl" never gets read as "C" then "l" */
+const SYMS=Object.keys(ELEMENTS).sort(function(a,b){return b.length-a.length||a.localeCompare(b);});
+
+/* ============================================================
+   CATIONS — metals that form ionic compounds
+   ch  : the charge(s) this metal can take
+   why : how a student knows that charge without memorizing it
+   ============================================================ */
+const CATIONS=[
+  {s:"Li",ch:[1],why:"group 1"},
+  {s:"Na",ch:[1],why:"group 1"},
+  {s:"K", ch:[1],why:"group 1"},
+  {s:"Rb",ch:[1],why:"group 1"},
+  {s:"Cs",ch:[1],why:"group 1"},
+  {s:"Be",ch:[2],why:"group 2"},
+  {s:"Mg",ch:[2],why:"group 2"},
+  {s:"Ca",ch:[2],why:"group 2"},
+  {s:"Sr",ch:[2],why:"group 2"},
+  {s:"Ba",ch:[2],why:"group 2"},
+  {s:"Al",ch:[3],why:"group 13"},
+  {s:"Ga",ch:[3],why:"group 13"},
+  /* transition metals with only ONE charge — no Roman numeral, ever */
+  {s:"Zn",ch:[2],why:"transition metal, but zinc is always 2+",fixedTM:true},
+  {s:"Cd",ch:[2],why:"transition metal, but cadmium is always 2+",fixedTM:true},
+  {s:"Ag",ch:[1],why:"transition metal, but silver is always 1+",fixedTM:true},
+  {s:"Sc",ch:[3],why:"transition metal, but scandium is always 3+",fixedTM:true},
+  /* transition metals with more than one charge — Roman numeral required */
+  {s:"Fe",ch:[2,3],  why:"transition metal — iron can be 2+ or 3+",vari:true},
+  {s:"Cu",ch:[1,2],  why:"transition metal — copper can be 1+ or 2+",vari:true},
+  {s:"Cr",ch:[2,3],  why:"transition metal — chromium can be 2+ or 3+",vari:true},
+  {s:"Co",ch:[2,3],  why:"transition metal — cobalt can be 2+ or 3+",vari:true},
+  {s:"Ni",ch:[2,3],  why:"transition metal — nickel can be 2+ or 3+",vari:true},
+  {s:"Mn",ch:[2,3,4],why:"transition metal — manganese can be 2+, 3+ or 4+",vari:true},
+  {s:"Ti",ch:[3,4],  why:"transition metal — titanium can be 3+ or 4+",vari:true},
+  {s:"Pt",ch:[2,4],  why:"transition metal — platinum can be 2+ or 4+",vari:true},
+  {s:"Au",ch:[1,3],  why:"transition metal — gold can be 1+ or 3+",vari:true},
+  {s:"Sn",ch:[2,4],  why:"tin can be 2+ or 4+",vari:true},
+  {s:"Pb",ch:[2,4],  why:"lead can be 2+ or 4+",vari:true}
+];
+
+/* ============================================================
+   ANIONS — nonmetals in ionic compounds, with their -ide names
+   ============================================================ */
+const ANIONS=[
+  {s:"F", ide:"fluoride", ch:-1,why:"group 17"},
+  {s:"Cl",ide:"chloride", ch:-1,why:"group 17"},
+  {s:"Br",ide:"bromide",  ch:-1,why:"group 17"},
+  {s:"I", ide:"iodide",   ch:-1,why:"group 17"},
+  {s:"O", ide:"oxide",    ch:-2,why:"group 16"},
+  {s:"S", ide:"sulfide",  ch:-2,why:"group 16"},
+  {s:"Se",ide:"selenide", ch:-2,why:"group 16"},
+  {s:"N", ide:"nitride",  ch:-3,why:"group 15"},
+  {s:"P", ide:"phosphide",ch:-3,why:"group 15"}
+];
+/* -ide name for any nonmetal, ionic or covalent */
+const IDE={F:"fluoride",Cl:"chloride",Br:"bromide",I:"iodide",O:"oxide",S:"sulfide",
+  Se:"selenide",Te:"telluride",N:"nitride",P:"phosphide",C:"carbide",As:"arsenide",H:"hydride"};
+
+/* ============================================================
+   GREEK PREFIXES
+   ============================================================ */
+const PREFIX=[
+  {n:1, p:"mono", m:"Mono<b>rail</b> — one rail. Mono<b>cle</b> — one lens."},
+  {n:2, p:"di",   m:"Di<b>lemma</b> — stuck between two choices."},
+  {n:3, p:"tri",  m:"Tri<b>cycle</b> — three wheels."},
+  {n:4, p:"tetra",m:"A <b>tetra</b>hedron has four faces."},
+  {n:5, p:"penta",m:"The <b>Penta</b>gon has five sides."},
+  {n:6, p:"hexa", m:"A <b>hexa</b>gon has six sides. So does a snowflake."},
+  {n:7, p:"hepta",m:"A <b>hepta</b>gon has seven sides."},
+  {n:8, p:"octa", m:"An <b>octo</b>pus has eight arms."},
+  {n:9, p:"nona", m:"A <b>nona</b>gon has nine sides."},
+  {n:10,p:"deca", m:"A <b>deca</b>de is ten years. A <b>deca</b>thlon is ten events."}
+];
+const PREFIX_BY_N={}; PREFIX.forEach(function(x){PREFIX_BY_N[x.n]=x.p;});
+const PREFIX_BY_P={}; PREFIX.forEach(function(x){PREFIX_BY_P[x.p]=x.n;});
+
+/* ============================================================
+   REAL BINARY COVALENT COMPOUNDS
+   [first symbol, first count, second symbol, second count]
+   Every name on this page is generated from these by the prefix rule,
+   so the rule and the answers can never drift apart. All of these are
+   real, documented compounds — no invented formulas.
+   ============================================================ */
+const COV_RAW=[
+  ["C",1,"O",1],["C",1,"O",2],["C",1,"S",2],["C",1,"Cl",4],["C",1,"F",4],["C",1,"Br",4],["C",1,"I",4],
+  ["N",2,"O",1],["N",1,"O",1],["N",2,"O",3],["N",1,"O",2],["N",2,"O",4],["N",2,"O",5],
+  ["N",1,"F",3],["N",2,"F",4],["N",1,"Cl",3],["N",1,"Br",3],["N",1,"I",3],
+  ["S",1,"O",2],["S",1,"O",3],["S",1,"Cl",2],["S",2,"Cl",2],["S",1,"F",4],["S",1,"F",6],["S",2,"F",10],
+  ["P",1,"Cl",3],["P",1,"Cl",5],["P",1,"F",3],["P",1,"F",5],["P",1,"Br",3],["P",1,"Br",5],["P",1,"I",3],
+  ["P",4,"O",6],["P",4,"O",10],["P",2,"S",5],
+  ["Si",1,"O",2],["Si",1,"Cl",4],["Si",1,"F",4],["Si",1,"Br",4],
+  ["Cl",2,"O",1],["Cl",1,"O",2],["Cl",2,"O",7],["Cl",1,"F",1],["Cl",1,"F",3],["Cl",1,"F",5],
+  ["Br",1,"F",1],["Br",1,"F",3],["Br",1,"F",5],["Br",1,"Cl",1],
+  ["I",1,"Cl",1],["I",1,"Cl",3],["I",1,"F",5],["I",1,"F",7],["I",1,"Br",1],["I",2,"O",5],
+  ["Xe",1,"F",2],["Xe",1,"F",4],["Xe",1,"F",6],["Xe",1,"O",3],
+  ["O",1,"F",2],["O",2,"F",2],
+  ["Se",1,"O",2],["Se",1,"O",3],["Se",1,"F",6],["Te",1,"F",6],
+  ["As",1,"Cl",3],["As",1,"F",5],["As",2,"O",3],
+  ["Sb",1,"Cl",3],["Sb",1,"Cl",5],
+  ["B",1,"F",3],["B",1,"Cl",3],["B",2,"O",3]
+];
+
+/* the seven that never travel alone */
+const DIATOMIC=[
+  {s:"H",f:"H2"},{s:"N",f:"N2"},{s:"O",f:"O2"},{s:"F",f:"F2"},
+  {s:"Cl",f:"Cl2"},{s:"Br",f:"Br2"},{s:"I",f:"I2"}
+];
+
+/* pairs that make the "why prefixes exist" point */
+const COV_PAIRS=[
+  {a:["C",1,"O",1],b:["C",1,"O",2],
+   an:"One oxygen. Colorless, odorless, and dangerous — it locks onto your blood and blocks oxygen from getting in. This is the gas home detectors listen for.",
+   bn:"Two oxygens. You breathe it out all day. Plants live on it."},
+  {a:["N",2,"O",1],b:["N",1,"O",2],
+   an:"Laughing gas. The dentist gives it to you on purpose.",
+   bn:"Brown, sharp-smelling, and toxic. Part of what makes smog look brown over a city."}
+];
+
+/* ============================================================
+   PRACTICE SETS
+   ============================================================ */
+const SETS=[
+  {id:"mix", n:"Mixed practice — everything",       d:"Classify, name, and write formulas. The set to give before a test."},
+  {id:"cls", n:"Classify only — ionic or covalent", d:"One skill: metal + nonmetal, or two nonmetals. Nothing else."},
+  {id:"ion", n:"Ionic compounds only",              d:"Names, formulas, criss-cross, and charges."},
+  {id:"cov", n:"Covalent compounds only",           d:"Greek prefixes both directions."},
+  {id:"f2n", n:"Formula to name",                   d:"You see the formula, you write the name."},
+  {id:"n2f", n:"Name to formula",                   d:"You see the name, you write the formula."},
+  {id:"fib", n:"Fill in the blank",                 d:"The worksheet format — part of the name is already there."},
+  {id:"err", n:"Error hunt",                        d:"Every name on the page is wrong. Find what broke and fix it."}
+];
+
+/* ============================================================
+   small helpers
+   ============================================================ */
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(rng,arr){return arr[Math.floor(rng()*arr.length)];}
+function shuffle(rng,arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function tcase(s){return String(s).toLowerCase().replace(/(^|[\s'-])[a-z]/g,function(c){return c.toUpperCase();});}
+function cap(s){s=String(s||"");return s.charAt(0).toUpperCase()+s.slice(1);}
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){const t=b;b=a%b;a=t;}return a||1;}
+function periodLabel(p){const n=parseInt(p,10);if(!n)return"period ?";return n+(["","st","nd","rd"][n]||"th")+" period";}
+function stampToday(){const d=new Date();return String(d.getFullYear()%100).padStart(2,"0")+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");}
+function prettyStamp(ds){if(!/^\d{6}$/.test(ds))return ds;return ds.slice(2,4).replace(/^0/,"")+"/"+ds.slice(4,6)+"/20"+ds.slice(0,2);}
+function lev(a,b){
+  a=String(a);b=String(b);
+  const m=a.length,n=b.length;
+  if(!m)return n; if(!n)return m;
+  let prev=[],cur=[];
+  for(let j=0;j<=n;j++)prev[j]=j;
+  for(let i=1;i<=m;i++){
+    cur[0]=i;
+    for(let j=1;j<=n;j++){
+      cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a.charAt(i-1)===b.charAt(j-1)?0:1));
+    }
+    prev=cur.slice();
+  }
+  return prev[n];
+}
+
+const ROMAN=["","I","II","III","IV","V","VI","VII"];
+function roman(n){return ROMAN[n]||String(n);}
+function romanVal(s){
+  s=String(s).toUpperCase();
+  if(/^[1-7]$/.test(s))return parseInt(s,10);
+  const i=ROMAN.indexOf(s);
+  return i>0?i:null;
+}
+
+/* lookup maps */
+const CAT_BY={}; CATIONS.forEach(function(c){CAT_BY[c.s]=c;});
+const AN_BY={};  ANIONS.forEach(function(a){AN_BY[a.s]=a;});
+/* order elements are written in a covalent formula (IUPAC element sequence) */
+const COV_ORDER=["Rn","Xe","Kr","Ar","Ne","He","B","Si","C","Sb","As","P","N","H","Te","Se","S","At","I","Br","Cl","O","F"];
+function covRank(s){const i=COV_ORDER.indexOf(s);return i<0?99:i;}
+
+/* ============================================================
+   formulas
+   ============================================================ */
+function plainF(parts){
+  return parts.map(function(p){return p[0]+(p[1]>1?String(p[1]):"");}).join("");
+}
+function fxF(parts){
+  return '<span class="fx">'+parts.map(function(p){
+    return esc(p[0])+(p[1]>1?"<sub>"+p[1]+"</sub>":"");
+  }).join("")+'</span>';
+}
+function fxIon(sym,charge){
+  const n=Math.abs(charge);
+  return '<span class="fx">'+esc(sym)+'<sup>'+(n>1?n:"")+(charge>0?"+":"&minus;")+'</sup></span>';
+}
+function chargeTxt(c){return (c>0?c+"+":Math.abs(c)+"−");}
+
+/* every complete way a string can be read as element symbols, best first */
+function parseFormula(str){
+  const flags={};
+  let s=String(str||"").trim();
+  s=s.replace(/[₀-₉]/g,function(c){return String(c.charCodeAt(0)-0x2080);});
+  s=s.replace(/[⁰¹²³⁴-⁹]/g,function(c){
+    return String("⁰¹²³⁴⁵⁶⁷⁸⁹".indexOf(c));});
+  if(/[+⁺⁻−]/.test(s)||/\d\s*-\s*(?![a-z])/i.test(s)){flags.charges=true;}
+  s=s.replace(/[+⁺⁻−-]/g,"");
+  if(/[()\[\]]/.test(s)){flags.parens=true;s=s.replace(/[()\[\]]/g,"");}
+  s=s.replace(/\s+/g,"");
+  if(!s)return{ok:false,err:"empty",flags:flags};
+  if(!/^[A-Za-z0-9]+$/.test(s))return{ok:false,err:"junk",flags:flags};
+
+  const done=[];
+  (function walk(i,acc,fixed){
+    if(done.length>400)return;
+    if(i>=s.length){done.push({parts:acc.slice(),caseFixed:fixed});return;}
+    const cands=[];
+    for(let k=0;k<SYMS.length;k++){
+      const sym=SYMS[k], chunk=s.substr(i,sym.length);
+      if(chunk===sym)cands.push([sym,false]);
+      else if(chunk.length===sym.length&&chunk.toLowerCase()===sym.toLowerCase())cands.push([sym,true]);
+    }
+    cands.sort(function(a,b){return (a[1]-b[1])||(b[0].length-a[0].length);});
+    for(let k=0;k<cands.length;k++){
+      const sym=cands[k][0];
+      let j=i+sym.length,num="";
+      while(j<s.length&&/[0-9]/.test(s.charAt(j))){num+=s.charAt(j);j++;}
+      const c=num?parseInt(num,10):1;
+      if(c<1||c>40)continue;
+      acc.push([sym,c]);
+      walk(j,acc,fixed||cands[k][1]);
+      acc.pop();
+    }
+  })(0,[],false);
+
+  if(!done.length)return{ok:false,err:"symbol",flags:flags};
+  done.forEach(function(d){
+    d.score=0;
+    if(!d.caseFixed)d.score+=100;
+    const k=classify(d.parts);
+    if(k==="ionic"||k==="covalent")d.score+=60;
+    else if(k==="element")d.score+=15;
+    d.score-=d.parts.length*2;
+  });
+  done.sort(function(a,b){return b.score-a.score;});
+  const best=done[0];
+  if(best.caseFixed)flags.caseFixed=true;
+  return {ok:true,parts:best.parts,flags:flags,alts:done.length};
+}
+
+function distinct(parts){
+  const seen=[],out=[];
+  parts.forEach(function(p){
+    const i=seen.indexOf(p[0]);
+    if(i<0){seen.push(p[0]);out.push([p[0],p[1]]);}
+    else out[i][1]+=p[1];
+  });
+  return out;
+}
+function classify(parts){
+  const d=distinct(parts);
+  if(d.length===1)return "element";
+  if(d.length>2)return "poly";
+  const A=ELEMENTS[d[0][0]],B=ELEMENTS[d[1][0]];
+  if(!A||!B)return "unknown";
+  if(d[0][0]==="H"||d[1][0]==="H")return "hydrogen";
+  const ta=A.type,tb=B.type;
+  if(ta==="m"&&tb==="m")return "metals";
+  if(ta==="m"||tb==="m")return "ionic";
+  return "covalent";
+}
+
+/* ============================================================
+   IONIC
+   ============================================================ */
+function ionicFormula(cs,ch,as){
+  const neg=-AN_BY[as].ch, g=gcd(ch,neg);
+  return [[cs,neg/g],[as,ch/g]];
+}
+function ionicName(cs,ch,as){
+  const c=CAT_BY[cs];
+  return ELEMENTS[cs].n+(c&&c.vari?"("+roman(ch)+")":"")+" "+IDE[as];
+}
+/* read the metal's charge back out of a finished formula */
+function metalCharge(parts){
+  const d=distinct(parts);
+  let mi=ELEMENTS[d[0][0]].type==="m"?0:1, ai=1-mi;
+  const an=AN_BY[d[ai][0]];
+  if(!an)return null;
+  const total=d[ai][1]*Math.abs(an.ch);
+  if(total%d[mi][1]!==0)return null;
+  return {sym:d[mi][0],ch:total/d[mi][1],an:d[ai][0],anCh:an.ch,mCount:d[mi][1],aCount:d[ai][1]};
+}
+
+/* ============================================================
+   COVALENT
+   ============================================================ */
+function joinPrefix(pre,ide){
+  /* mono + oxide = monoxide, tetra + oxide = tetroxide.
+     The final a or o is dropped only in front of "oxide". di and tri end
+     in i, so they keep it: dioxide, trioxide. */
+  if(ide.charAt(0)==="o"&&/[ao]$/.test(pre))return pre.slice(0,-1)+ide;
+  return pre+ide;
+}
+function covalentName(parts){
+  const a=parts[0],b=parts[1];
+  const first=(a[1]>1?PREFIX_BY_N[a[1]]:"")+ELEMENTS[a[0]].n.toLowerCase();
+  const second=joinPrefix(PREFIX_BY_N[b[1]],IDE[b[0]]);
+  return first+" "+second;
+}
+/* every covalent compound on this page, name generated from the rule */
+const COV=COV_RAW.map(function(r){
+  const parts=[[r[0],r[1]],[r[2],r[3]]];
+  return {parts:parts,f:plainF(parts),name:covalentName(parts)};
+});
+
+/* ============================================================
+   NAME PARSER  — reads what a student typed
+   returns which element / count / charge they meant, plus what was fuzzy
+   ============================================================ */
+function normName(s){
+  return String(s||"").toLowerCase()
+    .replace(/[‐-―−]/g,"-")
+    .replace(/[.,;:!?"']/g,"")
+    .replace(/\(\s*/g,"(").replace(/\s*\)/g,")")
+    .replace(/\s+/g," ").trim();
+}
+const IDE_LIST=Object.keys(IDE).map(function(k){return {s:k,ide:IDE[k]};});
+
+/* build every legal spelling of a second word, with its element + count */
+const SECOND_FORMS=(function(){
+  const out={};
+  function add(str,sym,cnt,alt){
+    if(out[str]===undefined)out[str]={s:sym,c:cnt,alt:!!alt};
+  }
+  IDE_LIST.forEach(function(x){
+    add(x.ide,x.s,null);                                  /* no prefix at all */
+    PREFIX.forEach(function(p){
+      add(joinPrefix(p.p,x.ide),x.s,p.n);                 /* the correct form */
+      add(p.p+x.ide,x.s,p.n,true);                        /* tetraoxide etc.  */
+      if(p.p==="mono")add("mono"+x.ide,x.s,1,true);
+    });
+    /* the plain element name, in case they never changed the ending */
+    add(ELEMENTS[x.s].n.toLowerCase(),x.s,null);
+    PREFIX.forEach(function(p){add(p.p+ELEMENTS[x.s].n.toLowerCase(),x.s,p.n);});
+  });
+  /* every other element name too, so a name written backwards still parses
+     and gets diagnosed as an order problem instead of an unknown word */
+  Object.keys(ELEMENTS).forEach(function(sy){
+    add(ELEMENTS[sy].n.toLowerCase(),sy,null);
+  });
+  return out;
+})();
+const FIRST_FORMS=(function(){
+  const out={};
+  Object.keys(ELEMENTS).forEach(function(sy){
+    const nm=ELEMENTS[sy].n.toLowerCase();
+    if(out[nm]===undefined)out[nm]={s:sy,c:null};
+    PREFIX.forEach(function(p){
+      const k=p.p+nm;
+      if(out[k]===undefined)out[k]={s:sy,c:p.n};
+    });
+  });
+  return out;
+})();
+function fuzzyLook(word,table){
+  if(table[word])return {hit:table[word],fuzz:0,as:word};
+  let best=null,bd=99;
+  const keys=Object.keys(table);
+  for(let i=0;i<keys.length;i++){
+    const d=lev(word,keys[i]);
+    if(d<bd){bd=d;best=keys[i];}
+    if(bd===1)break;
+  }
+  const limit=word.length<=6?1:(word.length<=10?2:3);
+  if(best&&bd<=limit)return {hit:table[best],fuzz:bd,as:best};
+  return null;
+}
+function parseName(str){
+  const r={ok:false,roman:null,romanStyle:null,fuzz:0,flags:{}};
+  let s=normName(str);
+  if(!s){r.err="empty";return r;}
+  let m=s.match(/\((i{1,3}|iv|vi{0,2}|[1-7])\)/);
+  if(m){r.roman=romanVal(m[1]);r.romanStyle=/^[1-7]$/.test(m[1])?"digit":"ok";s=s.replace(m[0]," ");}
+  else{
+    m=s.match(/(^|\s)(iv|vii|vi|iii|ii|v|i)(\s|$)/);
+    if(m){r.roman=romanVal(m[2]);r.romanStyle="noparens";s=(s.slice(0,m.index)+" "+s.slice(m.index+m[0].length)).trim();}
+    else{
+      m=s.match(/(^|\s)([1-7])(\s|$)/);
+      if(m){r.roman=romanVal(m[2]);r.romanStyle="digit";s=(s.slice(0,m.index)+" "+s.slice(m.index+m[0].length)).trim();}
+    }
+  }
+  s=s.replace(/\s+/g," ").trim();
+  const w=s.split(" ");
+  if(w.length!==2){r.err="words";r.words=w.length;r.raw=s;return r;}
+  const f=fuzzyLook(w[0],FIRST_FORMS), g=fuzzyLook(w[1],SECOND_FORMS);
+  if(!f){r.err="first";r.raw=w[0];return r;}
+  if(!g){r.err="second";r.raw=w[1];return r;}
+  r.ok=true;
+  r.a={s:f.hit.s,c:f.hit.c}; r.b={s:g.hit.s,c:g.hit.c};
+  r.bWord=g.as; r.aWord=f.as;
+  r.bIsIde=/ide$/.test(g.as);
+  r.bAlt=!!g.hit.alt;
+  r.fuzz=f.fuzz+g.fuzz;
+  return r;
+}
+
+/* ============================================================
+   THE MISCONCEPTION CATALOG
+   h    what they did          fix  the one rule that repairs it
+   st   what to review later
+   ============================================================ */
+const MISTAKES={
+  prefixIonic:{h:"You put Greek prefixes on an ionic compound.",
+    fix:"Ionic names never take prefixes. The charges already lock the formula in one place, so the name has no counting to do. Write the metal, then the nonmetal with an −ide ending, and stop.",
+    st:"Ionic names never use prefixes"},
+  noIde:{h:"You left the nonmetal's ordinary name on the end.",
+    fix:"The second element always changes its ending to −ide. Chlorine becomes chloride, oxygen becomes oxide, nitrogen becomes nitride, sulfur becomes sulfide.",
+    st:"The −ide ending on the second element"},
+  noRoman:{h:"You left out the Roman numeral.",
+    fix:"This metal can carry more than one charge, so the name has to say which one it is using. Work the charge out from the nonmetal, then write it in Roman numerals in parentheses with no space.",
+    st:"Roman numerals on transition metals"},
+  wrongRoman:{h:"The Roman numeral is not the right charge.",
+    fix:"The Roman numeral is the charge on the metal, not the number of metal atoms. Add up the negative charge on the whole nonmetal side, then split it evenly across the metal atoms.",
+    st:"Working out a transition metal's charge"},
+  romanFixed:{h:"You added a Roman numeral to a metal that never needs one.",
+    fix:"Only metals with more than one possible charge take a Roman numeral. Every group 1, group 2 and group 13 metal has one fixed charge, and so do zinc, cadmium, silver and scandium.",
+    st:"Which metals do NOT take a Roman numeral"},
+  romanSub:{h:"You turned the Roman numeral into a subscript on the metal.",
+    fix:"The Roman numeral is the metal's charge, not how many of it there are. Iron(III) means one iron with a 3+ charge. Criss-cross that 3 onto the nonmetal, not back onto the iron.",
+    st:"A Roman numeral is a charge, not a count"},
+  order:{h:"The two parts are in the wrong order.",
+    fix:"The metal, or the element further to the left of the periodic table, always comes first — in the name and in the formula. The one that gains or pulls electrons goes second and takes the −ide ending.",
+    st:"Which element is written first"},
+  noPrefix:{h:"You named a covalent compound the ionic way, with no prefixes.",
+    fix:"Two nonmetals can combine in more than one arrangement, so the name has to count the atoms. Put a Greek prefix on each element to match its subscript.",
+    st:"Covalent names need Greek prefixes"},
+  monoFirst:{h:"You used “mono” on the first element.",
+    fix:"Never write mono on the first element. If there is only one of it, its name starts bare: carbon dioxide, not monocarbon dioxide.",
+    st:"No “mono” on the first element"},
+  missMono:{h:"You skipped the prefix on the second element.",
+    fix:"The second element always gets a prefix, even when there is only one of it. That is where “monoxide” in carbon monoxide comes from.",
+    st:"The second element always gets a prefix, even mono"},
+  wrongCount:{h:"A prefix does not match the subscript.",
+    fix:"Read the subscript, then reach for that prefix: 1 mono, 2 di, 3 tri, 4 tetra, 5 penta, 6 hexa, 7 hepta, 8 octa, 9 nona, 10 deca.",
+    st:"The Greek prefixes 1 through 10"},
+  noReduce:{h:"You criss-crossed but never reduced.",
+    fix:"After the charges swap down, divide both subscripts by the largest number that goes into both. Mg²⁺ with O²⁻ crosses to Mg₂O₂, and that has to come down to MgO.",
+    st:"Reducing subscripts after the criss-cross"},
+  crossBack:{h:"The subscripts are swapped — each charge landed on its own element.",
+    fix:"The charges cross over. The metal's charge becomes the nonmetal's subscript, and the nonmetal's charge becomes the metal's subscript. Al³⁺ and O²⁻ give Al₂O₃, not Al₃O₂.",
+    st:"Which direction the criss-cross goes"},
+  noBalance:{h:"You wrote one of each and left the charges unbalanced.",
+    fix:"A compound has to end up neutral. Add subscripts until the total positive charge and the total negative charge cancel exactly.",
+    st:"Balancing charge to zero"},
+  wroteCharges:{h:"You wrote the charges into the formula.",
+    fix:"Charges are how you work the formula out; they do not appear in the finished formula. Write the subscripts only — Al₂O₃, not Al³⁺₂O²⁻₃.",
+    st:"Charges are scratch work, not part of the formula"},
+  caseSym:{h:"The capital letters in the symbols are off.",
+    fix:"Every symbol starts with a capital and any second letter is lowercase. CO is carbon and oxygen. Co is cobalt. On a test those are two different answers.",
+    st:"Capitalization in chemical symbols"},
+  spelling:{h:"Right compound, spelling is off.",
+    fix:"You had it. Check the spelling of the element name and the −ide ending — on a written test that is where the point goes.",
+    st:"Spelling the element names"},
+  wrongEl:{h:"That is not the element in this formula.",
+    fix:"Read the symbols carefully, then find each one on the periodic table before you name it.",
+    st:"Reading symbols off the periodic table"},
+  wrongKind:{h:"You used the wrong set of rules for this compound.",
+    fix:"Decide ionic or covalent first, every single time. Metal + nonmetal is ionic, so no prefixes. Two nonmetals is covalent, so prefixes on both.",
+    st:"Classifying before naming"},
+  polyLike:{h:"You wrote it like a polyatomic compound.",
+    fix:"There are only two elements here, so there is no polyatomic ion and no parentheses. Two symbols, two subscripts.",
+    st:"Binary means exactly two elements"},
+  format:{h:"I could not read that as a compound name.",
+    fix:"A binary name is exactly two words: the first element, then the second element with an −ide ending. Anything else and it will not be counted.",
+    st:"The two-word shape of a binary name"}
+};
+function mk(tag,extra){
+  const m=MISTAKES[tag];
+  return {tag:tag,h:m.h,fix:m.fix,st:m.st,extra:extra||""};
+}
+
+/* ============================================================
+   CHECK A TYPED NAME AGAINST THE RIGHT ANSWER
+   item = {kind, parts, answer, cat, ch, an}
+   ============================================================ */
+function checkName(input,item){
+  const raw=normName(input);
+  if(!raw)return {ok:false,diag:mk("format")};
+  const want=normName(item.answer);
+  if(raw===want)return {ok:true};
+
+  const p=parseName(input);
+  if(!p.ok){
+    if(p.err==="words"){
+      return {ok:false,diag:mk("format","You wrote "+p.words+" word"+(p.words===1?"":"s")+". A binary name is two.")};
+    }
+    return {ok:false,diag:mk("wrongEl","I could not match “"+esc(p.raw||raw)+"” to an element.")};
+  }
+
+  const d=distinct(item.parts);
+  const want1=d[0],want2=d[1];
+
+  /* reversed order */
+  if(p.a.s===want2[0]&&p.b.s===want1[0])
+    return {ok:false,diag:mk("order","You wrote "+esc(ELEMENTS[want2[0]].n)+" first. "+esc(ELEMENTS[want1[0]].n)+" comes first.")};
+
+  if(p.a.s!==want1[0])
+    return {ok:false,diag:mk("wrongEl","The first symbol is "+want1[0]+", which is "+ELEMENTS[want1[0]].n+" — not "+ELEMENTS[p.a.s].n+".")};
+  if(p.b.s!==want2[0])
+    return {ok:false,diag:mk("wrongEl","The second symbol is "+want2[0]+", which is "+ELEMENTS[want2[0]].n+" — not "+ELEMENTS[p.b.s].n+".")};
+
+  if(!p.bIsIde)
+    return {ok:false,diag:mk("noIde","You wrote “"+esc(p.bWord)+"”. It should be “"+IDE[want2[0]]+"”.")};
+
+  if(item.kind==="ionic"){
+    if(p.a.c!==null||p.b.c!==null){
+      return {ok:false,diag:mk("prefixIonic","This is a metal with a nonmetal, so it is ionic. The right answer is “"+item.answer+"” with no prefixes anywhere.")};
+    }
+    const varMetal=CAT_BY[item.cat]&&CAT_BY[item.cat].vari;
+    if(varMetal&&p.roman===null)
+      return {ok:false,diag:mk("noRoman",ELEMENTS[item.cat].n+" can be "+CAT_BY[item.cat].ch.map(function(c){return c+"+";}).join(" or ")+". Here it is "+item.ch+"+, so it is "+ELEMENTS[item.cat].n+"("+roman(item.ch)+").")};
+    if(!varMetal&&p.roman!==null)
+      return {ok:false,diag:mk("romanFixed",ELEMENTS[item.cat].n+" only ever has one charge ("+item.ch+"+), so it never takes a Roman numeral.")};
+    if(varMetal&&p.roman!==item.ch){
+      const an=AN_BY[item.an];
+      return {ok:false,diag:mk("wrongRoman","The "+d[1][1]+" "+IDE[item.an]+" ion"+(d[1][1]===1?"":"s")+" carry "+(d[1][1]*Math.abs(an.ch))+"− in total, spread over "+d[0][1]+" "+ELEMENTS[item.cat].n.toLowerCase()+" atom"+(d[0][1]===1?"":"s")+". That makes each one "+item.ch+"+, so it is "+roman(item.ch)+", not "+roman(p.roman)+".")};
+    }
+    if(p.fuzz>0)
+      return {ok:true,soft:mk("spelling","You wrote “"+esc(raw)+"”. The spelling is “"+item.answer+"”.")};
+    if(p.romanStyle==="digit"||p.romanStyle==="noparens")
+      return {ok:true,soft:mk("noRoman","Right charge. Write it the standard way though — “"+item.answer+"”, Roman numerals in parentheses, no space.")};
+    return {ok:true};
+  }
+
+  /* covalent */
+  if(p.b.c===null){
+    /* no prefix anywhere, and the first element needed one too */
+    if(want1[1]>1&&p.a.c===null)
+      return {ok:false,diag:mk("noPrefix","Both of these are nonmetals, so it is covalent and every element needs a prefix. The answer is “"+item.answer+"”.")};
+    return {ok:false,diag:mk("missMono","There "+(want2[1]===1?"is 1 "+ELEMENTS[want2[0]].n.toLowerCase()+" atom, so it is “"+joinPrefix("mono",IDE[want2[0]])+"”":"are "+want2[1]+", so it is “"+joinPrefix(PREFIX_BY_N[want2[1]],IDE[want2[0]])+"”")+".")};
+  }
+  if(p.a.c===1&&want1[1]===1)
+    return {ok:false,diag:mk("monoFirst","Take the mono off the front. It is “"+item.answer+"”.")};
+  const a1=p.a.c===null?1:p.a.c;
+  if(a1!==want1[1])
+    return {ok:false,diag:mk("wrongCount","The subscript on "+want1[0]+" is "+want1[1]+", so the prefix is “"+(want1[1]>1?PREFIX_BY_N[want1[1]]:"none — leave it bare")+"”. You used "+p.a.c+".")};
+  if(p.b.c!==want2[1])
+    return {ok:false,diag:mk("wrongCount","The subscript on "+want2[0]+" is "+want2[1]+", so the prefix is “"+PREFIX_BY_N[want2[1]]+"”. You used "+p.b.c+".")};
+  if(p.roman!==null)
+    return {ok:false,diag:mk("wrongKind","Roman numerals belong to metals with more than one charge. There is no metal here — this one is covalent, so it is “"+item.answer+"”.")};
+  if(p.bAlt)
+    return {ok:true,soft:mk("spelling","Accepted, but the standard spelling drops the extra vowel: “"+item.answer+"”.")};
+  if(p.fuzz>0)
+    return {ok:true,soft:mk("spelling","You wrote “"+esc(raw)+"”. The spelling is “"+item.answer+"”.")};
+  return {ok:true};
+}
+
+/* ============================================================
+   CHECK A TYPED FORMULA AGAINST THE RIGHT ANSWER
+   ============================================================ */
+function sameParts(a,b){
+  if(a.length!==b.length)return false;
+  for(let i=0;i<a.length;i++){if(a[i][0]!==b[i][0]||a[i][1]!==b[i][1])return false;}
+  return true;
+}
+function checkFormula(input,item){
+  const want=item.parts;
+  const r=parseFormula(input);
+  if(!r.ok){
+    if(r.err==="empty")return {ok:false,diag:mk("format","Nothing was typed.")};
+    return {ok:false,diag:mk("wrongEl","I could not read that as element symbols. Write the symbols with their subscripts, like "+plainF(want)+".")};
+  }
+  const got=r.parts;
+  if(sameParts(got,want)){
+    if(r.flags.charges)return {ok:true,soft:mk("wroteCharges","Right formula. Leave the charges off the final answer: "+plainF(want)+".")};
+    if(r.flags.parens)return {ok:true,soft:mk("polyLike","Right formula. No parentheses needed with only two elements: "+plainF(want)+".")};
+    if(r.flags.caseFixed)return {ok:true,soft:mk("caseSym","Right elements. Watch the capitals: "+plainF(want)+".")};
+    return {ok:true};
+  }
+
+  const dw=distinct(want),dg=distinct(got);
+  /* wrong elements entirely */
+  if(dg.length!==dw.length||dg[0][0]!==dw[0][0]||dg[1]&&dw[1]&&dg[1][0]!==dw[1][0]){
+    if(dg.length===dw.length&&dw[1]&&dg[0][0]===dw[1][0]&&dg[1][0]===dw[0][0])
+      return {ok:false,diag:mk("order",plainF(want).replace(/(\d)/g,"$1")+" is the order — "+dw[0][0]+" first.")};
+    return {ok:false,diag:mk("wrongEl","This compound is built from "+dw.map(function(x){return x[0]+" ("+ELEMENTS[x[0]].n+")";}).join(" and ")+".")};
+  }
+
+  if(item.kind==="ionic"&&item.ch!=null){
+    const neg=Math.abs(AN_BY[item.an].ch), g=gcd(item.ch,neg);
+    const crossA=neg,crossB=item.ch;
+    /* criss-crossed but never reduced */
+    if(g>1&&dg[0][1]===crossA&&dg[1][1]===crossB)
+      return {ok:false,diag:mk("noReduce",plainF([[dw[0][0],crossA],[dw[1][0],crossB]])+" is what the criss-cross gives you. Both subscripts divide by "+g+", so it comes down to "+plainF(want)+".")};
+    /* charges landed on their own element instead of crossing */
+    if(dg[0][1]===item.ch&&dg[1][1]===neg&&item.ch!==neg)
+      return {ok:false,diag:mk("crossBack",ELEMENTS[dw[0][0]].n+" is "+item.ch+"+ and "+IDE[item.an]+" is "+neg+"−. The "+item.ch+" goes DOWN onto the "+dw[1][0]+" and the "+neg+" goes DOWN onto the "+dw[0][0]+", giving "+plainF(want)+".")};
+    /* roman numeral used as a subscript */
+    if(CAT_BY[item.cat]&&CAT_BY[item.cat].vari&&dg[0][1]===item.ch&&item.ch>1&&dw[0][1]!==item.ch)
+      return {ok:false,diag:mk("romanSub","The "+roman(item.ch)+" in the name is the charge on "+ELEMENTS[item.cat].n.toLowerCase()+", not how many there are. Cross it onto the "+dw[1][0]+": "+plainF(want)+".")};
+    /* one of each */
+    if(dg[0][1]===1&&dg[1][1]===1)
+      return {ok:false,diag:mk("noBalance",fxPlain(item.cat,item.ch)+" and "+fxPlain(item.an,AN_BY[item.an].ch)+" do not cancel one to one. You need "+dw[0][1]+" "+dw[0][0]+" and "+dw[1][1]+" "+dw[1][0]+" so the charges hit zero: "+plainF(want)+".")};
+    return {ok:false,diag:mk("noBalance","Total up the charges: "+dw[0][1]+" × "+item.ch+"+ = "+(dw[0][1]*item.ch)+"+ and "+dw[1][1]+" × "+Math.abs(AN_BY[item.an].ch)+"− = "+(dw[1][1]*Math.abs(AN_BY[item.an].ch))+"−. That is why it is "+plainF(want)+".")};
+  }
+
+  /* covalent count error */
+  const bad=[];
+  if(dg[0][1]!==dw[0][1])bad.push([dw[0][0],dg[0][1],dw[0][1]]);
+  if(dg[1]&&dw[1]&&dg[1][1]!==dw[1][1])bad.push([dw[1][0],dg[1][1],dw[1][1]]);
+  if(bad.length){
+    const b=bad[0];
+    const pre=b[2]>1?PREFIX_BY_N[b[2]]:"no prefix";
+    return {ok:false,diag:mk("wrongCount","“"+(b[2]>1?pre:"a bare element name")+"” means "+b[2]+", so "+b[0]+" gets a subscript of "+b[2]+", not "+b[1]+". The formula is "+plainF(want)+".")};
+  }
+  return {ok:false,diag:mk("wrongCount","The answer is "+plainF(want)+".")};
+}
+function fxPlain(sym,ch){return sym+" "+chargeTxt(ch);}
+
+/* ============================================================
+   NAME  <->  FORMULA  with the steps shown
+   ============================================================ */
+/* hideRoman: the class has not met Roman numerals yet, so do not bring them up
+   for a metal that would never need one anyway */
+function nameFromFormula(input,hideRoman){
+  const r=parseFormula(input);
+  if(!r.ok)return {ok:false,msg:"That is not a formula I can read. Try something like MgCl2, Fe2O3, or N2O4."};
+  const parts=r.parts, d=distinct(parts), kind=classify(parts);
+  const steps=[];
+  steps.push("<b>Step 1 — what is it made of?</b> "+d.map(function(x){
+    const e=ELEMENTS[x[0]];
+    return x[0]+" is "+e.n+", group "+e.grp+", a "+(e.type==="m"?"metal":e.type==="d"?"metalloid":"nonmetal");
+  }).join(". ")+".");
+
+  if(kind==="element"){
+    const dia=DIATOMIC.filter(function(x){return x.s===d[0][0];})[0];
+    return {ok:false,msg:"There is only one element here, so it is not a compound at all — it is "+ELEMENTS[d[0][0]].n+
+      (dia?", and "+dia.f+" is one of the seven diatomic elements. Two atoms of the same element is still an element.":". Compounds need at least two different elements.")};
+  }
+  if(kind==="poly")return {ok:false,msg:"That has three or more different elements, which makes it a polyatomic compound. Those need the polyatomic ion chart and are not part of this course."};
+  if(kind==="metals")return {ok:false,msg:"Both of those are metals. Metals mixed with metals make an alloy, like brass or steel — not an ionic or covalent compound, and alloys are not named this way."};
+  if(kind==="hydrogen")return {ok:false,msg:"Hydrogen compounds are the exceptions. H₂O is water, NH₃ is ammonia, CH₄ is methane, and HCl dissolved in water is an acid. They all have common names that came first, so the prefix and −ide rules do not apply to them."};
+  if(kind!=="ionic"&&kind!=="covalent")return {ok:false,msg:"I could not classify that one."};
+
+  if(kind==="ionic"){
+    const mc=metalCharge(parts);
+    if(!mc)return {ok:false,msg:"The charges in "+plainF(parts)+" do not balance, so that formula cannot exist as written."};
+    const c=CAT_BY[mc.sym];
+    steps.push("<b>Step 2 — metal + nonmetal, so it is IONIC.</b> Ionic names use no prefixes. The metal keeps its name, and the nonmetal changes its ending to −ide.");
+    if(c&&c.vari){
+      steps.push("<b>Step 3 — which charge is the metal using?</b> "+ELEMENTS[mc.sym].n+" can be "+c.ch.map(function(x){return x+"+";}).join(" or ")+", so the name has to say. The "+mc.aCount+" "+IDE[mc.an]+" ion"+(mc.aCount===1?"":"s")+" carry "+(mc.aCount*Math.abs(mc.anCh))+"− altogether. Spread that over "+mc.mCount+" "+ELEMENTS[mc.sym].n.toLowerCase()+" atom"+(mc.mCount===1?"":"s")+" and each one is "+mc.ch+"+ — that is Roman numeral "+roman(mc.ch)+".");
+    }else if(c&&!hideRoman){
+      steps.push("<b>Step 3 — no Roman numeral.</b> "+ELEMENTS[mc.sym].n+" is always "+mc.ch+"+ ("+c.why+"), so there is nothing to specify.");
+    }else if(c){
+      steps.push("<b>Step 3 — the charges.</b> "+ELEMENTS[mc.sym].n+" is "+mc.ch+"+ ("+c.why+") and "+IDE[mc.an]+" is "+Math.abs(mc.anCh)+"−, which is what fixes the subscripts.");
+    }
+    steps.push("<b>Step 4 — change the ending.</b> "+ELEMENTS[mc.an].n+" becomes <b>"+IDE[mc.an]+"</b>.");
+    return {ok:true,kind:"ionic",answer:ionicName(mc.sym,mc.ch,mc.an),steps:steps,parts:parts};
+  }
+
+  /* covalent — put the elements in the order the formula was written */
+  if(parts.length!==2||d.length!==2)return {ok:false,msg:"Write each element once, like N2O4."};
+  const A=d[0],B=d[1];
+  steps.push("<b>Step 2 — two nonmetals, so it is COVALENT.</b> Nonmetals can combine in more than one arrangement, so the name has to count the atoms. Every element gets a Greek prefix, except a single first element.");
+  steps.push("<b>Step 3 — count and prefix.</b> "+A[0]+" has a subscript of "+A[1]+" → "+(A[1]>1?"“"+PREFIX_BY_N[A[1]]+"”":"no prefix, because mono is never used on the first element")+". "+B[0]+" has a subscript of "+B[1]+" → “"+PREFIX_BY_N[B[1]]+"”, and it is always used even when it is one.");
+  const nm=covalentName([[A[0],A[1]],[B[0],B[1]]]);
+  steps.push("<b>Step 4 — change the ending.</b> "+ELEMENTS[B[0]].n+" becomes <b>"+IDE[B[0]]+"</b>"+
+    (/^o/.test(IDE[B[0]])&&/[ao]$/.test(PREFIX_BY_N[B[1]])?", and the prefix drops its last vowel in front of it — "+PREFIX_BY_N[B[1]]+" + "+IDE[B[0]]+" becomes "+joinPrefix(PREFIX_BY_N[B[1]],IDE[B[0]])+".":"."));
+  return {ok:true,kind:"covalent",answer:nm,steps:steps,parts:[[A[0],A[1]],[B[0],B[1]]]};
+}
+
+function formulaFromName(input){
+  const p=parseName(input);
+  const steps=[];
+  if(!p.ok){
+    if(p.err==="words")return {ok:false,msg:"A binary compound name is exactly two words — you gave "+p.words+". Try “magnesium chloride” or “dinitrogen tetroxide”."};
+    return {ok:false,msg:"I could not match “"+esc(p.raw||input)+"” to an element name."};
+  }
+  const A=ELEMENTS[p.a.s],B=ELEMENTS[p.b.s];
+  steps.push("<b>Step 1 — find the two elements.</b> "+p.a.s+" is "+A.n+", a "+(A.type==="m"?"metal":A.type==="d"?"metalloid":"nonmetal")+". "+p.b.s+" is "+B.n+", a "+(B.type==="m"?"metal":B.type==="d"?"metalloid":"nonmetal")+".");
+  const kind=classify([[p.a.s,1],[p.b.s,1]]);
+  if(kind==="hydrogen")return {ok:false,msg:"Hydrogen compounds have common names that came before the rules — water, ammonia, methane. They are not named this way."};
+
+  if(kind==="ionic"){
+    const cat=A.type==="m"?p.a.s:p.b.s, an=A.type==="m"?p.b.s:p.a.s;
+    if(A.type!=="m")return {ok:false,msg:"In an ionic name the metal is written first. Try “"+ELEMENTS[cat].n.toLowerCase()+" "+IDE[an]+"”."};
+    if(!AN_BY[an])return {ok:false,msg:ELEMENTS[an].n+" is not one of the nonmetals this course forms ionic compounds with."};
+    const c=CAT_BY[cat];
+    if(!c)return {ok:false,msg:ELEMENTS[cat].n+" is not one of the metals on this page."};
+    if(p.a.c!==null||p.b.c!==null)steps.push("<b>Heads up —</b> that name has a Greek prefix in it. Ionic names never do. Ignoring it.");
+    let ch;
+    if(c.vari){
+      if(p.roman===null)return {ok:false,msg:ELEMENTS[cat].n+" can be "+c.ch.map(function(x){return x+"+";}).join(" or ")+", so the name has to include a Roman numeral. Try “"+ELEMENTS[cat].n.toLowerCase()+"(II) "+IDE[an]+"”."};
+      ch=p.roman;
+      steps.push("<b>Step 2 — read the charges.</b> The Roman numeral says "+ELEMENTS[cat].n.toLowerCase()+" is "+ch+"+ this time. "+IDE[an]+" is "+Math.abs(AN_BY[an].ch)+"− ("+AN_BY[an].why+").");
+    }else{
+      ch=c.ch[0];
+      steps.push("<b>Step 2 — read the charges off the table.</b> "+ELEMENTS[cat].n+" is "+ch+"+ ("+c.why+"). "+cap(IDE[an])+" is "+Math.abs(AN_BY[an].ch)+"− ("+AN_BY[an].why+").");
+    }
+    const neg=Math.abs(AN_BY[an].ch), g=gcd(ch,neg);
+    const cross=[[cat,neg],[an,ch]];
+    steps.push("<b>Step 3 — criss-cross.</b> The "+ch+" from the metal goes down onto the nonmetal, and the "+neg+" from the nonmetal goes down onto the metal: "+plainF(cross)+".");
+    if(g>1)steps.push("<b>Step 4 — reduce.</b> Both subscripts divide by "+g+", so "+plainF(cross)+" becomes "+plainF(ionicFormula(cat,ch,an))+".");
+    else steps.push("<b>Step 4 — reduce.</b> Nothing divides into both, so it stays as it is.");
+    const parts=ionicFormula(cat,ch,an);
+    steps.push("<b>Check.</b> "+parts[0][1]+" × "+ch+"+ = "+(parts[0][1]*ch)+"+ and "+parts[1][1]+" × "+neg+"− = "+(parts[1][1]*neg)+"−. They cancel, so the compound is neutral.");
+    return {ok:true,kind:"ionic",parts:parts,steps:steps,answer:plainF(parts)};
+  }
+
+  /* covalent */
+  if(p.roman!==null)steps.push("<b>Heads up —</b> there is no metal here, so a Roman numeral does not belong. Ignoring it.");
+  if(p.b.c===null)return {ok:false,msg:"Both of those are nonmetals, so it is covalent and every part needs a prefix — including the second element, even when there is only one. Did you mean “"+(p.a.c>1?PREFIX_BY_N[p.a.c]:"")+ELEMENTS[p.a.s].n.toLowerCase()+" "+joinPrefix("mono",IDE[p.b.s])+"”?"};
+  const ca=p.a.c===null?1:p.a.c, cb=p.b.c;
+  steps.push("<b>Step 2 — two nonmetals, so it is COVALENT.</b> The prefixes ARE the subscripts — no charges, no criss-cross, no reducing.");
+  steps.push("<b>Step 3 — read the prefixes.</b> "+(p.a.c===null?"No prefix on "+A.n.toLowerCase()+", which means 1":"“"+PREFIX_BY_N[ca]+"” means "+ca)+". “"+PREFIX_BY_N[cb]+"” means "+cb+".");
+  const parts=[[p.a.s,ca],[p.b.s,cb]];
+  steps.push("<b>Step 4 — write them straight down as subscripts.</b> Never reduce a covalent formula. N₂O₄ stays N₂O₄ — it does not become NO₂, because that is a different compound.");
+  return {ok:true,kind:"covalent",parts:parts,steps:steps,answer:plainF(parts)};
+}
+
+/* ============================================================
+   storage + codes
+   ============================================================ */
+const KEY="tobinNC1";
+let DB={users:{},best:{}};
+try{const raw=localStorage.getItem(KEY); if(raw)DB=JSON.parse(raw)||{users:{},best:{}};}catch(err){}
+if(!DB.users)DB.users={}; if(!DB.best)DB.best={};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(err){}}
+
+function rollEnc(s,prefix){
+  let k=7,out="",sum=0;
+  for(const ch of s){const c=ch.charCodeAt(0);sum+=c;out+=(c^k).toString(36).padStart(2,"0");k=(k*3+c)%29+1;}
+  return (prefix+"-"+out+"-"+(sum%1296).toString(36).padStart(2,"0")).toUpperCase();
+}
+function rollDec(body,check){
+  let k=7,s="",sum=0;
+  for(let i=0;i<body.length;i+=2){const v=parseInt(body.slice(i,i+2),36);const c=v^k;s+=String.fromCharCode(c);sum+=c;k=(k*3+c)%29+1;}
+  if((sum%1296).toString(36).padStart(2,"0").toUpperCase()!==check)return null;
+  return s;
+}
+const SET_IDS=SETS.map(function(s){return s.id;});
+function setName(id){for(let i=0;i<SETS.length;i++)if(SETS[i].id===id)return SETS[i].n;return id;}
+function encPractice(name,set,rn,got,total){
+  return rollEnc([name.toUpperCase().slice(0,24),set,rn?"1":"0",got,total,stampToday()].join("|"),"NCE");
+}
+function decPractice(code){
+  try{
+    const m=String(code).trim().toUpperCase().match(/^NCE-([0-9A-Z]+)-([0-9A-Z]{2})$/); if(!m)return null;
+    const body=m[1].toLowerCase(); if(body.length%2)return null;
+    const s=rollDec(body,m[2]); if(s===null)return null;
+    const p=s.split("|"); if(p.length!==6)return null;
+    const got=parseInt(p[3],10), total=parseInt(p[4],10);
+    if(isNaN(got)||isNaN(total)||total<1||got<0||got>total)return null;
+    if(SET_IDS.indexOf(p[1].toLowerCase())<0)return null;
+    return {name:p[0],set:p[1].toLowerCase(),rn:p[2]==="1",got:got,total:total,date:p[5],pct:Math.round(got/total*100)};
+  }catch(err){return null;}
+}
+function encAsg(last,first,period,set,rn,got,total){
+  return rollEnc([last.toUpperCase().slice(0,14),first.toUpperCase().slice(0,12),period||"0",set,rn?"1":"0",got,total,stampToday()].join("|"),"NCA");
+}
+function decAsg(code){
+  try{
+    const m=String(code).trim().toUpperCase().match(/^NCA-([0-9A-Z]+)-([0-9A-Z]{2})$/); if(!m)return null;
+    const body=m[1].toLowerCase(); if(body.length%2)return null;
+    const s=rollDec(body,m[2]); if(s===null)return null;
+    const p=s.split("|"); if(p.length!==8)return null;
+    const got=parseInt(p[5],10), total=parseInt(p[6],10);
+    if(isNaN(got)||isNaN(total)||total<1||got<0||got>total)return null;
+    if(SET_IDS.indexOf(p[3].toLowerCase())<0)return null;
+    return {last:p[0],first:p[1],period:p[2],set:p[3].toLowerCase(),rn:p[4]==="1",got:got,total:total,date:p[7],pct:Math.round(got/total*100)};
+  }catch(err){return null;}
+}
+
+/* ============================================================
+   FLOW CHART
+   ============================================================ */
+function fillFlow(){
+  const rn=ROMAN_ON;
+  const exI=rn?[["Fe",1],["Cl",3]]:[["Mg",1],["Cl",2]];
+  const exN=rn?ionicName("Fe",3,"Cl"):ionicName("Mg",2,"Cl");
+  $("fdIon").innerHTML=
+    '<b style="color:var(--ionic)">USE THE −IDE ENDING. NO PREFIXES.</b>'+
+    '<ol>'+
+    '<li>Write the <b>metal</b> name exactly as it appears on the periodic table.</li>'+
+    (rn?'<li>If the metal is a <b>transition metal with more than one charge</b>, work out which charge it is using here and write it in Roman numerals: Iron(III). Zinc, cadmium, silver and scandium never need one.</li>':'')+
+    '<li>Write the <b>nonmetal</b> and change its ending to <b>−ide</b>.</li>'+
+    '<li>No prefixes. Ever. There is only one way these two can combine, so nothing needs counting.</li>'+
+    '</ol>'+
+    '<div class="ex"><div class="exq">'+fxF(exI)+'</div>'+
+    '<div class="exs">'+ELEMENTS[exI[0][0]].n+' is a metal, '+ELEMENTS[exI[1][0]].n+' is a nonmetal → ionic</div>'+
+    (rn?'<div class="exs">3 chlorides carry 3− in total, on 1 iron → iron is 3+ → Iron(III)</div>':'')+
+    '<div class="exs">Chlorine becomes chlor<b>ide</b></div>'+
+    '<div class="exa">'+exN+'</div>'+
+    '<div class="exs" style="margin-top:7px;color:var(--red)">Not "'+(rn?"iron trichloride":"magnesium dichloride")+'" — that is the covalent rule on an ionic compound.</div></div>';
+
+  $("fdCov").innerHTML=
+    '<b style="color:var(--coval)">USE GREEK PREFIXES.</b>'+
+    '<ol>'+
+    '<li>Put a Greek prefix in front of each element to say how many atoms there are.</li>'+
+    '<li><b>Never use "mono" on the first element.</b> One carbon is just "carbon".</li>'+
+    '<li><b>Always use a prefix on the second element</b>, even when there is only one. That is where "monoxide" comes from.</li>'+
+    '<li>Change the second element ending to <b>−ide</b>. If the prefix ends in a or o and runs into "oxide", drop that last vowel: pent<b>oxide</b>, not penta-oxide.</li>'+
+    '<li>Never reduce a covalent formula. N₂O₄ is not NO₂ — those are two different compounds.</li>'+
+    '</ol>'+
+    '<div class="ex"><div class="exq">'+fxF([["N",2],["O",4]])+'</div>'+
+    '<div class="exs">Nitrogen and oxygen are both nonmetals → covalent</div>'+
+    '<div class="exs">2 nitrogens → di · 4 oxygens → tetra</div>'+
+    '<div class="exs">tetra + oxide → tetroxide</div>'+
+    '<div class="exa">Dinitrogen tetroxide</div>'+
+    '<div class="exs" style="margin-top:7px;color:var(--red)">Not "nitrogen oxide" — without the prefixes there is no way to tell it from NO, N₂O, NO₂ or N₂O₅.</div></div>';
+}
+function bindFlow(){
+  document.querySelectorAll(".fpick").forEach(function(b){
+    b.onclick=function(){
+      const on=b.classList.contains("on");
+      document.querySelectorAll(".fpick").forEach(function(x){x.classList.remove("on");});
+      document.querySelectorAll(".fdetail").forEach(function(x){x.classList.remove("on");});
+      if(!on){
+        b.classList.add("on");
+        $(b.dataset.b==="ion"?"fdIon":"fdCov").classList.add("on");
+      }
+    };
+  });
+}
+
+/* ---------- compound namer ---------- */
+const NAMER_TRY=["MgCl2","Fe2O3","N2O4","CO","Al2O3","dinitrogen pentoxide","copper(II) sulfide","calcium nitride","SF6","O2","NaNO3","H2O"];
+function runNamer(){
+  const v=$("namerIn").value.trim(), out=$("namerOut");
+  if(!v){out.innerHTML="";return;}
+  /* a name has a space in it or ends in -ide; a formula does not */
+  const looksName=/\s/.test(v)||/ide$/i.test(v.trim());
+  let r=looksName?formulaFromName(v):nameFromFormula(v,!ROMAN_ON), dir=looksName?"n2f":"f2n";
+  if(!r.ok){
+    const alt=looksName?nameFromFormula(v,!ROMAN_ON):formulaFromName(v);
+    if(alt.ok){r=alt;dir=looksName?"f2n":"n2f";}
+  }
+  if(!r.ok){out.innerHTML='<div class="nbad">'+r.msg+'</div>';return;}
+  let h='<div class="pill" style="background:'+(r.kind==="ionic"?"#3a1a2c":"#152a4a")+'; color:'+(r.kind==="ionic"?"var(--ionic)":"var(--coval)")+'; font-weight:700; font-size:.86em">'+r.kind.toUpperCase()+'</div>';
+  r.steps.forEach(function(s){h+='<div class="nstep">'+s+'</div>';});
+  let canon;
+  if(r.kind==="ionic"){const mc=metalCharge(r.parts); canon=mc?ionicName(mc.sym,mc.ch,mc.an):r.answer;}
+  else canon=cap(covalentName(r.parts));
+  h+='<div class="nfinal">'+fxF(r.parts)+' &nbsp;=&nbsp; '+esc(cap(canon))+'</div>';
+  out.innerHTML=h;
+}
+
+/* ============================================================
+   CRISS-CROSS STEPPER
+   ============================================================ */
+const CC_METALS=["Na","Mg","Al","K","Ca","Li","Ba","Ga","Zn","Sr"];
+const CC_NONS=["Cl","O","N","S","F","Br","P","I"];
+let CCM="Al",CCN="O",CCSTEP=0;
+function ccData(){
+  const ch=CAT_BY[CCM].ch[0], neg=Math.abs(AN_BY[CCN].ch), g=gcd(ch,neg);
+  return {ch:ch,neg:neg,g:g,cross:[[CCM,neg],[CCN,ch]],fin:ionicFormula(CCM,ch,CCN)};
+}
+function ccSVG(step){
+  const d=ccData();
+  const boxA='<rect x="60" y="46" width="150" height="104" rx="16" fill="#16283f" stroke="'+(step>=1?"#fbbf24":"#2a4568")+'" stroke-width="3"/>';
+  const boxB='<rect x="330" y="46" width="150" height="104" rx="16" fill="#16283f" stroke="'+(step>=1?"#fbbf24":"#2a4568")+'" stroke-width="3"/>';
+  let s='<svg viewBox="0 0 540 300" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">';
+  s+=boxA+boxB;
+  s+='<text x="118" y="118" font-size="52" font-weight="800" fill="#eaf2fb">'+CCM+'</text>';
+  s+='<text x="'+(118+CCM.length*30)+'" y="86" font-size="27" font-weight="800" fill="'+(step>=1?"#fbbf24":"#9fb4cc")+'">'+d.ch+'+</text>';
+  s+='<text x="388" y="118" font-size="52" font-weight="800" fill="#eaf2fb">'+CCN+'</text>';
+  s+='<text x="'+(388+CCN.length*30)+'" y="86" font-size="27" font-weight="800" fill="'+(step>=1?"#fbbf24":"#9fb4cc")+'">'+d.neg+'−</text>';
+  s+='<text x="135" y="176" font-size="14" fill="#9fb4cc">'+esc(CAT_BY[CCM].why)+'</text>';
+  s+='<text x="405" y="176" font-size="14" fill="#9fb4cc">'+esc(AN_BY[CCN].why)+'</text>';
+  s+='<text x="135" y="34" font-size="13" fill="#9fb4cc" text-anchor="middle">gives away '+d.ch+'</text>';
+  s+='<text x="405" y="34" font-size="13" fill="#9fb4cc" text-anchor="middle">takes '+d.neg+'</text>';
+  if(step>=2){
+    s+='<defs><marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">'+
+       '<path d="M0 0 L8 4 L0 8 z" fill="#fbbf24"/></marker></defs>';
+    s+='<path d="M175 88 C 260 88, 300 190, 396 214" stroke="#fbbf24" stroke-width="4" fill="none" marker-end="url(#ah)"/>';
+    s+='<path d="M448 88 C 360 88, 260 190, 168 214" stroke="#fbbf24" stroke-width="4" fill="none" marker-end="url(#ah)"/>';
+  }
+  if(step>=3){
+    s+='<text x="270" y="252" font-size="42" font-weight="800" fill="'+(step>=4&&d.g>1?"#f87171":"#34d399")+'" text-anchor="middle">'+
+       CCM+'<tspan font-size="27" dy="8">'+(d.neg>1?d.neg:"")+'</tspan><tspan dy="-8">'+CCN+'</tspan><tspan font-size="27" dy="8">'+(d.ch>1?d.ch:"")+'</tspan></text>';
+  }
+  if(step>=4){
+    if(d.g>1){
+      s+='<text x="270" y="284" font-size="15" fill="#9fb4cc" text-anchor="middle">divide both by '+d.g+'</text>';
+      s+='<text x="470" y="252" font-size="34" font-weight="800" fill="#34d399" text-anchor="middle">'+
+         d.fin[0][0]+'<tspan font-size="22" dy="7">'+(d.fin[0][1]>1?d.fin[0][1]:"")+'</tspan><tspan dy="-7">'+d.fin[1][0]+'</tspan><tspan font-size="22" dy="7">'+(d.fin[1][1]>1?d.fin[1][1]:"")+'</tspan></text>';
+    }else{
+      s+='<text x="270" y="284" font-size="15" fill="#34d399" text-anchor="middle">nothing divides into both — this is the answer</text>';
+    }
+  }
+  return s+'</svg>';
+}
+const CC_WORDS=[
+  function(d){return "Two ions, side by side. <b>"+ELEMENTS[CCM].n+"</b> is a metal, so it gives electrons away and ends up positive. <b>"+ELEMENTS[CCN].n+"</b> is a nonmetal, so it takes electrons and ends up negative.";},
+  function(d){return "<b>Read the charges off the periodic table.</b> "+ELEMENTS[CCM].n+" is "+d.ch+"+ ("+CAT_BY[CCM].why+"). "+ELEMENTS[CCN].n+" is "+d.neg+"− ("+AN_BY[CCN].why+"). You are not memorizing these — the group number hands them to you.";},
+  function(d){return "<b>Now cross them.</b> The "+d.ch+" from "+ELEMENTS[CCM].n.toLowerCase()+" travels down to "+CCN+". The "+d.neg+" from "+ELEMENTS[CCN].n.toLowerCase()+" travels down to "+CCM+". <b>Here is why it works:</b> putting "+d.neg+" "+CCM+" atoms in gives you "+(d.neg*d.ch)+"+ total, and putting "+d.ch+" "+CCN+" atoms in gives you "+(d.ch*d.neg)+"−. Cross-multiplying is just the fastest way to make those two totals equal.";},
+  function(d){return "<b>"+plainF(d.cross)+".</b> Check it: "+d.neg+" × "+d.ch+"+ = "+(d.neg*d.ch)+"+ and "+d.ch+" × "+d.neg+"− = "+(d.ch*d.neg)+"−. They cancel exactly, so the compound is neutral. That is the whole point — compounds have no leftover charge.";},
+  function(d){return d.g>1
+    ? "<b>Last step: reduce.</b> "+plainF(d.cross)+" has the right ratio but not the smallest one. Both subscripts divide by "+d.g+", so the formula is <b>"+plainF(d.fin)+"</b>. Ionic formulas always show the simplest whole-number ratio, because an ionic compound is a repeating lattice, not a molecule you can count out."
+    : "<b>Nothing to reduce.</b> No number divides into both subscripts, so <b>"+plainF(d.fin)+"</b> is the finished formula. The name is <b>"+ionicName(CCM,d.ch,CCN)+"</b>.";}
+];
+function ccRender(){
+  const d=ccData();
+  $("ccStage").innerHTML=ccSVG(CCSTEP);
+  $("ccWords").innerHTML=CC_WORDS[Math.min(CCSTEP,CC_WORDS.length-1)](d);
+  let dots="";
+  for(let i=0;i<CC_WORDS.length;i++)dots+='<i class="'+(i<=CCSTEP?"on":"")+'"></i>';
+  $("ccDots").innerHTML=dots;
+  $("ccBack").disabled=CCSTEP===0;
+  $("ccNext").disabled=CCSTEP>=CC_WORDS.length-1;
+  $("ccNext").textContent=CCSTEP>=CC_WORDS.length-1?"Done":"Next step";
+}
+
+/* ============================================================
+   ELECTRON TRANSFER
+   ============================================================ */
+const ET_METALS=["Li","Na","K","Be","Mg","Ca","Al","Sr","Ga"];
+const ET_NONS=["F","Cl","Br","O","S","N","P"];
+function atomSVG(sym,cx,cy,mode,extra){
+  /* mode: "neutral" | "ion" ; extra = electrons drawn/removed */
+  const e=ELEMENTS[sym], val=e.val, R=46;
+  let s='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="#2a4568" stroke-width="2"/>';
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="22" fill="#16283f" stroke="#38bdf8" stroke-width="2"/>';
+  s+='<text x="'+cx+'" y="'+(cy+7)+'" font-size="20" font-weight="800" fill="#eaf2fb" text-anchor="middle">'+sym+'</text>';
+  const isMetal=e.type==="m";
+  const shown=mode==="ion"?(isMetal?0:8):val;
+  const gained=mode==="ion"&&!isMetal?(8-val):0;
+  for(let i=0;i<8;i++){
+    const a=(-90+i*45)*Math.PI/180, x=cx+R*Math.cos(a), y=cy+R*Math.sin(a);
+    if(i<shown-gained){
+      s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="6" fill="'+(isMetal?"#fbbf24":"#38bdf8")+'"/>';
+    }else if(i<shown){
+      s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="6" fill="#fbbf24" stroke="#fff" stroke-width="1.5"/>';
+    }else if(mode==="neutral"&&!isMetal){
+      s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="6" fill="none" stroke="#4a6a8c" stroke-width="2" stroke-dasharray="3 3"/>';
+    }
+  }
+  if(mode==="ion"){
+    const ch=isMetal?CAT_BY[sym].ch[0]:AN_BY[sym].ch;
+    s+='<text x="'+(cx+R+6)+'" y="'+(cy-R+4)+'" font-size="19" font-weight="800" fill="'+(isMetal?"#fbbf24":"#38bdf8")+'">'+Math.abs(ch)+(isMetal?"+":"−")+'</text>';
+  }
+  s+='<text x="'+cx+'" y="'+(cy+R+24)+'" font-size="14" fill="#9fb4cc" text-anchor="middle">'+ELEMENTS[sym].n+'</text>';
+  s+='<text x="'+cx+'" y="'+(cy+R+41)+'" font-size="12" fill="#9fb4cc" text-anchor="middle">'+
+     (mode==="neutral"?val+" valence electron"+(val===1?"":"s"):(isMetal?"gave away "+CAT_BY[sym].ch[0]:"full outer level"))+'</text>';
+  return s;
+}
+function etDraw(){
+  const mv=$("etMetal").value,nv=$("etNon").value;
+  const m=CAT_BY[mv]?mv:"Al", n=AN_BY[nv]?nv:"O";
+  const give=CAT_BY[m].ch[0], take=Math.abs(AN_BY[n].ch);
+  const L=give*take/gcd(give,take), nm=L/give, nn=L/take;
+  const parts=ionicFormula(m,give,n);
+
+  let s='<svg viewBox="0 0 620 400" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">';
+  s+='<text x="310" y="22" font-size="15" fill="#9fb4cc" text-anchor="middle">BEFORE — two neutral atoms</text>';
+  s+=atomSVG(m,150,100,"neutral");
+  s+=atomSVG(n,470,100,"neutral");
+  s+='<defs><marker id="ah2" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#fbbf24"/></marker></defs>';
+  s+='<path d="M212 100 L 400 100" stroke="#fbbf24" stroke-width="4" fill="none" marker-end="url(#ah2)" stroke-dasharray="9 6"/>';
+  s+='<text x="306" y="88" font-size="15" font-weight="700" fill="#fbbf24" text-anchor="middle">'+give+' electron'+(give===1?"":"s")+'</text>';
+  s+='<text x="306" y="120" font-size="13" fill="#9fb4cc" text-anchor="middle">but '+ELEMENTS[n].n.toLowerCase()+' only has room for '+take+'</text>';
+  s+='<line x1="40" y1="196" x2="580" y2="196" stroke="#2a4568" stroke-width="2"/>';
+  s+='<text x="310" y="222" font-size="15" fill="#9fb4cc" text-anchor="middle">AFTER — the only ratio with nothing left over</text>';
+
+  /* rows of ions */
+  const total=nm+nn, startX=310-(total*54)/2+27;
+  for(let i=0;i<nm;i++)s+=miniIon(m,startX+i*54,300,true);
+  for(let i=0;i<nn;i++)s+=miniIon(n,startX+(nm+i)*54,300,false);
+  s+='<text x="310" y="382" font-size="13" fill="#9fb4cc" text-anchor="middle">'+
+     nm+' × '+give+'+ = '+L+'+ &#160;&#160;and&#160;&#160; '+nn+' × '+take+'− = '+L+'− &#160;&#160;→&#160;&#160; balanced</text>';
+  s+='</svg>';
+  $("etStage").innerHTML=s;
+
+  $("etWords").innerHTML="Each <b>"+ELEMENTS[m].n.toLowerCase()+"</b> atom has "+ELEMENTS[m].val+
+    " valence electron"+(ELEMENTS[m].val===1?"":"s")+" and gives "+give+" away. Each <b>"+ELEMENTS[n].n.toLowerCase()+
+    "</b> atom is "+take+" short of a full outer level, so it takes "+take+". Electrons cannot be left sitting in mid-air — every one given away has to land somewhere. The smallest number that "+give+
+    " and "+take+" both go into is <b>"+L+"</b>, so you need <b>"+nm+" "+ELEMENTS[m].n.toLowerCase()+
+    "</b> and <b>"+nn+" "+ELEMENTS[n].n.toLowerCase()+"</b>. That is "+plainF(parts)+" — and it is exactly what the criss-cross gave you.";
+
+  $("etCount").innerHTML=
+    '<div><b style="color:var(--gold)">Electrons out</b><br>'+nm+' '+ELEMENTS[m].n.toLowerCase()+' × '+give+' each = <b>'+L+'</b></div>'+
+    '<div><b style="color:var(--accent)">Electrons in</b><br>'+nn+' '+ELEMENTS[n].n.toLowerCase()+' × '+take+' each = <b>'+L+'</b></div>'+
+    '<div><b style="color:var(--green)">Formula</b><br>'+plainF(parts)+' — '+ionicName(m,give,n)+'</div>';
+}
+function miniIon(sym,cx,cy,pos){
+  const c=pos?CAT_BY[sym].ch[0]:Math.abs(AN_BY[sym].ch);
+  let s='<circle cx="'+cx+'" cy="'+cy+'" r="24" fill="'+(pos?"#3a2a05":"#0d2434")+'" stroke="'+(pos?"#fbbf24":"#38bdf8")+'" stroke-width="2.5"/>';
+  s+='<text x="'+cx+'" y="'+(cy+7)+'" font-size="18" font-weight="800" fill="#eaf2fb" text-anchor="middle">'+sym+'</text>';
+  s+='<text x="'+(cx+20)+'" y="'+(cy-16)+'" font-size="14" font-weight="800" fill="'+(pos?"#fbbf24":"#38bdf8")+'">'+c+(pos?"+":"−")+'</text>';
+  return s;
+}
+
+/* ---------- covalent "why prefixes" + diatomics ---------- */
+function fillHow(){
+  $("coWhy").innerHTML=COV_PAIRS.map(function(p){
+    const a=[[p.a[0],p.a[1]],[p.a[2],p.a[3]]], b=[[p.b[0],p.b[1]],[p.b[2],p.b[3]]];
+    return '<div><div class="big">'+fxF(a)+'</div><div class="nm">'+cap(covalentName(a))+'</div><div class="ds">'+p.an+'</div></div>'+
+           '<div><div class="big">'+fxF(b)+'</div><div class="nm">'+cap(covalentName(b))+'</div><div class="ds">'+p.bn+'</div></div>';
+  }).join("");
+  $("diaGrid").innerHTML=DIATOMIC.map(function(d){
+    return '<div><div class="s">'+d.f.replace(/2/,"<sub>2</sub>")+'</div><div class="n">'+ELEMENTS[d.s].n+'</div></div>';
+  }).join("");
+}
+
+/* ============================================================
+   QUESTION BUILDERS
+   ============================================================ */
+function ionPool(rn){
+  return CATIONS.filter(function(c){return rn?true:!c.vari;});
+}
+function randIonic(rng,rn){
+  const c=pick(rng,ionPool(rn)), a=pick(rng,ANIONS);
+  const ch=c.vari?pick(rng,c.ch):c.ch[0];
+  const parts=ionicFormula(c.s,ch,a.s);
+  return {kind:"ionic",parts:parts,cat:c.s,ch:ch,an:a.s,answer:ionicName(c.s,ch,a.s),f:plainF(parts)};
+}
+function randCov(rng){
+  const c=pick(rng,COV);
+  return {kind:"covalent",parts:c.parts,answer:cap(c.name),f:c.f};
+}
+function anyCompound(rng,rn){return rng()<0.5?randIonic(rng,rn):randCov(rng);}
+function mcOpts(rng,correct,wrongs){
+  const opts=shuffle(rng,[{txt:correct,tag:null}].concat(wrongs));
+  let ans=0; opts.forEach(function(o,i){if(o.tag===null)ans=i;});
+  return {opts:opts,ans:ans};
+}
+
+/* --- classify --- */
+function qClassify(rng,rn){
+  const roll=rng();
+  let item,ansTxt,why;
+  if(roll<0.44){
+    item=randIonic(rng,rn); ansTxt="Ionic — a metal and a nonmetal";
+    why="<b>"+item.f+"</b>: "+ELEMENTS[item.cat].n+" is a metal and "+ELEMENTS[item.an].n+" is a nonmetal. Metal + nonmetal is always ionic, which means no prefixes and an −ide ending: "+item.answer+".";
+  }else if(roll<0.88){
+    item=randCov(rng); const d=distinct(item.parts);
+    ansTxt="Covalent — two nonmetals";
+    why="<b>"+item.f+"</b>: "+ELEMENTS[d[0][0]].n+" and "+ELEMENTS[d[1][0]].n+" are both on the nonmetal side"+
+      (ELEMENTS[d[0][0]].type==="d"||ELEMENTS[d[1][0]].type==="d"?" (a metalloid counts as a nonmetal here)":"")+
+      ". Two nonmetals is covalent, so it takes Greek prefixes: "+item.answer+".";
+  }else{
+    const d=pick(rng,DIATOMIC);
+    item={kind:"element",f:d.f,parts:[[d.s,2]]};
+    ansTxt="Neither — that is a single element";
+    why="<b>"+d.f+"</b> is only one kind of atom, so it is an element, not a compound. "+ELEMENTS[d.s].n+" is one of the seven diatomic elements — it travels in pairs. A subscript does not make it a compound; two different symbols do.";
+  }
+  const m=mcOpts(rng,ansTxt,[
+    {txt:"Ionic — a metal and a nonmetal",tag:"wrongKind"},
+    {txt:"Covalent — two nonmetals",tag:"wrongKind"},
+    {txt:"Neither — that is a single element",tag:"wrongKind"}
+  ].filter(function(o){return o.txt!==ansTxt;}));
+  return {t:"mc",tag:"Classify",q:"Is this compound ionic or covalent?",big:fxF(item.parts),opts:m.opts,ans:m.ans,why:why};
+}
+
+/* --- formula to name --- */
+function qF2N(rng,rn,kind){
+  const item=kind==="ion"?randIonic(rng,rn):(kind==="cov"?randCov(rng):anyCompound(rng,rn));
+  const r=nameFromFormula(item.f,!rn);
+  return {t:"txt",tag:"Formula → name",item:item,
+    q:"Write the name of this compound.",big:fxF(item.parts),
+    ph:"compound name",ansTxt:item.answer,
+    check:function(v){return checkName(v,item);},
+    why:r.ok?r.steps.join(" ")+" <b>Answer: "+item.answer+"</b>":"Answer: "+item.answer};
+}
+/* --- name to formula --- */
+function qN2F(rng,rn,kind){
+  const item=kind==="ion"?randIonic(rng,rn):(kind==="cov"?randCov(rng):anyCompound(rng,rn));
+  const r=formulaFromName(item.answer);
+  return {t:"txt",tag:"Name → formula",item:item,
+    q:"Write the formula for <b>"+esc(item.answer)+"</b>.",
+    ph:"e.g. MgCl2",ansTxt:plainF(item.parts),mono:true,
+    check:function(v){return checkFormula(v,item);},
+    why:r.ok?r.steps.join(" ")+" <b>Answer: "+plainF(item.parts)+"</b>":"Answer: "+plainF(item.parts)};
+}
+/* --- fill in the blank --- */
+/* kind: "ion" forces ionic, "cov" forces covalent, anything else mixes */
+function qFIB(rng,rn,kind){
+  const wantIonic=kind==="ion"?true:(kind==="cov"?false:rng()<0.5);
+  if(wantIonic){
+    const it=randIonic(rng,rn), c=CAT_BY[it.cat];
+    if(c.vari){
+      return {t:"fib",tag:"Fill in the blank",item:it,
+        q:"Finish the name. Watch the Roman numeral.",big:fxF(it.parts),
+        blanks:[{pre:ELEMENTS[it.cat].n+"(",post:") "+IDE[it.an],ans:roman(it.ch),w:78,
+                 alt:[String(it.ch)],why:"Roman numeral for the metal's charge"}],
+        ansTxt:it.answer,
+        check:function(vals){
+          const v=String(vals[0]||"").trim().toUpperCase().replace(/[()]/g,"");
+          if(v===roman(it.ch))return {ok:true};
+          if(v===String(it.ch))return {ok:true,soft:mk("noRoman","Right charge — write it in Roman numerals: "+roman(it.ch)+".")};
+          const rv=romanVal(v);
+          if(rv)return {ok:false,diag:mk("wrongRoman","The "+distinct(it.parts)[1][1]+" "+IDE[it.an]+" ion"+(distinct(it.parts)[1][1]===1?"":"s")+" carry "+(distinct(it.parts)[1][1]*Math.abs(AN_BY[it.an].ch))+"− over "+distinct(it.parts)[0][1]+" "+ELEMENTS[it.cat].n.toLowerCase()+" atom"+(distinct(it.parts)[0][1]===1?"":"s")+", so it is "+roman(it.ch)+", not "+roman(rv)+".")};
+          return {ok:false,diag:mk("noRoman","It is "+roman(it.ch)+".")};
+        },
+        why:"The charge on the metal is what the Roman numeral reports. <b>"+it.answer+"</b>"};
+    }
+    return {t:"fib",tag:"Fill in the blank",item:it,
+      q:"Finish the name. The ending is the part being tested.",big:fxF(it.parts),
+      blanks:[{pre:ELEMENTS[it.cat].n+" ",post:"",ans:IDE[it.an],w:150,why:"−ide ending"}],
+      ansTxt:it.answer,
+      check:function(vals){
+        const v=normName(vals[0]);
+        if(v===IDE[it.an])return {ok:true};
+        if(v===ELEMENTS[it.an].n.toLowerCase())return {ok:false,diag:mk("noIde",ELEMENTS[it.an].n+" becomes <b>"+IDE[it.an]+"</b>.")};
+        if(lev(v,IDE[it.an])<=2)return {ok:true,soft:mk("spelling","The spelling is “"+IDE[it.an]+"”.")};
+        return {ok:false,diag:mk("noIde","It is “"+IDE[it.an]+"”.")};
+      },
+      why:"The second element always changes its ending to −ide. <b>"+it.answer+"</b>"};
+  }
+  const it=randCov(rng), d=distinct(it.parts);
+  const first=(d[0][1]>1?PREFIX_BY_N[d[0][1]]:""), second=PREFIX_BY_N[d[1][1]];
+  return {t:"fib",tag:"Fill in the blank",item:it,
+    q:"Fill in the missing Greek prefixes.",big:fxF(it.parts),
+    blanks:[{pre:"",post:ELEMENTS[d[0][0]].n.toLowerCase(),ans:first,w:118,why:"prefix on the first element"},
+            {pre:"",post:IDE[d[1][0]],ans:second,w:118,why:"prefix on the second element"}],
+    ansTxt:it.answer,
+    check:function(vals){
+      const a=normName(vals[0]).replace(/-/g,""), b=normName(vals[1]).replace(/-/g,"");
+      const wantA=first, wantB=second;
+      if(a===wantA&&b===wantB)return {ok:true};
+      if(wantA===""&&a==="mono")return {ok:false,diag:mk("monoFirst","There is only 1 "+ELEMENTS[d[0][0]].n.toLowerCase()+", so the first blank stays empty.")};
+      if(a!==wantA){
+        if(PREFIX_BY_P[a])return {ok:false,diag:mk("wrongCount","The subscript on "+d[0][0]+" is "+d[0][1]+", so the first prefix is "+(wantA?"“"+wantA+"”":"nothing at all")+" — you wrote “"+esc(a)+"”, which means "+PREFIX_BY_P[a]+".")};
+        return {ok:false,diag:mk("wrongCount","The subscript on "+d[0][0]+" is "+d[0][1]+", so the first prefix is "+(wantA?"“"+wantA+"”":"nothing at all")+".")};
+      }
+      if(!b)return {ok:false,diag:mk("missMono","The second element always gets a prefix, even when there is only one of it. Here it is “"+wantB+"”.")};
+      return {ok:false,diag:mk("wrongCount","The subscript on "+d[1][0]+" is "+d[1][1]+", so the second prefix is “"+wantB+"”"+(PREFIX_BY_P[b]?" — “"+esc(b)+"” means "+PREFIX_BY_P[b]+".":"."))};
+    },
+    why:"Prefixes are the subscripts, read straight off the formula. Note the finished name runs them together: <b>"+it.answer+"</b>"};
+}
+/* --- criss cross --- */
+function qCriss(rng,rn){
+  const it=randIonic(rng,rn);
+  const neg=Math.abs(AN_BY[it.an].ch), g=gcd(it.ch,neg);
+  return {t:"txt",tag:"Criss-cross",item:it,mono:true,
+    q:"An ion of "+ELEMENTS[it.cat].n.toLowerCase()+" is "+chargeTxt(it.ch)+" and an ion of "+ELEMENTS[it.an].n.toLowerCase()+" is "+chargeTxt(AN_BY[it.an].ch)+". Write the formula of the compound they make.",
+    ph:"formula",ansTxt:plainF(it.parts),
+    check:function(v){return checkFormula(v,it);},
+    why:"Cross the charges down: "+plainF([[it.cat,neg],[it.an,it.ch]])+
+      (g>1?", then divide both subscripts by "+g+" to get <b>"+plainF(it.parts)+"</b>.":". Nothing divides into both, so it stays <b>"+plainF(it.parts)+"</b>.")+
+      " Check: "+it.parts[0][1]+" × "+it.ch+"+ = "+(it.parts[0][1]*it.ch)+"+ and "+it.parts[1][1]+" × "+neg+"− = "+(it.parts[1][1]*neg)+"−, so it is neutral."};
+}
+/* --- roman numeral from formula --- */
+function qRoman(rng){
+  const c=pick(rng,CATIONS.filter(function(x){return x.vari;})), a=pick(rng,ANIONS);
+  const ch=pick(rng,c.ch), parts=ionicFormula(c.s,ch,a.s), d=distinct(parts);
+  const neg=Math.abs(a.ch);
+  const wrongs=[];
+  [1,2,3,4].forEach(function(n){if(n!==ch&&wrongs.length<3)wrongs.push({txt:ELEMENTS[c.s].n+"("+roman(n)+")",tag:"wrongRoman"});});
+  const m=mcOpts(rng,ELEMENTS[c.s].n+"("+roman(ch)+")",wrongs);
+  return {t:"mc",tag:"Roman numerals",
+    q:"How is the metal written in the name of this compound?",big:fxF(parts),
+    opts:m.opts,ans:m.ans,
+    why:"There "+(d[1][1]===1?"is 1 "+IDE[a.s]+" ion":"are "+d[1][1]+" "+IDE[a.s]+" ions")+" at "+neg+"− each, which is "+(d[1][1]*neg)+"− altogether. That charge is spread over "+d[0][1]+" "+ELEMENTS[c.s].n.toLowerCase()+" atom"+(d[0][1]===1?"":"s")+", so each one is "+(d[1][1]*neg)+" ÷ "+d[0][1]+" = "+ch+"+. <b>"+ionicName(c.s,ch,a.s)+"</b>. The Roman numeral is the charge, never the subscript."};
+}
+/* --- prefixes --- */
+function qPrefix(rng){
+  const p=pick(rng,PREFIX);
+  if(rng()<0.5){
+    const wrongs=shuffle(rng,PREFIX.filter(function(x){return x.n!==p.n;})).slice(0,3).map(function(x){return {txt:String(x.n),tag:"wrongCount"};});
+    const m=mcOpts(rng,String(p.n),wrongs);
+    return {t:"mc",tag:"Prefixes",q:"How many atoms does the prefix <b>"+p.p+"−</b> stand for?",opts:m.opts,ans:m.ans,
+      why:p.p+" = "+p.n+". "+p.m};
+  }
+  const wrongs=shuffle(rng,PREFIX.filter(function(x){return x.n!==p.n;})).slice(0,3).map(function(x){return {txt:x.p,tag:"wrongCount"};});
+  const m=mcOpts(rng,p.p,wrongs);
+  return {t:"mc",tag:"Prefixes",q:"Which prefix means <b>"+p.n+"</b>?",opts:m.opts,ans:m.ans,why:p.n+" = "+p.p+". "+p.m};
+}
+/* --- error hunt --- */
+function badName(rng,rn){
+  const kinds=[];
+  const it=rng()<0.55?randIonic(rng,rn):randCov(rng);
+  const d=distinct(it.parts);
+  if(it.kind==="ionic"){
+    const c=CAT_BY[it.cat];
+    kinds.push({tag:"prefixIonic",bad:(d[0][1]>1?PREFIX_BY_N[d[0][1]]:"")+ELEMENTS[it.cat].n.toLowerCase()+(c.vari?"("+roman(it.ch)+")":"")+" "+joinPrefix(PREFIX_BY_N[d[1][1]],IDE[it.an])});
+    kinds.push({tag:"noIde",bad:ELEMENTS[it.cat].n.toLowerCase()+(c.vari?"("+roman(it.ch)+")":"")+" "+ELEMENTS[it.an].n.toLowerCase()});
+    if(c.vari){
+      kinds.push({tag:"noRoman",bad:ELEMENTS[it.cat].n.toLowerCase()+" "+IDE[it.an]});
+      const other=c.ch.filter(function(x){return x!==it.ch;})[0];
+      kinds.push({tag:"wrongRoman",bad:ELEMENTS[it.cat].n.toLowerCase()+"("+roman(other)+") "+IDE[it.an]});
+    }else if(rn){
+      /* only worth asking about once the class has actually met Roman numerals */
+      kinds.push({tag:"romanFixed",bad:ELEMENTS[it.cat].n.toLowerCase()+"("+roman(it.ch)+") "+IDE[it.an]});
+    }
+    kinds.push({tag:"order",bad:IDE[it.an]+" "+ELEMENTS[it.cat].n.toLowerCase()+(c.vari?"("+roman(it.ch)+")":"")});
+  }else{
+    kinds.push({tag:"noPrefix",bad:ELEMENTS[d[0][0]].n.toLowerCase()+" "+IDE[d[1][0]]});
+    kinds.push({tag:"missMono",bad:(d[0][1]>1?PREFIX_BY_N[d[0][1]]:"")+ELEMENTS[d[0][0]].n.toLowerCase()+" "+IDE[d[1][0]]});
+    if(d[0][1]===1)kinds.push({tag:"monoFirst",bad:"mono"+ELEMENTS[d[0][0]].n.toLowerCase()+" "+joinPrefix(PREFIX_BY_N[d[1][1]],IDE[d[1][0]])});
+    const off=d[1][1]===10?9:d[1][1]+1;
+    kinds.push({tag:"wrongCount",bad:(d[0][1]>1?PREFIX_BY_N[d[0][1]]:"")+ELEMENTS[d[0][0]].n.toLowerCase()+" "+joinPrefix(PREFIX_BY_N[off],IDE[d[1][0]])});
+  }
+  const k=pick(rng,kinds);
+  return {it:it,bad:k.bad,tag:k.tag};
+}
+const ERR_LABEL={
+  prefixIonic:"Greek prefixes were used on an ionic compound",
+  noIde:"The second element never got its −ide ending",
+  noRoman:"The Roman numeral is missing",
+  wrongRoman:"The Roman numeral is the wrong charge",
+  romanFixed:"A Roman numeral was added to a metal that never needs one",
+  order:"The two elements are in the wrong order",
+  noPrefix:"The Greek prefixes are missing entirely",
+  missMono:"The second element is missing its prefix",
+  monoFirst:"“Mono” was used on the first element",
+  wrongCount:"A prefix does not match its subscript"
+};
+const ROMAN_TAGS=["noRoman","wrongRoman","romanFixed"];
+function qError(rng,rn){
+  const b=badName(rng,rn);
+  const pool=Object.keys(ERR_LABEL).filter(function(k){
+    return k!==b.tag&&(rn||ROMAN_TAGS.indexOf(k)<0);
+  });
+  const wrongs=shuffle(rng,pool).slice(0,3).map(function(k){return {txt:ERR_LABEL[k],tag:k};});
+  const m=mcOpts(rng,ERR_LABEL[b.tag],wrongs);
+  return {t:"mc",tag:"Error hunt",
+    q:'A student wrote <b style="color:var(--red)">"'+esc(cap(b.bad))+'"</b> for this formula. What went wrong?',
+    big:fxF(b.it.parts),opts:m.opts,ans:m.ans,
+    why:MISTAKES[b.tag].fix+" The correct name is <b>"+b.it.answer+"</b>."};
+}
+
+/* --- set assembly --- */
+const SET_PLAN={
+  mix:["cls","f2n_i","n2f_i","f2n_c","n2f_c","fib","criss","prefix","err","cls","f2n_c","n2f_i"],
+  cls:["cls"],
+  ion:["f2n_i","n2f_i","criss","fib_i","roman"],
+  cov:["f2n_c","n2f_c","prefix","fib_c"],
+  f2n:["f2n_i","f2n_c"],
+  n2f:["n2f_i","n2f_c"],
+  fib:["fib"],
+  err:["err"]
+};
+function buildOne(kind,rng,rn){
+  switch(kind){
+    case "cls":   return qClassify(rng,rn);
+    case "f2n_i": return qF2N(rng,rn,"ion");
+    case "f2n_c": return qF2N(rng,rn,"cov");
+    case "n2f_i": return qN2F(rng,rn,"ion");
+    case "n2f_c": return qN2F(rng,rn,"cov");
+    case "fib":   return qFIB(rng,rn);
+    case "fib_i": return qFIB(rng,rn,"ion");
+    case "fib_c": return qFIB(rng,rn,"cov");
+    case "criss": return qCriss(rng,rn);
+    case "roman": return qRoman(rng);
+    case "prefix":return qPrefix(rng);
+    case "err":   return qError(rng,rn);
+  }
+  return qClassify(rng,rn);
+}
+function buildSet(setId,rng,rn){
+  let plan=SET_PLAN[setId]||SET_PLAN.mix;
+  if(setId==="ion"&&!rn)plan=plan.filter(function(k){return k!=="roman";});
+  const out=[];
+  for(let i=0;i<12;i++)out.push(buildOne(plan[i%plan.length],rng,rn));
+  return out;
+}
+
+/* ============================================================
+   PRACTICE UI
+   ============================================================ */
+let PU=null,PSET="mix",PROMAN=false,QS=[],ASG=null;
+function ukey(){return PU.name.trim().toUpperCase()+"|"+PSET+"|"+(PROMAN?"r":"n")+(ASG?"|A":"");}
+function urec(){
+  const k=ukey();
+  if(!DB.users[k])DB.users[k]={res:[],diag:[],set:0};
+  const r=DB.users[k];
+  if(!r.res)r.res=[];
+  if(!r.diag)r.diag=[];
+  if(typeof r.set!=="number")r.set=0;
+  return r;
+}
+function buildQuestions(){
+  const r=urec();
+  const rng=mulberry32(hashStr(PU.name.trim().toUpperCase()+"|"+PSET+"|"+(PROMAN?"r":"n")+"|"+r.set));
+  QS=buildSet(PSET,rng,PROMAN);
+  if(r.res.length!==QS.length){r.res=new Array(QS.length).fill(null);r.diag=new Array(QS.length).fill(null);}
+  save();
+}
+function pScore(){
+  const r=urec();
+  let got=0,done=0;
+  r.res.forEach(function(v){if(v===1)got++; if(v!==null)done++;});
+  return {got:got,done:done,total:QS.length};
+}
+function pCodeNow(){
+  const sc=pScore();
+  if(ASG)return encAsg(PU.last||"",PU.first||"",PU.period||"0",PSET,PROMAN,sc.got,sc.total);
+  return encPractice(PU.name,PSET,PROMAN,sc.got,sc.total);
+}
+function renderPractice(){
+  const r=urec(), host=$("qArea");
+  host.innerHTML="";
+  QS.forEach(function(q,i){
+    const row=document.createElement("div");
+    row.className="qrow";
+    let h='<div class="qtext"><span class="qn">'+(i+1)+'.</span>'+q.q+'<span class="qtag">'+q.tag+'</span></div>';
+    if(q.big)h+='<div class="big">'+q.big+'</div>';
+    if(q.t==="mc"){
+      h+=q.opts.map(function(o,j){return '<button class="mcopt" data-i="'+i+'" data-j="'+j+'">'+esc(o.txt)+'</button>';}).join("");
+    }else if(q.t==="txt"){
+      h+='<div class="numrow"><input type="text" data-i="'+i+'" placeholder="'+esc(q.ph||"answer")+'" autocomplete="off" spellcheck="false"'+
+         (q.mono?' style="font-family:Consolas,monospace"':'')+'> '+
+         '<button class="btn small" data-check="'+i+'">Check</button><span class="mark" id="mk'+i+'"></span></div>';
+    }else{
+      h+='<div class="blankrow">';
+      q.blanks.forEach(function(b,j){
+        h+=esc(b.pre)+'<input type="text" data-i="'+i+'" data-b="'+j+'" style="width:'+b.w+'px" autocomplete="off" spellcheck="false">'+esc(b.post)+' ';
+      });
+      h+='<button class="btn small" data-check="'+i+'">Check</button><span class="mark" id="mk'+i+'"></span></div>';
+    }
+    h+='<div class="diag" id="dg'+i+'"></div>';
+    h+='<div class="why" id="why'+i+'">'+q.why+'</div>';
+    row.innerHTML=h;
+    host.appendChild(row);
+    if(r.res[i]!==null)lockRow(i);
+  });
+  updatePBar();
+}
+function lockRow(i){
+  const q=QS[i], r=urec(), row=$("qArea").children[i];
+  if(!row)return;
+  $("why"+i).style.display="block";
+  row.classList.toggle("right",r.res[i]===1);
+  row.classList.toggle("miss",r.res[i]===0);
+  if(q.t==="mc"){
+    row.querySelectorAll(".mcopt").forEach(function(b,j){
+      if(j===q.ans)b.classList.add("right");
+    });
+  }else{
+    const mk2=$("mk"+i);
+    if(mk2)mk2.innerHTML=(r.res[i]===1?'<span style="color:var(--green)">correct</span>'
+                                      :'<span style="color:var(--red)">answer: '+esc(q.ansTxt)+'</span>');
+    row.querySelectorAll("input").forEach(function(x){x.disabled=true;});
+    const cb=row.querySelector("[data-check]"); if(cb)cb.disabled=true;
+  }
+}
+function showDiag(i,d){
+  const el=$("dg"+i);
+  if(!d){el.style.display="none";return;}
+  el.innerHTML='<span class="dh">'+d.h+'</span>'+(d.extra?d.extra+" ":"")+'<span class="fix">Fix it: '+d.fix+'</span>';
+  el.style.display="block";
+}
+function answerQ(i,correct,diag){
+  const r=urec();
+  if(r.res[i]===null){
+    r.res[i]=correct?1:0;
+    /* only a genuine miss goes into the study report — a soft note does not */
+    r.diag[i]=(!correct&&diag)?diag.tag:null;
+    save();
+  }
+  showDiag(i,diag);
+  lockRow(i); updatePBar();
+}
+function updatePBar(){
+  const sc=pScore();
+  $("pFill").style.width=(sc.total?Math.round(sc.done/sc.total*100):0)+"%";
+  $("pScoreTxt").textContent=sc.done+" of "+sc.total+" answered · "+sc.got+" correct ("+
+    (sc.total?Math.round(sc.got/sc.total*100):0)+"%)";
+  $("pCode").textContent=pCodeNow();
+  const done=sc.done===sc.total&&sc.total>0;
+  $("pDone").style.display=done?"block":"none";
+  if(done){
+    $("pDoneMsg").textContent="You scored "+sc.got+" out of "+sc.total+" ("+Math.round(sc.got/sc.total*100)+"%). Copy the code above and turn it in.";
+    buildReport();
+  }else{
+    $("pReport").style.display="none";
+  }
+}
+function buildReport(){
+  const r=urec(), counts={};
+  r.diag.forEach(function(t){if(t)counts[t]=(counts[t]||0)+1;});
+  const keys=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];});
+  if(!keys.length){
+    $("pReportBody").innerHTML='<div class="rpt" style="border-left-color:var(--green)">Nothing to fix. You did not repeat a single naming mistake on this set.</div>';
+  }else{
+    $("pReportBody").innerHTML=keys.map(function(k){
+      return '<div class="rpt"><b>'+MISTAKES[k].st+'</b> — missed '+counts[k]+' time'+(counts[k]===1?"":"s")+'.<br>'+MISTAKES[k].fix+'</div>';
+    }).join("");
+  }
+  $("pReport").style.display="block";
+}
+function startPractice(){
+  $("pGate").style.display="none"; $("pMain").style.display="block";
+  $("pWho").textContent=PU.name;
+  $("pSetTxt").textContent=setName(PSET)+(PROMAN?" · Roman numerals on":" · main-group metals only")+
+    (ASG?" · assigned by your teacher · "+periodLabel(PU.period):"");
+  $("pNewSet").style.display=ASG?"none":"inline-block";
+  buildQuestions(); renderPractice();
+}
+
+/* ============================================================
+   FLASH CARDS
+   ============================================================ */
+let FCI=0,FCDIR="p2n",FCORDER=PREFIX.map(function(_,i){return i;});
+function fcShuffleNow(){
+  if($("fcShuffle").checked){
+    const a=FCORDER.slice();
+    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}
+    FCORDER=a;
+  }else{
+    FCORDER=PREFIX.map(function(_,i){return i;});
+  }
+  FCI=0; fcRender();
+}
+function fcRender(){
+  const p=PREFIX[FCORDER[FCI]];
+  $("fcCard").classList.remove("flip");
+  const f=$("fcFront"),b=$("fcBack");
+  if(FCDIR==="p2n"){
+    f.querySelector(".m").textContent=p.p+"−";
+    f.querySelector(".s").textContent="how many atoms?";
+    b.querySelector(".m").textContent=String(p.n);
+    b.querySelector(".s").innerHTML=p.m;
+  }else{
+    f.querySelector(".m").textContent=String(p.n);
+    f.querySelector(".s").textContent="which prefix?";
+    b.querySelector(".m").textContent=p.p+"−";
+    b.querySelector(".s").innerHTML=p.m;
+  }
+  $("fcProg").textContent="Card "+(FCI+1)+" of "+PREFIX.length;
+}
+
+/* ============================================================
+   SPEED DRILL
+   ============================================================ */
+let SDMODE="cls",SDT=null,SDLEFT=60,SDGot=0,SDMiss=0,SDCur=null,SDON=false;
+function sdRand(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function sdMake(){
+  const rng=Math.random;
+  if(SDMODE==="pre"){
+    const p=sdRand(PREFIX);
+    const wrong=[];
+    while(wrong.length<3){const x=sdRand(PREFIX); if(x.n!==p.n&&wrong.indexOf(String(x.n))<0)wrong.push(String(x.n));}
+    return {big:p.p+"−",opts:sdShuf([String(p.n)].concat(wrong)),ans:String(p.n),why:p.p+" = "+p.n};
+  }
+  if(SDMODE==="nam"){
+    const it=Math.random()<0.5?randIonic(rng,ROMAN_ON):randCov(rng);
+    const pool=[];
+    while(pool.length<3){
+      const o=Math.random()<0.5?randIonic(rng,ROMAN_ON):randCov(rng);
+      if(o.answer!==it.answer&&pool.indexOf(o.answer)<0)pool.push(o.answer);
+    }
+    return {big:it.f,opts:sdShuf([it.answer].concat(pool)),ans:it.answer,why:it.f+" is "+it.answer};
+  }
+  const roll=Math.random();
+  let big,ans;
+  if(roll<0.45){const it=randIonic(rng,ROMAN_ON);big=it.f;ans="Ionic";}
+  else if(roll<0.9){const it=randCov(rng);big=it.f;ans="Covalent";}
+  else{const d=sdRand(DIATOMIC);big=d.f;ans="Neither";}
+  return {big:big,opts:["Ionic","Covalent","Neither"],ans:ans,why:big+" is "+ans.toLowerCase()};
+}
+function sdShuf(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=b[i];b[i]=b[j];b[j]=t;}return b;}
+function sdNext(){
+  SDCur=sdMake();
+  $("sdBig").innerHTML=SDMODE==="pre"?esc(SDCur.big):(SDMODE==="nam"||SDMODE==="cls"?fxF(parseFormula(SDCur.big).parts||[[SDCur.big,1]]):esc(SDCur.big));
+  $("sdOpts").innerHTML=SDCur.opts.map(function(o,i){return '<button data-o="'+i+'">'+esc(o)+'</button>';}).join("");
+}
+function sdStats(){
+  $("sdStats").innerHTML=
+    '<div><div class="k">Time</div><div class="v" style="color:var(--accent)">'+Math.max(0,Math.ceil(SDLEFT))+'</div></div>'+
+    '<div><div class="k">Right</div><div class="v" style="color:var(--green)">'+SDGot+'</div></div>'+
+    '<div><div class="k">Wrong</div><div class="v" style="color:var(--red)">'+SDMiss+'</div></div>';
+  $("sdFill").style.width=Math.max(0,SDLEFT/60*100)+"%";
+}
+function sdStart(){
+  if(SDON)return;
+  SDON=true;SDLEFT=60;SDGot=0;SDMiss=0;
+  $("sdStart").disabled=true;$("sdStart").textContent="Go!";
+  sdNext();sdStats();
+  SDT=setInterval(function(){
+    SDLEFT-=0.1;
+    if(SDLEFT<=0)sdEnd(); else sdStats();
+  },100);
+}
+function sdEnd(){
+  clearInterval(SDT);SDON=false;SDLEFT=0;sdStats();
+  $("sdStart").disabled=false;$("sdStart").textContent="Go again";
+  $("sdBig").textContent="Time!";
+  $("sdOpts").innerHTML="";
+  const key="sd_"+SDMODE;
+  const prev=DB.best[key]||0;
+  if(SDGot>prev){DB.best[key]=SDGot;save();
+    $("sdBest").innerHTML='<b style="color:var(--gold)">New best: '+SDGot+' right.</b>';}
+  else $("sdBest").innerHTML='You got '+SDGot+' right. Your best on this drill is '+prev+'.';
+}
+function sdAnswer(i){
+  if(!SDON||!SDCur)return;
+  const btns=$("sdOpts").querySelectorAll("button");
+  const chosen=SDCur.opts[i];
+  if(chosen===SDCur.ans){SDGot++;btns[i].classList.add("right");}
+  else{SDMiss++;SDLEFT-=2;btns[i].classList.add("wrong");
+    btns.forEach(function(b,j){if(SDCur.opts[j]===SDCur.ans)b.classList.add("right");});}
+  sdStats();
+  setTimeout(function(){if(SDON)sdNext();},chosen===SDCur.ans?120:650);
+}
+
+/* ============================================================
+   REFERENCE
+   ============================================================ */
+function fillRef(){
+  $("refRules").innerHTML=[
+    ["1. Classify first, every time.","Count the elements. Exactly two? Good. Is one of them a metal? Then it is ionic. Are both nonmetals (a metalloid counts as a nonmetal here)? Then it is covalent. Everything after this depends on getting this right."],
+    ["2. First element keeps its name.","Metal or not, the element written first is called by its ordinary name. No prefix on it if there is only one."],
+    ["3. Second element ends in −ide.","Chlorine → chloride. Oxygen → oxide. Nitrogen → nitride. This is true for ionic and covalent both."],
+    ["4. Then, and only then, add the counting.","Ionic: no prefixes — but add a Roman numeral if the metal has more than one possible charge. Covalent: a Greek prefix on every element, except a single first one."]
+  ].map(function(r){
+    return '<div style="background:#0c1626;border-radius:10px;padding:11px 14px;margin:7px 0;line-height:1.5"><b style="color:var(--accent)">'+r[0]+'</b><br>'+r[1]+'</div>';
+  }).join("");
+
+  $("refPrefix").innerHTML='<table class="rtable"><tr><th>Number</th><th>Prefix</th><th>With "oxide"</th><th>How to remember it</th></tr>'+
+    PREFIX.map(function(p){
+      return '<tr><td class="c">'+p.n+'</td><td><b>'+p.p+'−</b></td><td>'+joinPrefix(p.p,"oxide")+'</td><td class="dim">'+p.m+'</td></tr>';
+    }).join("")+'</table>'+
+    '<div style="margin-top:10px;background:#0c1626;border-radius:10px;padding:11px 14px;line-height:1.5">'+
+    'Watch the vowel. A prefix ending in <b>a</b> or <b>o</b> drops it in front of "oxide" — pent<b>oxide</b>, not penta-oxide. "Di" and "tri" end in i, so they keep it: dioxide, trioxide.</div>';
+
+  const gr=[[1,"1+","Li, Na, K, Rb, Cs"],[2,"2+","Be, Mg, Ca, Sr, Ba"],[13,"3+","Al, Ga"],
+            [15,"3−","N, P"],[16,"2−","O, S, Se"],[17,"1−","F, Cl, Br, I"],[18,"0","He, Ne, Ar — they do not bond"]];
+  $("refCharge").innerHTML='<table class="rtable"><tr><th>Group</th><th>Charge</th><th>Elements</th></tr>'+
+    gr.map(function(g){return '<tr><td class="c">'+g[0]+'</td><td class="c"><b>'+g[1]+'</b></td><td>'+g[2]+'</td></tr>';}).join("")+
+    '</table><div style="margin-top:10px;background:#0c1626;border-radius:10px;padding:11px 14px;line-height:1.5">'+
+    'Groups 1, 2 and 13 give electrons away, so they go positive. Groups 15, 16 and 17 take electrons, so they go negative. Group 14 sits in the middle and mostly shares, which is why carbon and silicon show up in covalent compounds instead.</div>';
+
+  const vari=CATIONS.filter(function(c){return c.vari;});
+  const fixedTM=CATIONS.filter(function(c){return c.fixedTM;});
+  $("refRoman").innerHTML='<table class="rtable"><tr><th>Metal</th><th>Charges it can take</th><th>Example</th></tr>'+
+    vari.map(function(c){
+      const ch=c.ch[c.ch.length-1];
+      return '<tr><td><b>'+ELEMENTS[c.s].n+'</b> ('+c.s+')</td><td>'+c.ch.map(function(x){return x+"+";}).join(", ")+
+             '</td><td>'+plainF(ionicFormula(c.s,ch,"O"))+' = '+ionicName(c.s,ch,"O")+'</td></tr>';
+    }).join("")+'</table>'+
+    '<div style="margin-top:12px;background:#0c1626;border-radius:10px;padding:11px 14px;line-height:1.5">'+
+    '<b style="color:var(--gold)">These four are in the middle block and still never take a Roman numeral:</b> '+
+    fixedTM.map(function(c){return ELEMENTS[c.s].n+" is always "+c.ch[0]+"+";}).join(" · ")+
+    '. Adding one to zinc chloride is a common way to lose a point.</div>';
+
+  $("refIde").innerHTML='<table class="rtable"><tr><th>Element</th><th>Becomes</th><th>Element</th><th>Becomes</th></tr>'+
+    (function(){
+      const list=["F","Cl","Br","I","O","S","Se","N","P","C","Te","As"];
+      let h="";
+      for(let i=0;i<list.length;i+=2){
+        h+='<tr><td>'+ELEMENTS[list[i]].n+'</td><td><b>'+IDE[list[i]]+'</b></td>'+
+           (list[i+1]?'<td>'+ELEMENTS[list[i+1]].n+'</td><td><b>'+IDE[list[i+1]]+'</b></td>':'<td></td><td></td>')+'</tr>';
+      }
+      return h;
+    })()+'</table>';
+
+  const traps=["prefixIonic","noRoman","romanFixed","missMono","monoFirst","noReduce","crossBack","romanSub","noIde"];
+  $("refTraps").innerHTML=traps.map(function(t){
+    return '<div style="background:#0c1626;border-left:4px solid var(--red);border-radius:10px;padding:11px 14px;margin:7px 0;line-height:1.5">'+
+      '<b style="color:var(--red)">'+MISTAKES[t].h+'</b><br>'+MISTAKES[t].fix+'</div>';
+  }).join("");
+}
+
+/* ============================================================
+   PRINT SHEETS
+   ============================================================ */
+const SHEETS=[
+  {id:"chart",t:"Naming flow chart + rules",d:"One page for the binder: the decision chart, both rule boxes, the prefix table, and the charges you can read off the periodic table. No writing on it — this is the page they keep open while they work.",key:false},
+  {id:"classify",t:"Classify and name",d:"Twelve compounds. Ionic or covalent, then the name. The core practice sheet, mixed on purpose so they have to decide before they write.",key:true},
+  {id:"criss",t:"Criss-cross — write the formula",d:"Ten names to turn into formulas, with a worked example at the top and a charge-balance check column. This is where reducing gets practiced.",key:true},
+  {id:"prefix",t:"Greek prefixes and covalent naming",d:"Prefix recall, formula to name, and name to formula for covalent compounds. Includes the mono / tetroxide traps.",key:true},
+  {id:"roman",t:"Transition metals and Roman numerals",d:"Work the charge out from the nonmetal, both directions, plus the four transition metals that never take a numeral.",key:true}
+];
+const P_CLASSIFY=["MgF2","CO2","AlBr3","N2O4","K2S","SF6","CaO","PCl5","Li3N","SiO2","ZnCl2","Cl2O7"];
+const P_CRISS=[["Na",1,"O"],["Ca",2,"Cl"],["Al",3,"S"],["Mg",2,"N"],["K",1,"P"],
+               ["Ba",2,"Br"],["Li",1,"O"],["Al",3,"O"],["Sr",2,"I"],["Ga",3,"Se"]];
+const P_COV=["CO","N2O5","SF4","P4O10","CCl4","Cl2O","IF7","SO3","N2O3","PBr5"];
+const P_ROMAN=[["Fe",3,"Cl"],["Cu",2,"O"],["Sn",4,"O"],["Cr",3,"O"],["Pb",2,"S"],
+               ["Co",2,"Br"],["Mn",3,"O"],["Au",3,"Cl"],["Ni",2,"F"],["Cu",1,"S"]];
+function pFoot(){return '<div class="foot">tobinscience.com</div>';}
+function pHead(title,sub,name){
+  return '<h1>'+title+'</h1><div class="sub">'+sub+'</div>'+
+    (name!==false?'<div class="nameline">Name: ______________________________&nbsp;&nbsp;&nbsp;&nbsp;Period: ______&nbsp;&nbsp;&nbsp;&nbsp;Date: ______________</div>':'');
+}
+function pf(parts){return parts.map(function(p){return p[0]+(p[1]>1?"<sub>"+p[1]+"</sub>":"");}).join("");}
+function sheetHTML(id,key){
+  let h='<div class="psheet">';
+  if(id==="chart"){
+    h+=pHead("Naming Binary Compounds","Two elements only — ionic and covalent. Keep this page open while you work.",false);
+    h+='<div class="fchart"><span class="lvl" style="text-align:center;font-weight:700">WHAT IS IT MADE OF?</span>'+
+       '<div class="two" style="gap:10px">'+
+       '<div><div class="arw">&darr;</div><span class="lvl" style="text-align:center">METAL + NONMETAL &rarr; <b>IONIC</b></span>'+
+       '<div class="rule"><b>No prefixes, ever.</b><br>1. Write the metal name.<br>2. If it is a transition metal with more than one charge, add the charge in Roman numerals: Iron(III).<br>3. Write the nonmetal with an <b>&minus;ide</b> ending.<br><br><b>Example:</b> MgCl<sub>2</sub> &rarr; magnesium chlor<b>ide</b><br>FeCl<sub>3</sub> &rarr; 3 chlorides = 3&minus;, on 1 iron &rarr; Iron(III) chloride<br><br><b>Never:</b> "magnesium dichloride"</div></div>'+
+       '<div><div class="arw">&darr;</div><span class="lvl" style="text-align:center">TWO NONMETALS &rarr; <b>COVALENT</b></span>'+
+       '<div class="rule"><b>Greek prefixes on both.</b><br>1. Prefix + first element name. <b>Never "mono" on the first.</b><br>2. Prefix + second element with an <b>&minus;ide</b> ending. <b>Always</b> a prefix here, even mono.<br>3. Never reduce a covalent formula.<br><br><b>Example:</b> N<sub>2</sub>O<sub>4</sub> &rarr; <b>di</b>nitrogen <b>tetr</b>oxide<br>CO &rarr; carbon <b>mon</b>oxide<br><br><b>Never:</b> "nitrogen oxide"</div></div>'+
+       '</div></div>';
+    h+='<div class="two" style="margin-top:8px">'+
+       '<div class="box"><h3>Greek prefixes</h3><table><tr><th>#</th><th>Prefix</th><th>#</th><th>Prefix</th></tr>'+
+       (function(){let s="";for(let i=0;i<5;i++){s+='<tr><td class="c">'+PREFIX[i].n+'</td><td>'+PREFIX[i].p+'&minus;</td><td class="c">'+PREFIX[i+5].n+'</td><td>'+PREFIX[i+5].p+'&minus;</td></tr>';}return s;})()+
+       '</table><div style="margin-top:4px;font-size:8.5pt">A prefix ending in <b>a</b> or <b>o</b> drops it before "oxide": pent<b>oxide</b>, tetr<b>oxide</b>, mon<b>oxide</b>. Di and tri keep it.</div></div>'+
+       '<div class="box"><h3>Charges from the group number</h3><table><tr><th>Group</th><th>Charge</th><th>Group</th><th>Charge</th></tr>'+
+       '<tr><td class="c">1</td><td class="c">1+</td><td class="c">15</td><td class="c">3&minus;</td></tr>'+
+       '<tr><td class="c">2</td><td class="c">2+</td><td class="c">16</td><td class="c">2&minus;</td></tr>'+
+       '<tr><td class="c">13</td><td class="c">3+</td><td class="c">17</td><td class="c">1&minus;</td></tr></table>'+
+       '<h3 style="margin-top:6px">&minus;ide endings</h3><div style="font-size:9pt">fluorine&rarr;fluoride · chlorine&rarr;chloride · bromine&rarr;bromide · iodine&rarr;iodide · oxygen&rarr;oxide · sulfur&rarr;sulfide · nitrogen&rarr;nitride · phosphorus&rarr;phosphide</div>'+
+       '<h3 style="margin-top:6px">No Roman numeral needed</h3><div style="font-size:9pt">Zinc is always 2+ · Silver is always 1+ · Cadmium is always 2+ · Scandium is always 3+. Every group 1, 2 and 13 metal has one fixed charge too.</div></div>'+
+       '</div>';
+    h+='<div class="rule" style="margin-top:8px"><b>Three or more different elements?</b> That is a polyatomic compound and it needs the polyatomic ion chart. Not part of this course — everything here has exactly two elements.</div>';
+    h+=pFoot();
+  }
+  else if(id==="classify"){
+    h+=(key?'<div class="keytag">ANSWER KEY</div>':"")+
+       pHead("Classify and Name","Decide ionic or covalent first, then write the name. Ionic gets no prefixes. Covalent gets prefixes on both.",key?false:true);
+    h+='<table><tr><th style="width:16%">Formula</th><th style="width:24%">Ionic or covalent?</th><th style="width:26%">Why — what are the two elements?</th><th>Name</th></tr>';
+    P_CLASSIFY.forEach(function(f){
+      const parts=parseFormula(f).parts, kind=classify(parts), d=distinct(parts);
+      const r=nameFromFormula(f);
+      if(key){
+        h+='<tr><td>'+pf(parts)+'</td><td>'+cap(kind)+'</td><td>'+
+           d.map(function(x){return ELEMENTS[x[0]].n+" ("+(ELEMENTS[x[0]].type==="m"?"metal":ELEMENTS[x[0]].type==="d"?"metalloid":"nonmetal")+")";}).join(" + ")+
+           '</td><td>'+cap(r.answer)+'</td></tr>';
+      }else{
+        h+='<tr><td>'+pf(parts)+'</td><td></td><td></td><td></td></tr>';
+      }
+    });
+    h+='</table>';
+    if(!key)h+='<ol><li>Two of the twelve above have a <b>metalloid</b> in them. Find them, and explain which set of rules you used and why. <span class="wl" style="min-width:230px"></span></li>'+
+      '<li>One of them has a transition metal that does <b>not</b> take a Roman numeral. Which one, and how were you supposed to know? <span class="wl" style="min-width:200px"></span></li>'+
+      '<li>Why would "dipotassium sulfide" be marked wrong? <span class="wl" style="min-width:290px"></span></li></ol>';
+    else h+='<ol><li>SiO<sub>2</sub> (silicon) and none other on this list — silicon is a metalloid, and paired with a nonmetal it follows the covalent rules. Accept students who also flag that no metalloid here is bonded to a metal.</li>'+
+      '<li>ZnCl<sub>2</sub>. Zinc is a transition metal but it only ever forms a 2+ ion, so there is no second possibility to specify. Silver, cadmium and scandium behave the same way.</li>'+
+      '<li>K<sub>2</sub>S is ionic — a metal with a nonmetal — and ionic names never take Greek prefixes. It is potassium sulfide.</li></ol>';
+    h+=pFoot();
+  }
+  else if(id==="criss"){
+    h+=(key?'<div class="keytag">ANSWER KEY</div>':"")+
+       pHead("Criss-Cross — Write the Formula","Charges cross down and become subscripts. Then reduce. Then check that the charges cancel.",key?false:true);
+    if(!key)h+='<div class="rule"><b>Worked example — aluminum oxide.</b> Aluminum is in group 13, so it is 3+. Oxygen is in group 16, so it is 2&minus;. Cross them: the 3 goes down onto the O, the 2 goes down onto the Al &rarr; Al<sub>2</sub>O<sub>3</sub>. Nothing divides into both 2 and 3, so it stays. Check: 2 &times; 3+ = 6+ and 3 &times; 2&minus; = 6&minus;. They cancel.</div>';
+    h+='<table><tr><th style="width:26%">Name</th><th style="width:11%">Metal charge</th><th style="width:13%">Nonmetal charge</th><th style="width:16%">After crossing</th><th style="width:14%">Reduced?</th><th>Final formula</th></tr>';
+    P_CRISS.forEach(function(row){
+      const cat=row[0],ch=row[1],an=row[2];
+      const neg=Math.abs(AN_BY[an].ch), g=gcd(ch,neg);
+      const cross=[[cat,neg],[an,ch]], fin=ionicFormula(cat,ch,an);
+      if(key){
+        h+='<tr><td>'+ionicName(cat,ch,an)+'</td><td class="c">'+ch+'+</td><td class="c">'+neg+'&minus;</td><td class="c">'+pf(cross)+'</td><td class="c">'+(g>1?"&divide; "+g:"no")+'</td><td class="c"><b>'+pf(fin)+'</b></td></tr>';
+      }else{
+        h+='<tr><td>'+ionicName(cat,ch,an)+'</td><td></td><td></td><td></td><td></td><td></td></tr>';
+      }
+    });
+    h+='</table>';
+    if(!key)h+='<ol><li>Three rows above needed reducing. Pick one and explain, in a sentence, why the un-reduced version is wrong. <span class="wl" style="min-width:250px"></span></li>'+
+      '<li>Covalent formulas are <b>never</b> reduced — N<sub>2</sub>O<sub>4</sub> stays N<sub>2</sub>O<sub>4</sub>. Why does that rule apply to covalent but not ionic? <span class="wl" style="min-width:200px"></span></li>'+
+      '<li>Write the formula for an imaginary metal X that forms X<sup>2+</sup> combined with nitrogen. <span class="wl" style="min-width:120px"></span></li></ol>';
+    else h+='<ol><li>Any of Na<sub>2</sub>O, Li<sub>2</sub>O, Mg<sub>3</sub>N<sub>2</sub> (crossing gives Na<sub>2</sub>O<sub>2</sub>, Li<sub>2</sub>O<sub>2</sub>, Mg<sub>6</sub>N<sub>6</sub>... check student work). An ionic compound is a repeating lattice, not a molecule, so the formula only reports the simplest whole-number ratio. Na<sub>2</sub>O<sub>2</sub> would be a different substance — sodium peroxide.</li>'+
+      '<li>A covalent formula counts the atoms in one actual molecule, so the numbers are real counts, not a ratio. N<sub>2</sub>O<sub>4</sub> and NO<sub>2</sub> are two different molecules.</li>'+
+      '<li>X<sub>3</sub>N<sub>2</sub>. Nitrogen is 3&minus;, so cross: 3 onto X, 2 onto N.</li></ol>';
+    h+=pFoot();
+  }
+  else if(id==="prefix"){
+    h+=(key?'<div class="keytag">ANSWER KEY</div>':"")+
+       pHead("Greek Prefixes and Covalent Naming","Two nonmetals. Prefixes on both — and never mono on the first.",key?false:true);
+    h+='<div class="two"><div class="box"><h3>Write the number each prefix means</h3><table>'+
+       (function(){
+         let s='<tr><th>Prefix</th><th>#</th><th>Prefix</th><th>#</th></tr>';
+         const o=[4,7,1,8,3,9,0,5,2,6];
+         for(let i=0;i<5;i++){
+           const a=PREFIX[o[i]],b=PREFIX[o[i+5]];
+           s+='<tr><td>'+a.p+'&minus;</td><td class="c">'+(key?a.n:"")+'</td><td>'+b.p+'&minus;</td><td class="c">'+(key?b.n:"")+'</td></tr>';
+         }
+         return s;
+       })()+'</table></div>'+
+       '<div class="box"><h3>Write the prefix for each number</h3><table><tr><th>#</th><th>Prefix</th><th>#</th><th>Prefix</th></tr>'+
+       (function(){
+         let s="";const o=[6,2,9,5,0,3,8,1,7,4];
+         for(let i=0;i<5;i++){
+           const a=PREFIX[o[i]],b=PREFIX[o[i+5]];
+           s+='<tr><td class="c">'+a.n+'</td><td>'+(key?a.p+"&minus;":"")+'</td><td class="c">'+b.n+'</td><td>'+(key?b.p+"&minus;":"")+'</td></tr>';
+         }
+         return s;
+       })()+'</table></div></div>';
+    h+='<h2>Formula &rarr; name</h2><table><tr><th style="width:20%">Formula</th><th>Name</th><th style="width:20%">Formula</th><th>Name</th></tr>';
+    for(let i=0;i<P_COV.length;i+=2){
+      const a=parseFormula(P_COV[i]).parts, b=parseFormula(P_COV[i+1]).parts;
+      h+='<tr><td>'+pf(a)+'</td><td>'+(key?cap(covalentName(a)):"")+'</td><td>'+pf(b)+'</td><td>'+(key?cap(covalentName(b)):"")+'</td></tr>';
+    }
+    h+='</table>';
+    h+='<h2>Name &rarr; formula</h2><table><tr><th>Name</th><th style="width:17%">Formula</th><th>Name</th><th style="width:17%">Formula</th></tr>';
+    const n2f=["disulfur dichloride","carbon tetrabromide","tetraphosphorus hexoxide","xenon hexafluoride",
+               "diiodine pentoxide","boron trifluoride","oxygen difluoride","selenium trioxide"];
+    for(let i=0;i<n2f.length;i+=2){
+      const a=formulaFromName(n2f[i]), b=formulaFromName(n2f[i+1]);
+      h+='<tr><td>'+cap(n2f[i])+'</td><td class="c">'+(key?pf(a.parts):"")+'</td><td>'+cap(n2f[i+1])+'</td><td class="c">'+(key?pf(b.parts):"")+'</td></tr>';
+    }
+    h+='</table>';
+    if(!key)h+='<ol><li>Why is CO called carbon <b>mon</b>oxide and not just "carbon oxide"? <span class="wl" style="min-width:270px"></span></li>'+
+      '<li>Why is it never "<b>mono</b>carbon dioxide"? <span class="wl" style="min-width:290px"></span></li>'+
+      '<li>Explain the spelling of "pentoxide" — where did the a go? <span class="wl" style="min-width:250px"></span></li></ol>';
+    else h+='<ol><li>Because CO<sub>2</sub>, C<sub>3</sub>O<sub>2</sub> and others exist. Without the prefix the name does not say how many oxygens, and carbon monoxide and carbon dioxide are very different substances. The second element always takes a prefix for exactly this reason.</li>'+
+      '<li>Mono is never used on the first element. If there is only one, the bare element name already says so.</li>'+
+      '<li>Penta ends in a, and oxide starts with o. The final vowel of the prefix is dropped in front of "oxide" so the word is sayable: penta + oxide &rarr; pentoxide. Same for mono&rarr;monoxide and tetra&rarr;tetroxide.</li></ol>';
+    h+=pFoot();
+  }
+  else if(id==="roman"){
+    h+=(key?'<div class="keytag">ANSWER KEY</div>':"")+
+       pHead("Transition Metals and Roman Numerals","The Roman numeral is the charge on the metal — not how many of them there are.",key?false:true);
+    if(!key)h+='<div class="rule"><b>How to find it.</b> Add up the total negative charge on the nonmetal side, then divide it evenly across the metal atoms. In Fe<sub>2</sub>O<sub>3</sub>: 3 oxides &times; 2&minus; = 6&minus;, spread over 2 irons, so each iron is 3+ &rarr; <b>Iron(III) oxide</b>.</div>';
+    h+='<h2>Formula &rarr; name</h2><table><tr><th style="width:15%">Formula</th><th style="width:20%">Total negative charge</th><th style="width:17%">Metal charge</th><th>Name</th></tr>';
+    P_ROMAN.forEach(function(r){
+      const cat=r[0],ch=r[1],an=r[2];
+      const parts=ionicFormula(cat,ch,an), d=distinct(parts), neg=Math.abs(AN_BY[an].ch);
+      if(key)h+='<tr><td>'+pf(parts)+'</td><td class="c">'+d[1][1]+' &times; '+neg+'&minus; = '+(d[1][1]*neg)+'&minus;</td><td class="c">'+(d[1][1]*neg)+' &divide; '+d[0][1]+' = '+ch+'+</td><td><b>'+ionicName(cat,ch,an)+'</b></td></tr>';
+      else h+='<tr><td>'+pf(parts)+'</td><td></td><td></td><td></td></tr>';
+    });
+    h+='</table>';
+    h+='<h2>Name &rarr; formula</h2><table><tr><th>Name</th><th style="width:17%">Formula</th><th>Name</th><th style="width:17%">Formula</th></tr>';
+    const rn2f=[["Fe",2,"O"],["Cu",1,"Cl"],["Pb",4,"O"],["Cr",2,"Br"],["Ti",4,"Cl"],["Mn",4,"O"],["Co",3,"O"],["Sn",2,"S"]];
+    for(let i=0;i<rn2f.length;i+=2){
+      const a=rn2f[i],b=rn2f[i+1];
+      h+='<tr><td>'+ionicName(a[0],a[1],a[2])+'</td><td class="c">'+(key?pf(ionicFormula(a[0],a[1],a[2])):"")+'</td>'+
+         '<td>'+ionicName(b[0],b[1],b[2])+'</td><td class="c">'+(key?pf(ionicFormula(b[0],b[1],b[2])):"")+'</td></tr>';
+    }
+    h+='</table>';
+    if(!key)h+='<div class="rule" style="margin-top:8px"><b>Four transition metals never take a Roman numeral.</b> Write them and their one charge: <br><br>'+
+      '________________ ______ &nbsp;&nbsp; ________________ ______ &nbsp;&nbsp; ________________ ______ &nbsp;&nbsp; ________________ ______</div>'+
+      '<ol><li>A student wrote "Iron(III) chloride" as Fe<sub>3</sub>Cl<sub>3</sub>. Explain the mistake and give the right formula. <span class="wl" style="min-width:200px"></span></li>'+
+      '<li>Why does copper need a Roman numeral but calcium never does? <span class="wl" style="min-width:230px"></span></li></ol>';
+    else h+='<div class="rule" style="margin-top:8px"><b>Four transition metals that never take a Roman numeral:</b> Zinc 2+ · Silver 1+ · Cadmium 2+ · Scandium 3+</div>'+
+      '<ol><li>They read the Roman numeral as a subscript. It is a charge, not a count. One iron at 3+ needs three 1&minus; chlorides: <b>FeCl<sub>3</sub></b>.</li>'+
+      '<li>Copper can form either Cu<sup>1+</sup> or Cu<sup>2+</sup>, so the name has to say which one. Calcium is in group 2 and only ever forms Ca<sup>2+</sup>, so there is nothing to specify.</li></ol>';
+    h+=pFoot();
+  }
+  return h+'</div>';
+}
+function doPrint(id,withKey){
+  let h=sheetHTML(id,false);
+  if(withKey)h+=sheetHTML(id,true);
+  $("printArea").innerHTML=h;
+  window.print();
+}
+function drawSheets(){
+  $("sheetGrid").innerHTML=SHEETS.map(function(s){
+    return '<div class="sheet"><h3>'+s.t+'</h3><p>'+s.d+'</p><div class="row">'+
+      '<button class="btn small" data-sheet="'+s.id+'">Print sheet</button>'+
+      (s.key?'<button class="btn gray small" data-sheet="'+s.id+'" data-key="1">Print with key</button>':"")+
+      '</div></div>';
+  }).join("");
+}
+
+/* ============================================================
+   TEACHER TOOLS
+   ============================================================ */
+function gradeCodes(){
+  const raw=$("gradeIn").value||"", out=$("gradeOut");
+  const codes=raw.match(/NCA-[0-9A-Z]+-[0-9A-Z]{2}/gi)||[];
+  const strays=(raw.match(/NCE-[0-9A-Z]+-[0-9A-Z]{2}/gi)||[]).length;
+  const rows=[],bad=[],seen={};
+  codes.forEach(function(c){
+    const d=decAsg(c);
+    if(!d){bad.push(c);return;}
+    const k=d.last+"|"+d.first+"|"+d.period;
+    if(seen[k]!=null){if(d.got/d.total>rows[seen[k]].got/rows[seen[k]].total)rows[seen[k]]=d;return;}
+    seen[k]=rows.length; rows.push(d);
+  });
+  if(!rows.length){
+    out.innerHTML='<span style="color:var(--red)">No valid assignment codes found.'+
+      (strays?" Found "+strays+" free-practice code"+(strays===1?"":"s")+" (NCE) — check those one at a time below.":"")+'</span>';
+    $("gradeCopy").style.display="none"; return;
+  }
+  rows.sort(function(a,b){
+    const pa=parseInt(a.period,10)||99,pb=parseInt(b.period,10)||99;
+    if(pa!==pb)return pa-pb;
+    return a.last.localeCompare(b.last)||a.first.localeCompare(b.first);
+  });
+  let h='<table class="gradeTable"><tr><th>Period</th><th>Last</th><th>First</th><th>Set</th><th>Roman</th><th>Score</th><th>%</th><th>Date</th></tr>';
+  rows.forEach(function(d){
+    h+='<tr><td>'+(parseInt(d.period,10)||"?")+'</td><td>'+esc(tcase(d.last))+'</td><td>'+esc(tcase(d.first))+
+       '</td><td>'+esc(setName(d.set))+'</td><td>'+(d.rn?"yes":"no")+'</td><td>'+d.got+" / "+d.total+
+       '</td><td class="pct">'+d.pct+'%</td><td>'+prettyStamp(d.date)+'</td></tr>';
+  });
+  h+='</table>';
+  const notes=[];
+  if(bad.length)notes.push(bad.length+" code"+(bad.length===1?"":"s")+" could not be read (typo or altered)");
+  if(strays)notes.push(strays+" free-practice NCE code"+(strays===1?"":"s")+" skipped");
+  if(notes.length)h+='<div class="dim" style="margin-top:8px; font-size:.9em">'+notes.join(" · ")+'</div>';
+  out.innerHTML=h;
+  $("gradeCopy").style.display="inline-block";
+  $("gradeCopy").onclick=function(){
+    const txt=rows.map(function(d){return tcase(d.last)+", "+tcase(d.first)+"\t"+d.pct;}).join("\n");
+    navigator.clipboard.writeText(txt).then(function(){
+      $("gradeCopy").textContent="Copied!";
+      setTimeout(function(){$("gradeCopy").textContent="Copy for gradebook";},1400);
+    },function(){});
+  };
+}
+function verifyOne(){
+  const d=decPractice($("verifyIn").value), out=$("verifyOut");
+  if(!d){
+    const a=decAsg($("verifyIn").value);
+    if(a){out.innerHTML='<span style="color:var(--gold)">That is an assignment code — paste it into the grading box above. '+
+      esc(tcase(a.first))+" "+esc(tcase(a.last))+", "+a.got+"/"+a.total+" ("+a.pct+"%)</span>"; return;}
+    out.innerHTML='<span style="color:var(--red)">Not a valid code.</span>'; return;
+  }
+  out.innerHTML='<span style="color:var(--green)"><b>'+esc(tcase(d.name))+'</b> — '+esc(setName(d.set))+
+    (d.rn?" (Roman numerals on)":"")+" — "+d.got+" of "+d.total+" correct ("+d.pct+"%) on "+prettyStamp(d.date)+"</span>";
+}
+
+/* ============================================================
+   WIRING
+   ============================================================ */
+let ROMAN_ON=false;
+$("logoTop").src=LOGO; $("logoFoot").src=LOGO;
+
+document.querySelectorAll("#tabs button").forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll("#tabs button").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on");
+    document.querySelectorAll(".view").forEach(function(v){v.classList.remove("on");});
+    $("v"+b.dataset.v).classList.add("on");
+    window.scrollTo(0,0);
+  };
+});
+function syncBig(on){
+  document.body.classList.toggle("big",on);
+  ["bigTog","bigTog2","bigTog3"].forEach(function(id){if($(id))$(id).checked=on;});
+}
+["bigTog","bigTog2","bigTog3"].forEach(function(id){
+  if($(id))$(id).onchange=function(){syncBig(this.checked);};
+});
+$("tmTog").onchange=function(){ROMAN_ON=this.checked; fillFlow(); $("pRoman").checked=ROMAN_ON;};
+
+bindFlow(); fillFlow(); fillHow(); fillRef(); drawSheets();
+
+/* namer */
+$("namerGo").onclick=runNamer;
+$("namerIn").onkeydown=function(e){if(e.key==="Enter")runNamer();};
+$("namerChips").innerHTML=NAMER_TRY.map(function(t){return '<button data-t="'+esc(t)+'">'+esc(t)+'</button>';}).join("");
+$("namerChips").onclick=function(e){
+  const b=e.target.closest("button"); if(!b)return;
+  $("namerIn").value=b.dataset.t; runNamer();
+};
+
+/* criss cross */
+$("ccMetal").innerHTML=CC_METALS.map(function(s){return '<option value="'+s+'"'+(s===CCM?" selected":"")+'>'+ELEMENTS[s].n+'</option>';}).join("");
+$("ccNon").innerHTML=CC_NONS.map(function(s){return '<option value="'+s+'"'+(s===CCN?" selected":"")+'>'+ELEMENTS[s].n+'</option>';}).join("");
+$("ccMetal").onchange=function(){CCM=this.value;CCSTEP=0;ccRender();};
+$("ccNon").onchange=function(){CCN=this.value;CCSTEP=0;ccRender();};
+$("ccNext").onclick=function(){if(CCSTEP<CC_WORDS.length-1){CCSTEP++;ccRender();}};
+$("ccBack").onclick=function(){if(CCSTEP>0){CCSTEP--;ccRender();}};
+$("ccReset").onclick=function(){CCSTEP=0;ccRender();};
+ccRender();
+
+/* electron transfer */
+$("etMetal").innerHTML=ET_METALS.map(function(s){return '<option value="'+s+'"'+(s==="Al"?" selected":"")+'>'+ELEMENTS[s].n+'</option>';}).join("");
+$("etNon").innerHTML=ET_NONS.map(function(s){return '<option value="'+s+'"'+(s==="O"?" selected":"")+'>'+ELEMENTS[s].n+'</option>';}).join("");
+$("etGo").onclick=etDraw;
+$("etMetal").onchange=etDraw; $("etNon").onchange=etDraw;
+etDraw();
+
+/* practice */
+$("pSetSel").innerHTML=SETS.map(function(s){return '<option value="'+s.id+'">'+esc(s.n)+'</option>';}).join("");
+$("pGo").onclick=function(){
+  if(ASG){
+    const f=$("pFirst").value.trim(),l=$("pLast").value.trim(),p=$("pPeriod").value;
+    if(f.length<2||l.length<2){alert("Please type your first and last name.");return;}
+    if(!p){alert("Please choose your class period.");return;}
+    PU={name:tcase(f+" "+l),first:f,last:l,period:p};
+  }else{
+    const n=$("pName").value.trim();
+    if(n.length<3){alert("Please type your first and last name.");return;}
+    PU={name:tcase(n),first:"",last:"",period:""};
+    PSET=$("pSetSel").value;
+    PROMAN=$("pRoman").checked;
+  }
+  startPractice();
+};
+$("pSwitch").onclick=function(){PU=null;QS=[];$("pMain").style.display="none";$("pGate").style.display="block";};
+$("pNewSet").onclick=function(){
+  const r=urec(); r.set=(r.set||0)+1; r.res=[]; r.diag=[]; save();
+  buildQuestions(); renderPractice();
+};
+$("pCopy").onclick=function(){
+  navigator.clipboard.writeText(pCodeNow()).then(function(){
+    $("pCopy").textContent="Copied!"; setTimeout(function(){$("pCopy").textContent="Copy my code";},1400);
+  },function(){});
+};
+$("qArea").addEventListener("click",function(ev){
+  const mc=ev.target.closest(".mcopt");
+  if(mc&&!mc.disabled){
+    const i=+mc.dataset.i,j=+mc.dataset.j,q=QS[i],r=urec();
+    if(r.res[i]!==null)return;
+    const ok=j===q.ans;
+    if(!ok)mc.classList.add("wrong");
+    answerQ(i,ok,ok?null:mk(q.opts[j].tag||"wrongKind"));
+    return;
+  }
+  const cb=ev.target.closest("[data-check]");
+  if(cb&&!cb.disabled){
+    const i=+cb.dataset.check,q=QS[i],r=urec();
+    if(r.res[i]!==null)return;
+    let res;
+    if(q.t==="fib"){
+      const vals=[];
+      $("qArea").children[i].querySelectorAll("input").forEach(function(x){vals.push(x.value);});
+      res=q.check(vals);
+    }else{
+      res=q.check($("qArea").children[i].querySelector("input").value);
+    }
+    answerQ(i,!!res.ok,res.ok?(res.soft||null):res.diag);
+  }
+});
+$("qArea").addEventListener("keydown",function(ev){
+  if(ev.key!=="Enter")return;
+  const inp=ev.target.closest("input[data-i]"); if(!inp)return;
+  const row=$("qArea").children[+inp.dataset.i];
+  const cb=row&&row.querySelector("[data-check]");
+  if(cb&&!cb.disabled)cb.click();
+});
+
+/* drills */
+document.querySelectorAll("#drSeg button").forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll("#drSeg button").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on");
+    $("drFc").style.display=b.dataset.d==="fc"?"block":"none";
+    $("drSd").style.display=b.dataset.d==="sd"?"block":"none";
+  };
+});
+document.querySelectorAll("#fcDirSeg button").forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll("#fcDirSeg button").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on"); FCDIR=b.dataset.d; fcRender();
+  };
+});
+$("fcCard").onclick=function(){this.classList.toggle("flip");};
+$("fcFlip").onclick=function(){$("fcCard").classList.toggle("flip");};
+$("fcNext").onclick=function(){FCI=(FCI+1)%PREFIX.length;fcRender();};
+$("fcPrev").onclick=function(){FCI=(FCI+PREFIX.length-1)%PREFIX.length;fcRender();};
+$("fcShuffle").onchange=fcShuffleNow;
+fcShuffleNow();
+
+document.querySelectorAll("#sdModeSeg button").forEach(function(b){
+  b.onclick=function(){
+    if(SDON)return;
+    document.querySelectorAll("#sdModeSeg button").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on"); SDMODE=b.dataset.m;
+    $("sdBest").innerHTML="Best on this drill: "+(DB.best["sd_"+SDMODE]||0);
+  };
+});
+$("sdStart").onclick=sdStart;
+$("sdOpts").onclick=function(ev){
+  const b=ev.target.closest("button[data-o]"); if(!b)return;
+  sdAnswer(+b.dataset.o);
+};
+$("sdBest").innerHTML="Best on this drill: "+(DB.best.sd_cls||0);
+
+/* print */
+$("sheetGrid").onclick=function(ev){
+  const b=ev.target.closest("[data-sheet]"); if(!b)return;
+  doPrint(b.dataset.sheet,b.dataset.key==="1");
+};
+
+/* teacher */
+$("asgSet").innerHTML=SETS.map(function(s){return '<option value="'+s.id+'">'+esc(s.n)+'</option>';}).join("");
+$("asgMake").onclick=function(){
+  const base=location.href.split("?")[0].split("#")[0];
+  const url=base+"?assign="+$("asgSet").value+($("asgRoman").checked?"&r=1":"");
+  $("asgLinkIn").value=url;
+  $("asgLinkRow").style.display="block";
+  $("asgLinkNote").textContent=setName($("asgSet").value)+" · 12 questions";
+};
+$("asgLinkCopy").onclick=function(){
+  navigator.clipboard.writeText($("asgLinkIn").value).then(function(){
+    $("asgLinkCopy").textContent="Copied!"; setTimeout(function(){$("asgLinkCopy").textContent="Copy link";},1400);
+  },function(){});
+};
+$("gradeBtn").onclick=gradeCodes;
+$("verifyBtn").onclick=verifyOne;
+$("resetDevice").onclick=function(){
+  if(confirm("This clears every score and code stored in this browser. Continue?")){
+    DB={users:{},best:{}}; save(); location.reload();
+  }
+};
+
+/* assignment mode from the URL */
+(function(){
+  const q=new URLSearchParams(location.search);
+  const a=(q.get("assign")||"").toLowerCase();
+  if(SET_IDS.indexOf(a)<0)return;
+  ASG={set:a,rn:q.get("r")==="1"};
+  PSET=a; PROMAN=ASG.rn; ROMAN_ON=ASG.rn;
+  $("tmTog").checked=ASG.rn; fillFlow();
+  $("pAsgFields").style.display="block";
+  $("pName").style.display="none";
+  $("pGateHint").textContent="Your teacher assigned this. Sign in exactly as your name appears in the gradebook.";
+  $("pAsgInfo").style.display="block";
+  $("pAsgInfo").textContent="Assigned set: "+setName(a)+(ASG.rn?" (with Roman numerals)":"");
+  $("pSetPick").style.display="none";
+  $("pRomanPick").style.display="none";
+  document.querySelector('#tabs button[data-v="practice"]').click();
+})();
+
+</script>
+</body>
+</html>
