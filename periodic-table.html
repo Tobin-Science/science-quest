@@ -47,6 +47,9 @@ h2 .icn{color:var(--accent);}
 /* ---------- header + tabs ---------- */
 #head{text-align:center; padding:18px 10px 6px;}
 #head img{width:72px; height:72px; border-radius:50%; margin-bottom:6px;}
+.logoLink{display:inline-block; line-height:0;}
+.logoLink img{transition:transform .12s;}
+.logoLink:hover img{transform:scale(1.08);}
 #tabs{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:16px 0 14px;}
 #tabs button{background:var(--panel); color:var(--dim); border:2px solid var(--line); padding:9px 18px; font-weight:700;}
 #tabs button:hover{border-color:var(--accent); color:var(--ink);}
@@ -237,7 +240,7 @@ body.big .arrowNote div,body.big #trWhat,body.big #trWhy{font-size:1.22em;}
 <div class="wrap" id="app">
 
 <div id="head">
-  <img id="logoTop" alt="Tobin Science">
+  <a class="logoLink" href="https://www.tobinscience.com" target="_blank" rel="noopener" title="TobinScience.com"><img id="logoTop" alt="Tobin Science"></a>
   <h1>Tobin Science — Periodic Table Explorer</h1>
   <div class="dim">Click any element. Color the whole table any way you need. Built for 8th grade and High School Physical Science.</div>
 </div>
