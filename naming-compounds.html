@@ -139,11 +139,12 @@ body.big #wkFormula{font-size:3.1em;}
 .ccDots i{width:9px; height:9px; border-radius:50%; background:var(--line); display:block;}
 .ccDots i.on{background:var(--gold);}
 
-/* ---------- electron transfer ---------- */
-#etStage{background:#0a1420; border-radius:14px; padding:14px 8px; text-align:center; overflow-x:auto;}
-#etStage svg{width:100%; max-width:620px; height:auto;}
-#etWords{margin-top:12px; background:var(--panel2); border-left:4px solid var(--green); border-radius:9px; padding:11px 15px; line-height:1.5;}
-#etWords b{color:var(--green);}
+/* ---------- electron transfer + electron sharing ---------- */
+#etStage,#cvStage{background:#0a1420; border-radius:14px; padding:14px 8px; text-align:center; overflow-x:auto;}
+#etStage svg,#cvStage svg{width:100%; max-width:620px; height:auto;}
+#etWords,#cvWords{margin-top:12px; background:var(--panel2); border-left:4px solid var(--green); border-radius:9px; padding:11px 15px; line-height:1.5;}
+#etWords b,#cvWords b{color:var(--green);}
+#cvWords .pfx{color:var(--gold); font-weight:700;}
 #etCount{margin-top:10px; display:flex; gap:16px; flex-wrap:wrap;}
 #etCount>div{flex:1; min-width:210px; background:#0c1626; border-radius:10px; padding:11px 13px; line-height:1.5; font-size:.96em;}
 
@@ -419,6 +420,17 @@ body.big .pill,body.big .qrow .qtag{font-size:.8em;}
     <div id="etStage"></div>
     <div id="etWords"></div>
     <div id="etCount"></div>
+  </div>
+
+  <div class="card">
+    <h2><svg class="icn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/><circle cx="12" cy="10.4" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="13.6" r="1" fill="currentColor" stroke="none"/></svg> Watch the electrons share</h2>
+    <div class="dim" style="margin:5px 0 12px">That was ionic — the electrons changed owners. Covalent bonds do it the other way: the empty seats sit <b>between</b> the atoms, and every seat pair gets one electron from each side. Both atoms count the shared pair as theirs, so everybody fills up without anybody letting go.</div>
+    <div style="display:flex; gap:9px; flex-wrap:wrap; align-items:center; margin-bottom:12px">
+      <select id="cvSel"></select>
+      <button class="btn small" id="cvGo">Share the electrons</button>
+    </div>
+    <div id="cvStage"></div>
+    <div id="cvWords"></div>
   </div>
 
   <div class="card">
@@ -1719,6 +1731,8 @@ function etDraw(){
 }
 function etFinishInstant(){
   const d=ET.d;
+  /* the electron that is mid-air when someone skips still has to land */
+  if(ET.flying){ET.queue.unshift(ET.flying);ET.flying=null;}
   ET.queue.forEach(function(t){
     const e=$("me_"+t.mi+"_"+t.me); if(e)e.setAttribute("opacity","0");
     const seat=$("seat_"+t.nj+"_"+t.seat);
@@ -1786,6 +1800,203 @@ function etStart(){
       if(f.seat===ET.d.take-1){const q=$("nq_"+f.nj); if(q)q.setAttribute("opacity","1");}
       ET.flying=null;
       if(!ET.queue.length){etComplete();return;}
+      nextAt=now+GAP;
+    }
+  },16);
+}
+
+/* ============================================================
+   ELECTRON SHARING — the covalent mirror of the transfer scene
+   Hand-curated molecules only. Every structure here is a clean
+   octet picture (SF6 is included ON PURPOSE as the rule-breaker);
+   nothing is auto-drawn, so nothing can be drawn wrong.
+   b = bond order per terminal · angles = where the terminals sit
+   lpA = where the central atom's lone pairs sit
+   ============================================================ */
+const COVIZ=[
+  {f:"CO2", b:2, angles:[180,0],                lpA:[]},
+  {f:"CF4", b:1, angles:[45,135,225,315],       lpA:[]},
+  {f:"CCl4",b:1, angles:[45,135,225,315],       lpA:[]},
+  {f:"NF3", b:1, angles:[210,270,330],          lpA:[90]},
+  {f:"PCl3",b:1, angles:[210,270,330],          lpA:[90]},
+  {f:"OF2", b:1, angles:[35,145],               lpA:[235,305]},
+  {f:"Cl2O",b:1, angles:[35,145],               lpA:[235,305]},
+  {f:"SF6", b:1, angles:[0,60,120,180,240,300], lpA:[],
+   note:"Sulfur is a famous rule-breaker: in SF6 it holds TWELVE shared electrons, not eight. Molecules like this are exactly why the prefixes go all the way up to deca."}
+];
+function cvData(entry){
+  const item=COV.filter(function(c){return c.f===entry.f;})[0];
+  const parts=item.parts;
+  /* the element that appears once is the one in the middle */
+  const ci=parts[0][1]===1?0:1;
+  const central=parts[ci][0], term=parts[1-ci][0], nTerm=parts[1-ci][1];
+  const cLP=(ELEMENTS[central].val-nTerm*entry.b)/2;
+  const tLP=(ELEMENTS[term].val-entry.b)/2;
+  return {f:entry.f,b:entry.b,angles:entry.angles,lpA:entry.lpA||[],note:entry.note||null,
+          parts:parts,name:item.name,central:central,term:term,nTerm:nTerm,
+          cLP:cLP,tLP:tLP,octetC:2*entry.b*nTerm+2*cLP,octetT:2*entry.b+2*tLP};
+}
+let CV={timer:null,queue:[],flying:null,done:0,running:false,finished:false,d:null};
+function cvPair(cx,cy,r,deg,color){
+  /* a lone pair: two dots side by side on the ring */
+  let s="";
+  [-9,9].forEach(function(off){
+    const a=(deg+off)*Math.PI/180;
+    s+='<circle cx="'+(cx+r*Math.cos(a)).toFixed(1)+'" cy="'+(cy+r*Math.sin(a)).toFixed(1)+'" r="6.5" fill="'+color+'"/>';
+  });
+  return s;
+}
+function cvScene(d){
+  const W=640,H=430,CX=320,CY=207,R=46,DIST=140;
+  let s='<svg id="cvSvg" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">';
+  s+='<text x="'+(W/2)+'" y="24" font-size="15" fill="#9fb4cc" text-anchor="middle">'+
+     'One '+esc(ELEMENTS[d.central].n.toLowerCase())+' · '+d.nTerm+' '+esc(ELEMENTS[d.term].n.toLowerCase())+
+     ' — flattened so you can count; real molecules are 3-D</text>';
+  /* the shared seats first, so atoms draw over them cleanly */
+  for(let t=0;t<d.nTerm;t++){
+    const A=d.angles[t]*Math.PI/180, ux=Math.cos(A), uy=Math.sin(A);
+    for(let p=0;p<d.b;p++){
+      const perp=(p-(d.b-1)/2)*17;
+      const mx=CX+70*ux-perp*uy, my=CY+70*uy+perp*ux;
+      s+='<circle id="cs_'+t+'_'+p+'" cx="'+(mx-7*ux).toFixed(1)+'" cy="'+(my-7*uy).toFixed(1)+'" r="7" fill="none" stroke="#4a6a8c" stroke-width="2" stroke-dasharray="3 3"/>';
+      s+='<circle id="ts_'+t+'_'+p+'" cx="'+(mx+7*ux).toFixed(1)+'" cy="'+(my+7*uy).toFixed(1)+'" r="7" fill="none" stroke="#4a6a8c" stroke-width="2" stroke-dasharray="3 3"/>';
+    }
+  }
+  /* central atom */
+  s+='<circle cx="'+CX+'" cy="'+CY+'" r="'+R+'" fill="none" stroke="#2a4568" stroke-width="2"/>';
+  s+='<circle cx="'+CX+'" cy="'+CY+'" r="22" fill="#16283f" stroke="#fbbf24" stroke-width="2"/>';
+  s+='<text x="'+CX+'" y="'+(CY+7)+'" font-size="19" font-weight="800" fill="#eaf2fb" text-anchor="middle">'+d.central+'</text>';
+  d.lpA.forEach(function(a){s+=cvPair(CX,CY,R,a,"#fbbf24");});
+  for(let t=0;t<d.nTerm;t++){
+    for(let p=0;p<d.b;p++){
+      const off=d.b>1?(p===0?-12:12):0;
+      const a=(d.angles[t]+off)*Math.PI/180;
+      s+='<circle id="cve_'+t+'_'+p+'" cx="'+(CX+R*Math.cos(a)).toFixed(1)+'" cy="'+(CY+R*Math.sin(a)).toFixed(1)+'" r="7" fill="#fbbf24"/>';
+    }
+  }
+  s+='<text id="cvoc_c" x="'+CX+'" y="'+(CY-R-12)+'" font-size="19" font-weight="800" fill="'+(d.octetC>8?"#fbbf24":"#34d399")+'" text-anchor="middle" opacity="0">'+d.octetC+'</text>';
+  /* terminals */
+  for(let t=0;t<d.nTerm;t++){
+    const A=d.angles[t]*Math.PI/180;
+    const tx=CX+DIST*Math.cos(A), ty=CY+DIST*Math.sin(A);
+    s+='<circle cx="'+tx.toFixed(1)+'" cy="'+ty.toFixed(1)+'" r="'+R+'" fill="none" stroke="#2a4568" stroke-width="2"/>';
+    s+='<circle cx="'+tx.toFixed(1)+'" cy="'+ty.toFixed(1)+'" r="22" fill="#16283f" stroke="#38bdf8" stroke-width="2"/>';
+    s+='<text x="'+tx.toFixed(1)+'" y="'+(ty+7).toFixed(1)+'" font-size="19" font-weight="800" fill="#eaf2fb" text-anchor="middle">'+d.term+'</text>';
+    const outDeg=d.angles[t];
+    const spread=d.tLP===3?[0,75,-75]:(d.tLP===2?[40,-40]:(d.tLP===1?[0]:[]));
+    spread.forEach(function(off){s+=cvPair(tx,ty,R,outDeg+off,"#38bdf8");});
+    for(let p=0;p<d.b;p++){
+      const off=d.b>1?(p===0?-12:12):0;
+      const a=(outDeg+180+off)*Math.PI/180;
+      s+='<circle id="tve_'+t+'_'+p+'" cx="'+(tx+R*Math.cos(a)).toFixed(1)+'" cy="'+(ty+R*Math.sin(a)).toFixed(1)+'" r="7" fill="#38bdf8"/>';
+    }
+    const ocx=tx+ (R+14)*Math.cos(A), ocy=ty+(R+14)*Math.sin(A);
+    s+='<text id="cvoc_'+t+'" x="'+ocx.toFixed(1)+'" y="'+(ocy+6).toFixed(1)+'" font-size="17" font-weight="800" fill="#34d399" text-anchor="middle" opacity="0">'+d.octetT+'</text>';
+  }
+  s+='<circle id="cvFly" r="7" fill="#fbbf24" stroke="#fff" stroke-width="1.5" opacity="0"/>';
+  s+='<text id="cvTally" x="'+(W/2)+'" y="'+(H-14)+'" font-size="14" fill="#9fb4cc" text-anchor="middle">'+
+     (2*d.b*d.nTerm)+' electrons need to pair up between the atoms. Press the button.</text>';
+  return s+'</svg>';
+}
+function cvBuildQueue(d){
+  const q=[];
+  for(let t=0;t<d.nTerm;t++)for(let p=0;p<d.b;p++){
+    q.push({src:"cve_"+t+"_"+p,dst:"cs_"+t+"_"+p,gold:true});
+    q.push({src:"tve_"+t+"_"+p,dst:"ts_"+t+"_"+p,gold:false});
+  }
+  return q;
+}
+function cvAssembly(d){
+  const p1=d.parts[0],p2=d.parts[1];
+  const seg1=p1[1]>1?'<span class="pfx">'+PREFIX_BY_N[p1[1]]+'</span>'+ELEMENTS[p1[0]].n.toLowerCase()
+                    :ELEMENTS[p1[0]].n.toLowerCase()+' <span class="dim">(one — no prefix on the first)</span>';
+  const pfx2=PREFIX_BY_N[p2[1]], joined=joinPrefix(pfx2,IDE[p2[0]]);
+  const seg2=(joined!==pfx2+IDE[p2[0]])
+    ?'<span class="pfx">'+pfx2+'</span> + '+IDE[p2[0]]+' <span class="dim">(the vowel drops)</span> → '+joined
+    :'<span class="pfx">'+pfx2+'</span>'+IDE[p2[0]];
+  return "<b>Now count the atoms — that IS the name.</b> "+p1[1]+" "+ELEMENTS[p1[0]].n.toLowerCase()+" → "+seg1+
+         " · "+p2[1]+" "+ELEMENTS[p2[0]].n.toLowerCase()+" → "+seg2+" → <b>"+esc(cap(d.name))+"</b>.";
+}
+function cvDraw(){
+  if(CV.timer){clearInterval(CV.timer);CV.timer=null;}
+  const sel=$("cvSel");
+  const entry=COVIZ.filter(function(x){return x.f===sel.value;})[0]||COVIZ[0];
+  const d=cvData(entry);
+  CV={timer:null,queue:cvBuildQueue(d),flying:null,done:0,running:false,finished:false,d:d};
+  $("cvStage").innerHTML=cvScene(d);
+  $("cvGo").textContent="Share the electrons";
+  $("cvWords").innerHTML="Every dashed seat pair sits <b>between</b> two atoms, and it takes one electron from each side. "+
+    cap(ELEMENTS[d.central].n)+" shares "+(d.b*d.nTerm)+" of its "+ELEMENTS[d.central].val+" outer electrons"+
+    (d.cLP?" — the other "+(2*d.cLP)+" stay home as the paired dots":"")+
+    ", and each "+ELEMENTS[d.term].n.toLowerCase()+" shares "+d.b+". Nobody hands anything over: a shared pair counts for <b>both</b> of its owners.";
+}
+function cvFinishInstant(){
+  const d=CV.d;
+  /* the electron that is mid-air when someone skips still has to land */
+  if(CV.flying){CV.queue.unshift(CV.flying);CV.flying=null;}
+  CV.queue.forEach(function(t){
+    const e=$(t.src); if(e)e.setAttribute("opacity","0");
+    const seat=$(t.dst);
+    if(seat){seat.setAttribute("fill",t.gold?"#fbbf24":"#38bdf8");seat.setAttribute("stroke","#fff");seat.removeAttribute("stroke-dasharray");}
+  });
+  CV.queue=[]; CV.flying=null;
+  cvComplete();
+}
+function cvComplete(){
+  const d=CV.d;
+  CV.running=false; CV.finished=true;
+  if(CV.timer){clearInterval(CV.timer);CV.timer=null;}
+  const fly=$("cvFly"); if(fly)fly.setAttribute("opacity","0");
+  const oc=$("cvoc_c"); if(oc)oc.setAttribute("opacity","1");
+  for(let t=0;t<d.nTerm;t++){const q=$("cvoc_"+t); if(q)q.setAttribute("opacity","1");}
+  const tl=$("cvTally");
+  if(tl)tl.textContent="Count what each atom touches — shared pairs count for both owners.";
+  $("cvGo").textContent="Run it again";
+  $("cvWords").innerHTML="<b>The count.</b> "+cap(ELEMENTS[d.central].n)+" touches "+(2*d.b*d.nTerm)+" shared"+
+    (d.cLP?" + "+(2*d.cLP)+" of its own":"")+" = <b>"+d.octetC+"</b>. Each "+ELEMENTS[d.term].n.toLowerCase()+
+    " touches "+(2*d.b)+" shared + "+(2*d.tLP)+" of its own = <b>"+d.octetT+"</b>. "+
+    (d.note?d.note+" ":"Everyone full, nothing handed over — that is a covalent bond. ")+
+    "<br><br>"+cvAssembly(d);
+}
+function cvStart(){
+  if(CV.running){cvFinishInstant();return;}
+  if(CV.finished){cvDraw();}
+  CV.running=true;
+  $("cvGo").textContent="Skip to the end";
+  const FLIGHT=380, GAP=90;
+  let t0=null, nextAt=Date.now();
+  CV.timer=setInterval(function(){
+    const now=Date.now();
+    if(!CV.flying){
+      if(!CV.queue.length){cvComplete();return;}
+      if(now<nextAt)return;
+      CV.flying=CV.queue.shift(); t0=now;
+      const f=CV.flying, e=$(f.src), seat=$(f.dst), fly=$("cvFly");
+      if(e)e.setAttribute("opacity","0");
+      if(e&&seat&&fly){
+        f.x0=+e.getAttribute("cx"); f.y0=+e.getAttribute("cy");
+        f.x1=+seat.getAttribute("cx"); f.y1=+seat.getAttribute("cy");
+        fly.setAttribute("fill",f.gold?"#fbbf24":"#38bdf8");
+        fly.setAttribute("opacity","1");
+        fly.setAttribute("cx",f.x0); fly.setAttribute("cy",f.y0);
+      }
+    }
+    const f=CV.flying, el=Math.min(1,(now-t0)/FLIGHT);
+    const ease=el<0.5?2*el*el:1-Math.pow(-2*el+2,2)/2;
+    const fly=$("cvFly");
+    if(fly&&f.x0!=null){
+      fly.setAttribute("cx",(f.x0+(f.x1-f.x0)*ease).toFixed(1));
+      fly.setAttribute("cy",(f.y0+(f.y1-f.y0)*ease-20*Math.sin(Math.PI*ease)).toFixed(1));
+    }
+    if(el>=1){
+      const seat=$(f.dst);
+      if(seat){seat.setAttribute("fill",f.gold?"#fbbf24":"#38bdf8");seat.setAttribute("stroke","#fff");seat.removeAttribute("stroke-dasharray");}
+      if(fly)fly.setAttribute("opacity","0");
+      CV.done++;
+      const tl=$("cvTally");
+      if(tl)tl.textContent=CV.done+" of "+(2*CV.d.b*CV.d.nTerm)+" shared";
+      CV.flying=null;
+      if(!CV.queue.length){cvComplete();return;}
       nextAt=now+GAP;
     }
   },16);
@@ -2663,6 +2874,15 @@ $("etNon").innerHTML=ET_NONS.map(function(s){return '<option value="'+s+'"'+(s==
 $("etGo").onclick=etStart;
 $("etMetal").onchange=etDraw; $("etNon").onchange=etDraw;
 etDraw();
+
+/* electron sharing */
+$("cvSel").innerHTML=COVIZ.map(function(x){
+  const item=COV.filter(function(c){return c.f===x.f;})[0];
+  return '<option value="'+x.f+'"'+(x.f==="CO2"?" selected":"")+'>'+x.f+' — '+esc(item.name)+'</option>';
+}).join("");
+$("cvGo").onclick=cvStart;
+$("cvSel").onchange=cvDraw;
+cvDraw();
 
 /* ---------- walk the chart ---------- */
 let WK={it:null,step:1,streak:0};
